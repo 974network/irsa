@@ -8,7 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- 🔥 الحل الجديد - يمنع الحركة نهائياً -->
+    <!-- تحديث إصدار Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <style>
         /* حل فوري - يمنع أي حركة للواجهة */
         .login-box {
@@ -133,11 +137,6 @@
     </div>
 
     <!-- إضافة تهيئة Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
-    
     <script>
         // تهيئة Firebase مع بيانات المشروع الخاصة بك
         const firebaseConfig = {
@@ -145,8 +144,8 @@
             authDomain: "mohanad-93df3.firebaseapp.com",
             projectId: "mohanad-93df3",
             storageBucket: "mohanad-93df3.appspot.com",
-            messagingSenderId: "1057899918391",
-            appId: "1:1057899918391:web:a1b2c3d4e5f6g7h8i9j0"
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
         
         // تهيئة Firebase
