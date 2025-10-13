@@ -168,6 +168,107 @@
             font-size: 12px;
             text-align: center;
         }
+
+        /* حالة المزامنة */
+        .sync-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #e8f5e8;
+            color: #2e7d32;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            border: 1px solid #c8e6c9;
+        }
+
+        .sync-status i {
+            font-size: 14px;
+        }
+
+        .dashboard-header-compact {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        /* تحسينات التصميم */
+        .login-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .login-box {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-logo {
+            max-width: 120px;
+            margin-bottom: 20px;
+        }
+
+        .lang-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn:hover {
+            background: #e9ecef;
+        }
+
+        .input-group input {
+            width: 100%;
+            max-width: 300px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .create-account-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .create-account-btn:hover {
+            background: #5a6268;
+        }
     </style>
 </head>
 <body>
@@ -203,12 +304,16 @@
     </div>
 
     <!-- لوحة التحكم -->
-    <div id="dashboard" class="dashboard">
+    <div id="dashboard" class="dashboard" style="display: none;">
         <div class="dashboard-layout">
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="logo">
                     <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
+                    <div class="sync-status">
+                        <i class="fas fa-cloud"></i>
+                        <span data-translate="cloudSync">مزامنة مع السحابة</span>
+                    </div>
                 </div>
                 <div class="nav-links">
                     <!-- سيتم ملؤها ديناميكياً -->
