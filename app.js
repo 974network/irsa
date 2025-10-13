@@ -4225,11 +4225,66 @@ printReport() {
         }
     }
 }
+// --- Patch: Firebase Auth without editing your functions ---
+(function () {
+  if (!window.AdvancedPropertySystem || !firebase?.auth) return;
+
+  const auth = firebase.auth();
+
+  // إنشاء حساب جديد على Firebase + استدعاء كودك الحالي
+  const _create = AdvancedPropertySystem.prototype.createNewAccount;
+  AdvancedPropertySystem.prototype.createNewAccount = function (e) {
+    try {
+      e.preventDefault();
+      const fd = new FormData(e.target);
+      const email = fd.get('email') || document.getElementById('username')?.value?.trim();
+      const pass  = fd.get('password');
+      const conf  = fd.get('confirmPassword');
+
+      if (!email || !pass) {
+        this.showNotification?.('أدخل البريد وكلمة المرور', 'error');
+        return;
+      }
+      if (conf != null && pass !== conf) {
+        this.showNotification?.('كلمتا المرور غير متطابقتين', 'error');
+        return;
+      }
+
+      auth.createUserWithEmailAndPassword(email, pass)
+        .then(() => {
+          this.showNotification?.('تم إنشاء الحساب في Firebase');
+          _create.call(this, e);
+        })
+        .catch(err => this.showNotification?.(err.message, 'error'));
+    } catch (err) {
+      this.showNotification?.(String(err), 'error');
+    }
+  };
+
+  // تسجيل الدخول عبر Firebase + كودك الحالي
+  const _login = AdvancedPropertySystem.prototype.handleLogin;
+  AdvancedPropertySystem.prototype.handleLogin = function () {
+    const email = document.getElementById('username')?.value?.trim();
+    const pass  = document.getElementById('password')?.value;
+    if (!email || !pass) {
+      this.showNotification?.('أدخل البريد وكلمة المرور', 'error');
+      return;
+    }
+
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(() => {
+        _login.call(this);
+      })
+      .catch(err => this.showNotification?.(err.message, 'error'));
+  };
+})();
+
 
 // تهيئة النظام عند تحميل الصفحة
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
 
