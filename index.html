@@ -1,1 +1,140 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IRSA Trading & Contracting</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- 🔥 الحل الجديد - يمنع الحركة نهائياً -->
+    <style>
+        /* حل فوري - يمنع أي حركة للواجهة */
+        .login-box {
+            position: fixed !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+            transition: none !important;
+        }
+        
+        /* تثبيت جميع العناصر الداخلية */
+        .login-header {
+            text-align: center !important;
+            margin: 0 auto 30px auto !important;
+        }
+        
+        .language-switcher {
+            text-align: center !important;
+            margin: 20px auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 10px !important;
+        }
+        
+        .input-group {
+            text-align: center !important;
+            margin: 15px auto !important;
+            display: block !important;
+        }
+        
+        .input-group label {
+            text-align: center !important;
+            display: block !important;
+            margin: 0 auto 8px auto !important;
+        }
+        
+        .input-group input {
+            text-align: center !important;
+            margin: 0 auto !important;
+            display: block !important;
+        }
+        
+        .input-group input::placeholder {
+            text-align: center !important;
+        }
+        
+        .login-btn, 
+        .create-account-btn {
+            text-align: center !important;
+            margin: 10px auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
+        }
+        
+        /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
+        [dir="ltr"] .login-box,
+        [dir="rtl"] .login-box {
+            left: 50% !important;
+            right: auto !important;
+            transform: translate(-50%, -50%) !important;
+        }
+        
+        /* منع أي تحريك من JavaScript */
+        .login-container * {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="login-header">
+                <img src="irsa.png" alt="لوجو IRSA" class="logo-image login-logo">
+                <div class="language-switcher">
+                    <button type="button" class="lang-btn" data-lang="ar">العربية</button>
+                    <button type="button" class="lang-btn" data-lang="en">English</button>
+                </div>
+            </div>
+            <form id="loginForm">
+                <div class="input-group">
+                    <label for="username"><i class="fas fa-user"></i> <span data-translate="username">اسم المستخدم</span></label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+                </div>
+                <div class="input-group">
+                    <label for="password"><i class="fas fa-lock"></i> <span data-translate="password">كلمة المرور</span></label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> <span data-translate="login">تسجيل الدخول</span>
+                </button>
+                
+                <!-- زر إنشاء حساب جديد -->
+                <button type="button" class="btn btn-secondary create-account-btn" onclick="propertySystem.showCreateAccountModal()">
+                    <i class="fas fa-user-plus"></i> <span data-translate="createAccount">إنشاء حساب جديد</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- لوحة التحكم -->
+    <div id="dashboard" class="dashboard">
+        <div class="dashboard-layout">
+            <!-- الشريط الجانبي -->
+            <aside class="sidebar">
+                <div class="logo">
+                    <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
+                </div>
+                <div class="nav-links">
+                    <!-- سيتم ملؤها ديناميكياً -->
+                </div>
+            </aside>
+
+            <!-- المحتوى الرئيسي -->
+            <main class="main-content">
+                <!-- سيتم ملؤه ديناميكياً -->
+            </main>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
+
 
