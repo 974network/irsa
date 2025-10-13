@@ -4,10 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IRSA Trading & Contracting</title>
-    
-    <!-- إزالة المرجع لملف styles.css غير الموجود -->
-    <!-- <link rel="stylesheet" href="styles.css"> -->
-    
+    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -15,350 +12,75 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* إعادة تعيين CSS */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* حل فوري - يمنع أي حركة للواجهة */
+        .login-box {
+            position: fixed !important;
+            left: 50% !important;
+            top: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            margin: 0 !important;
+            transition: none !important;
         }
         
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #000;
-            color: #fff;
-            overflow-x: hidden;
-        }
-
-        /* تصميم شاشة تسجيل الدخول */
-        .login-container {
-            background: #000000;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .login-box {
-            background: #1a1a1a;
-            padding: 40px 30px;
-            border-radius: 15px;
-            border: 3px solid #d4af37;
-            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
-            width: 100%;
-            max-width: 400px;
-        }
-
+        /* تثبيت جميع العناصر الداخلية */
         .login-header {
-            text-align: center;
-            margin-bottom: 30px;
+            text-align: center !important;
+            margin: 0 auto 30px auto !important;
         }
-
-        .login-logo {
-            max-width: 150px;
-            margin-bottom: 20px;
-            filter: brightness(0) invert(1);
-        }
-
+        
         .language-switcher {
-            text-align: center;
-            margin: 20px 0;
-            display: flex;
-            justify-content: center;
-            gap: 15px;
+            text-align: center !important;
+            margin: 20px auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            gap: 10px !important;
         }
-
-        .lang-btn {
-            background: transparent;
-            border: 2px solid #d4af37;
-            color: #d4af37;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-        }
-
-        .lang-btn:hover {
-            background: #d4af37;
-            color: #000;
-        }
-
+        
         .input-group {
-            margin-bottom: 20px;
+            text-align: center !important;
+            margin: 15px auto !important;
+            display: block !important;
         }
-
+        
         .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #d4af37;
-            font-weight: bold;
-            font-size: 14px;
-            text-align: center;
+            text-align: center !important;
+            display: block !important;
+            margin: 0 auto 8px auto !important;
         }
-
+        
         .input-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #d4af37;
-            border-radius: 8px;
-            font-size: 16px;
-            background: #2a2a2a;
-            color: #fff;
-            transition: all 0.3s ease;
-            text-align: center;
+            text-align: center !important;
+            margin: 0 auto !important;
+            display: block !important;
         }
-
-        .input-group input:focus {
-            border-color: #ffd700;
-            background: #333;
-            outline: none;
-            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-        }
-
+        
         .input-group input::placeholder {
-            color: #888;
-            text-align: center;
+            text-align: center !important;
         }
-
-        .login-btn {
-            background: #d4af37;
-            color: #000;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
-            margin: 20px 0 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .login-btn:hover {
-            background: #ffd700;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-        }
-
+        
+        .login-btn, 
         .create-account-btn {
-            background: transparent;
-            color: #d4af37;
-            border: 2px solid #d4af37;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
+            text-align: center !important;
+            margin: 10px auto !important;
+            display: flex !important;
+            justify-content: center !important;
+            align-items: center !important;
         }
-
-        .create-account-btn:hover {
-            background: #d4af37;
-            color: #000;
+        
+        /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
+        [dir="ltr"] .login-box,
+        [dir="rtl"] .login-box {
+            left: 50% !important;
+            right: auto !important;
+            transform: translate(-50%, -50%) !important;
         }
-
-        /* تأثيرات الأيقونات */
-        .input-group i {
-            color: #d4af37;
-            margin-left: 8px;
-        }
-
-        /* تصميم متجاوب للشاشات الصغيرة */
-        @media (max-width: 480px) {
-            .login-box {
-                padding: 30px 20px;
-            }
-            
-            .login-logo {
-                max-width: 120px;
-            }
-            
-            .language-switcher {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .lang-btn {
-                width: 100%;
-            }
-        }
-
-        /* إخفاء لوحة التحكم */
-        .dashboard {
-            display: none;
-        }
-
-        /* ستايلات الإشعارات */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #1a1a1a;
-            border: 2px solid #d4af37;
-            border-radius: 8px;
-            padding: 15px 20px;
-            color: white;
-            z-index: 1000;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            max-width: 400px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-
-        .notification-success {
-            border-color: #28a745;
-        }
-
-        .notification-error {
-            border-color: #dc3545;
-        }
-
-        .notification-info {
-            border-color: #17a2b8;
-        }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-
-        .notification-close {
-            background: none;
-            border: none;
-            color: #fff;
-            cursor: pointer;
-            font-size: 16px;
-        }
-
-        /* ستايلات المودال */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: #1a1a1a;
-            border: 3px solid #d4af37;
-            border-radius: 15px;
-            padding: 30px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 15px;
-        }
-
-        .modal-header h3 {
-            color: #d4af37;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            color: #fff;
-            font-size: 24px;
-            cursor: pointer;
-            padding: 5px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #d4af37;
-            font-weight: bold;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #d4af37;
-            border-radius: 8px;
-            background: #2a2a2a;
-            color: #fff;
-            font-size: 16px;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 25px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex: 1;
-            justify-content: center;
-        }
-
-        .btn-primary {
-            background: #d4af37;
-            color: #000;
-        }
-
-        .btn-primary:hover {
-            background: #ffd700;
-        }
-
-        .btn-secondary {
-            background: transparent;
-            color: #d4af37;
-            border: 2px solid #d4af37;
-        }
-
-        .btn-secondary:hover {
-            background: #d4af37;
-            color: #000;
+        
+        /* منع أي تحريك من JavaScript */
+        .login-container * {
+            transition: none !important;
+            animation: none !important;
         }
     </style>
 </head>
@@ -367,10 +89,7 @@
     <div id="loginPage" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <!-- استخدم صورة افتراضية إذا لم توجد irsa.png -->
-                <div class="login-logo" style="background: #d4af37; width: 150px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin: 0 auto 20px;">
-                    <span style="color: #000; font-weight: bold; font-size: 18px;">IRSA LOGO</span>
-                </div>
+                <img src="irsa.png" alt="لوجو IRSA" class="logo-image login-logo">
                 <div class="language-switcher">
                     <button type="button" class="lang-btn" data-lang="ar">العربية</button>
                     <button type="button" class="lang-btn" data-lang="en">English</button>
@@ -378,8 +97,8 @@
             </div>
             <form id="loginForm">
                 <div class="input-group">
-                    <label for="email"><i class="fas fa-envelope"></i> <span data-translate="email">البريد الإلكتروني</span></label>
-                    <input type="email" id="email" placeholder="أدخل البريد الإلكتروني" required>
+                    <label for="username"><i class="fas fa-user"></i> <span data-translate="username">اسم المستخدم</span></label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
                 </div>
                 <div class="input-group">
                     <label for="password"><i class="fas fa-lock"></i> <span data-translate="password">كلمة المرور</span></label>
@@ -390,7 +109,7 @@
                 </button>
                 
                 <!-- زر إنشاء حساب جديد -->
-                <button type="button" class="create-account-btn" onclick="propertySystem.showCreateAccountModal()">
+                <button type="button" class="btn btn-secondary create-account-btn" onclick="propertySystem.showCreateAccountModal()">
                     <i class="fas fa-user-plus"></i> <span data-translate="createAccount">إنشاء حساب جديد</span>
                 </button>
             </form>
@@ -403,9 +122,7 @@
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="logo">
-                    <div style="background: #d4af37; width: 120px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin: 20px auto;">
-                        <span style="color: #000; font-weight: bold;">IRSA LOGO</span>
-                    </div>
+                    <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
                 </div>
                 <div class="nav-links">
                     <!-- سيتم ملؤها ديناميكياً -->
@@ -427,8 +144,8 @@
             authDomain: "mohanad-93df3.firebaseapp.com",
             projectId: "mohanad-93df3",
             storageBucket: "mohanad-93df3.appspot.com",
-            messagingSenderId: "1057899918391",
-            appId: "1:1057899918391:web:a1b2c3d4e5f6g7h8i9j0"
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
         };
         
         // تهيئة Firebase
