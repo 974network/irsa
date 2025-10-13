@@ -78,6 +78,8 @@ class FirebaseManager {
                 this.currentUser = user;
                 if (user) {
                     console.log('✅ User signed in:', user.email);
+                    // تحميل بيانات المستخدم من Firestore عند تسجيل الدخول
+                    this.loadUserDataFromFirestore(user.uid);
                 } else {
                     console.log('🔒 User signed out');
                 }
@@ -87,6 +89,210 @@ class FirebaseManager {
         } catch (error) {
             console.error('❌ Firebase Manager init error:', error);
         }
+    }
+
+    // 🔥 NEW: تحميل بيانات المستخدم من Firestore
+    async loadUserDataFromFirestore(userId) {
+        try {
+            const userDoc = await this.db.collection('users').doc(userId).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                console.log('✅ User data loaded from Firestore:', userData);
+                
+                // إرسال البيانات إلى النظام الرئيسي
+                if (window.propertySystem) {
+                    window.propertySystem.onUserDataLoaded(userData);
+                }
+                
+                return { success: true, data: userData };
+            }
+            return { success: false, error: 'User data not found' };
+        } catch (error) {
+            console.error('❌ Error loading user data:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ بيانات المستخدم في Firestore
+    async saveUserDataToFirestore(userId, userData) {
+        try {
+            await this.db.collection('users').doc(userId).set({
+                ...userData,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+            
+            console.log('✅ User data saved to Firestore');
+            return { success: true };
+        } catch (error) {
+            console.error('❌ Error saving user data:', error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ العقارات في Firestore
+    async savePropertiesToFirestore(userId, properties) {
+        try {
+            await this.db.collection('users').doc(userId).collection('properties').doc('data').set({
+                properties: properties,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل العقارات من Firestore
+    async loadPropertiesFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('properties').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().properties };
+            }
+            return { success: false, error: 'No properties found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ العملاء في Firestore
+    async saveCustomersToFirestore(userId, customers) {
+        try {
+            await this.db.collection('users').doc(userId).collection('customers').doc('data').set({
+                customers: customers,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل العملاء من Firestore
+    async loadCustomersFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('customers').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().customers };
+            }
+            return { success: false, error: 'No customers found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ العقود في Firestore
+    async saveContractsToFirestore(userId, contracts) {
+        try {
+            await this.db.collection('users').doc(userId).collection('contracts').doc('data').set({
+                contracts: contracts,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل العقود من Firestore
+    async loadContractsFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('contracts').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().contracts };
+            }
+            return { success: false, error: 'No contracts found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ المدفوعات في Firestore
+    async savePaymentsToFirestore(userId, payments) {
+        try {
+            await this.db.collection('users').doc(userId).collection('payments').doc('data').set({
+                payments: payments,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل المدفوعات من Firestore
+    async loadPaymentsFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('payments').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().payments };
+            }
+            return { success: false, error: 'No payments found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ الصيانة في Firestore
+    async saveMaintenanceToFirestore(userId, maintenance) {
+        try {
+            await this.db.collection('users').doc(userId).collection('maintenance').doc('data').set({
+                maintenance: maintenance,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل الصيانة من Firestore
+    async loadMaintenanceFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('maintenance').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().maintenance };
+            }
+            return { success: false, error: 'No maintenance found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: حفظ الإعدادات في Firestore
+    async saveSettingsToFirestore(userId, settings) {
+        try {
+            await this.db.collection('users').doc(userId).collection('settings').doc('data').set({
+                settings: settings,
+                lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: تحميل الإعدادات من Firestore
+    async loadSettingsFromFirestore(userId) {
+        try {
+            const doc = await this.db.collection('users').doc(userId).collection('settings').doc('data').get();
+            if (doc.exists) {
+                return { success: true, data: doc.data().settings };
+            }
+            return { success: false, error: 'No settings found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // 🔥 NEW: الاستماع للتحديثات في الوقت الحقيقي
+    setupRealtimeListener(userId, callback) {
+        return this.db.collection('users').doc(userId)
+            .onSnapshot((doc) => {
+                if (doc.exists) {
+                    callback(doc.data());
+                }
+            });
     }
 
     // تسجيل الدخول
@@ -130,6 +336,10 @@ class FirebaseManager {
             };
             
             await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
+            
+            // إنشاء البيانات الافتراضية للمستخدم الجديد
+            await this.createDefaultUserData(this.currentUser.uid, userProfile);
+            
             return { success: true, user: this.currentUser };
         } catch (error) {
             let errorMessage = 'فشل في إنشاء الحساب';
@@ -139,6 +349,40 @@ class FirebaseManager {
                 default: errorMessage = error.message;
             }
             return { success: false, error: errorMessage };
+        }
+    }
+
+    // 🔥 NEW: إنشاء البيانات الافتراضية للمستخدم الجديد
+    async createDefaultUserData(userId, userProfile) {
+        try {
+            const defaultProperties = [
+                { id: 1, name: 'A-101', type: 'شقة', area: '120م²', status: 'شاغرة', rent: 1500, tenant: '', contractEnd: '' },
+                { id: 2, name: 'A-102', type: 'شقة', area: '100م²', status: 'شاغرة', rent: 1200, tenant: '', contractEnd: '' },
+                { id: 3, name: 'B-201', type: 'فيلا', area: '200م²', status: 'شاغرة', rent: 2500, tenant: '', contractEnd: '' }
+            ];
+
+            const defaultCustomers = [
+                { id: 1, name: 'فاطمة محمد', phone: '0512345678', email: 'fatima@email.com', idNumber: '1234567890' },
+                { id: 2, name: 'أحمد خالد', phone: '0554321098', email: 'ahmed@email.com', idNumber: '0987654321' }
+            ];
+
+            const defaultSettings = {
+                companyName: 'نظام إدارة العقارات',
+                currency: 'ريال',
+                taxRate: 15
+            };
+
+            // حفظ البيانات الافتراضية في Firestore
+            await this.savePropertiesToFirestore(userId, defaultProperties);
+            await this.saveCustomersToFirestore(userId, defaultCustomers);
+            await this.saveSettingsToFirestore(userId, defaultSettings);
+            await this.saveContractsToFirestore(userId, []);
+            await this.savePaymentsToFirestore(userId, []);
+            await this.saveMaintenanceToFirestore(userId, []);
+            
+            console.log('✅ Default user data created in Firestore');
+        } catch (error) {
+            console.error('❌ Error creating default user data:', error);
         }
     }
 
@@ -212,23 +456,119 @@ class AdvancedPropertySystem {
         this.currentPage = 'dashboard';
         this.currentLanguage = localStorage.getItem('propertyLanguage') || 'ar';
         this.mainDB = getPropertyDB();
-        this.propertyDB = this.loadUserDB();
+        this.propertyDB = this.getDefaultUserDB();
         this.firebaseManager = new FirebaseManager();
+        this.isDataLoaded = false;
         this.init();
     }
 
-    // 🔥 تحميل قاعدة بيانات المستخدم الحالي
-    loadUserDB() {
-        const currentUser = localStorage.getItem('propertyUser');
-        if (currentUser) {
-            const userDB = localStorage.getItem(`propertyDB_${currentUser}`);
-            if (userDB) {
-                return JSON.parse(userDB);
-            } else {
-                return this.createNewUserDB(currentUser, localStorage.getItem('propertyEmail'));
-            }
+    // 🔥 NEW: دالة استدعاء عند تحميل بيانات المستخدم من Firestore
+    async onUserDataLoaded(userData) {
+        console.log('🔥 User data received from Firestore:', userData);
+        
+        const userId = this.firebaseManager.currentUser.uid;
+        
+        try {
+            // تحميل جميع البيانات من Firestore
+            const [propertiesResult, customersResult, contractsResult, paymentsResult, maintenanceResult, settingsResult] = await Promise.all([
+                this.firebaseManager.loadPropertiesFromFirestore(userId),
+                this.firebaseManager.loadCustomersFromFirestore(userId),
+                this.firebaseManager.loadContractsFromFirestore(userId),
+                this.firebaseManager.loadPaymentsFromFirestore(userId),
+                this.firebaseManager.loadMaintenanceFromFirestore(userId),
+                this.firebaseManager.loadSettingsFromFirestore(userId)
+            ]);
+
+            // تحديث قاعدة البيانات المحلية بالبيانات من Firestore
+            this.propertyDB = {
+                ...this.propertyDB,
+                currentUser: userData.username,
+                currentEmail: userData.email,
+                userProfiles: {
+                    [userData.username]: userData
+                },
+                properties: propertiesResult.success ? propertiesResult.data : this.propertyDB.properties,
+                customers: customersResult.success ? customersResult.data : this.propertyDB.customers,
+                contracts: contractsResult.success ? contractsResult.data : this.propertyDB.contracts,
+                payments: paymentsResult.success ? paymentsResult.data : this.propertyDB.payments,
+                maintenance: maintenanceResult.success ? maintenanceResult.data : this.propertyDB.maintenance,
+                settings: settingsResult.success ? settingsResult.data : this.propertyDB.settings
+            };
+
+            this.isDataLoaded = true;
+            
+            // تحديث الواجهة
+            this.applyPermissions();
+            this.setupUserMenu();
+            this.loadDashboard();
+            
+            console.log('✅ All user data synchronized from Firestore');
+            this.showNotification('تم مزامنة البيانات بنجاح من السحابة');
+            
+        } catch (error) {
+            console.error('❌ Error synchronizing user data:', error);
+            this.showNotification('خطأ في مزامنة البيانات', 'error');
         }
-        return this.getDefaultUserDB();
+    }
+
+    // 🔥 NEW: حفظ جميع البيانات إلى Firestore
+    async saveAllDataToFirestore() {
+        if (!this.firebaseManager.currentUser || !this.isDataLoaded) return;
+        
+        const userId = this.firebaseManager.currentUser.uid;
+        
+        try {
+            await Promise.all([
+                this.firebaseManager.savePropertiesToFirestore(userId, this.propertyDB.properties),
+                this.firebaseManager.saveCustomersToFirestore(userId, this.propertyDB.customers),
+                this.firebaseManager.saveContractsToFirestore(userId, this.propertyDB.contracts),
+                this.firebaseManager.savePaymentsToFirestore(userId, this.propertyDB.payments),
+                this.firebaseManager.saveMaintenanceToFirestore(userId, this.propertyDB.maintenance),
+                this.firebaseManager.saveSettingsToFirestore(userId, this.propertyDB.settings)
+            ]);
+            
+            console.log('✅ All data saved to Firestore');
+        } catch (error) {
+            console.error('❌ Error saving data to Firestore:', error);
+        }
+    }
+
+    // 🔥 NEW: حفظ البيانات مع التزامن التلقائي
+    async saveCurrentUserDB() {
+        if (!this.propertyDB || !this.propertyDB.currentUser) {
+            console.warn('⚠️ لا يمكن حفظ البيانات: لا يوجد مستخدم نشط');
+            return false;
+        }
+
+        try {
+            // حفظ محلي للنسخة الاحتياطية
+            const dataToSave = {
+                ...this.propertyDB,
+                _metadata: {
+                    lastSaved: new Date().toISOString(),
+                    user: this.propertyDB.currentUser
+                }
+            };
+            
+            localStorage.setItem(`propertyDB_${this.propertyDB.currentUser}`, JSON.stringify(dataToSave));
+            
+            // حفظ في Firestore للتزامن بين الأجهزة
+            if (this.firebaseManager.currentUser && this.isDataLoaded) {
+                await this.saveAllDataToFirestore();
+            }
+            
+            console.log('✅ تم حفظ البيانات بنجاح (محلي + سحابي)');
+            return true;
+        } catch (error) {
+            console.error('❌ فشل في حفظ البيانات:', error);
+            this.showNotification('فشل في حفظ البيانات', 'error');
+            return false;
+        }
+    }
+
+    // 🔥 NEW: دالة مساعدة للحفظ الآمن
+    async safeSave() {
+        return await this.saveCurrentUserDB();
     }
 
     // 🔥 قاعدة بيانات افتراضية للمستخدم
@@ -328,32 +668,6 @@ class AdvancedPropertySystem {
         return permissions[role] || permissions['عضو'];
     }
 
-    // 🔥 حفظ بيانات المستخدم الحالي
-    saveCurrentUserDB() {
-        if (!this.propertyDB || !this.propertyDB.currentUser) {
-            console.warn('⚠️ لا يمكن حفظ البيانات: لا يوجد مستخدم نشط');
-            return false;
-        }
-
-        try {
-            const dataToSave = {
-                ...this.propertyDB,
-                _metadata: {
-                    lastSaved: new Date().toISOString(),
-                    user: this.propertyDB.currentUser
-                }
-            };
-            
-            localStorage.setItem(`propertyDB_${this.propertyDB.currentUser}`, JSON.stringify(dataToSave));
-            console.log('✅ تم حفظ البيانات بنجاح');
-            return true;
-        } catch (error) {
-            console.error('❌ فشل في حفظ البيانات:', error);
-            this.showNotification('فشل في حفظ البيانات', 'error');
-            return false;
-        }
-    }
-
     init() {
         try {
             this.initializeDatabase();
@@ -435,22 +749,11 @@ class AdvancedPropertySystem {
         const result = await this.firebaseManager.login(email, password);
         
         if (result.success) {
-            // استخراج اسم المستخدم من البريد الإلكتروني
+            // سيتم تحميل البيانات تلقائياً عبر onUserDataLoaded
             const username = email.split('@')[0];
             
-            // تحميل قاعدة بيانات المستخدم الخاصة
-            const userDBKey = `propertyDB_${username}`;
-            const userDB = localStorage.getItem(userDBKey);
-            
-            if (userDB) {
-                this.propertyDB = JSON.parse(userDB);
-            } else {
-                // إنشاء قاعدة بيانات جديدة معزولة
-                this.propertyDB = this.createNewUserDB(username, email);
-            }
-            
             this.propertyDB.currentUser = username;
-            this.propertyDB.currentEmail = email; // حفظ البريد الإلكتروني
+            this.propertyDB.currentEmail = email;
             
             localStorage.setItem('propertyUser', username);
             localStorage.setItem('propertyEmail', email);
@@ -458,11 +761,8 @@ class AdvancedPropertySystem {
             
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            this.showNotification('مرحباً بك في النظام!');
+            this.showNotification('مرحباً بك في النظام! جاري مزامنة البيانات...');
             
-            this.applyPermissions();
-            this.setupUserMenu();
-            this.loadDashboard();
         } else {
             this.showNotification(result.error, 'error');
         }
@@ -508,16 +808,6 @@ class AdvancedPropertySystem {
         const result = await this.firebaseManager.createAccount(email, password, userData);
         
         if (result.success) {
-            // إنشاء قاعدة بيانات مستقلة للمستخدم الجديد
-            const newUserDB = this.createNewUserDB(username, email);
-            newUserDB.userProfiles[username] = { 
-                ...userData, 
-                email: email
-            };
-            
-            // حفظ قاعدة البيانات الجديدة للمستخدم
-            localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
-            
             this.closeModal('createAccountModal');
             this.showNotification('تم إنشاء الحساب الجديد بنجاح! يمكنك الآن تسجيل الدخول');
             
@@ -531,14 +821,10 @@ class AdvancedPropertySystem {
         try {
             const savedUser = localStorage.getItem('propertyUser');
             if (savedUser) {
-                const userDB = localStorage.getItem(`propertyDB_${savedUser}`);
-                if (userDB) {
-                    this.propertyDB = JSON.parse(userDB);
-                    this.validateDatabaseStructure();
-                    document.getElementById('loginPage').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                    this.loadDashboard();
-                }
+                // عرض شاشة التحمين
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                this.showNotification('جاري تحميل البيانات من السحابة...', 'info');
             }
         } catch (error) {
             console.error('Auth check error:', error);
@@ -546,20 +832,11 @@ class AdvancedPropertySystem {
         }
     }
 
-    validateDatabaseStructure() {
-        const requiredFields = ['properties', 'customers', 'contracts', 'payments', 'maintenance', 'settings'];
-        requiredFields.forEach(field => {
-            if (!this.propertyDB[field]) {
-                this.propertyDB[field] = this.getDefaultUserDB()[field];
-            }
-        });
-    }
-
     // 🔥 تسجيل الخروج مع Firebase
     async logout() {
         // حفظ بيانات المستخدم الحالي قبل تسجيل الخروج
         if (this.propertyDB && this.propertyDB.currentUser) {
-            this.saveCurrentUserDB();
+            await this.safeSave();
         }
         
         // تسجيل الخروج من Firebase
@@ -572,6 +849,7 @@ class AdvancedPropertySystem {
         
         // إعادة تعيين قاعدة البيانات للنظام
         this.propertyDB = this.getDefaultUserDB();
+        this.isDataLoaded = false;
         
         // تحديث الواجهة
         document.getElementById('dashboard').style.display = 'none';
@@ -627,7 +905,6 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 دوال واجهة المستخدم الأخرى...
     setupUserMenu() {
         const username = this.propertyDB.currentUser;
         const userProfile = this.propertyDB.userProfiles?.[username] || {};
@@ -820,10 +1097,6 @@ class AdvancedPropertySystem {
             await user.reauthenticateWithCredential(credential);
             await user.updatePassword(newPassword);
             
-            // تحديث كلمة المرور في قاعدة البيانات المحلية
-            this.propertyDB.users[this.propertyDB.currentUser] = newPassword;
-            this.saveCurrentUserDB();
-            
             this.closeModal('passwordModal');
             this.showNotification('تم تغيير كلمة المرور بنجاح!');
         } catch (error) {
@@ -876,6 +1149,10 @@ class AdvancedPropertySystem {
                         <i class="fas fa-home"></i> 
                         <span data-translate="dashboard">${this.getTranslation('dashboard')}</span>
                     </h1>
+                    <div class="sync-status">
+                        <i class="fas fa-cloud"></i>
+                        <span>${this.currentLanguage === 'ar' ? 'مزامنة مع السحابة' : 'Cloud Sync'}</span>
+                    </div>
                 </div>
 
                 <div class="stats-grid-compact">
@@ -977,7 +1254,6 @@ class AdvancedPropertySystem {
         `).join('');
     }
 
-    // 🔥 دوال الإدارة الأخرى (مختصرة)
     loadProperties() {
         const content = document.querySelector('.main-content');
         content.innerHTML = `
@@ -1014,81 +1290,7 @@ class AdvancedPropertySystem {
         `;
     }
 
-    loadCustomers() {
-        const content = document.querySelector('.main-content');
-        content.innerHTML = `
-            <div class="page-header">
-                <h2><i class="fas fa-users"></i> <span data-translate="customers">${this.getTranslation('customers')}</span></h2>
-                <button class="btn btn-primary" onclick="propertySystem.showCustomerForm()">
-                    <i class="fas fa-plus"></i> <span data-translate="addCustomer">${this.getTranslation('addCustomer')}</span>
-                </button>
-            </div>
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>${this.currentLanguage === 'ar' ? 'الاسم' : 'Name'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${this.propertyDB.customers.map(customer => `
-                            <tr>
-                                <td>${customer.name}</td>
-                                <td>${customer.phone}</td>
-                                <td>${customer.email}</td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    loadSettings() {
-        const content = document.querySelector('.main-content');
-        content.innerHTML = `
-            <div class="page-header">
-                <h2><i class="fas fa-cogs"></i> <span data-translate="settings">${this.getTranslation('settings')}</span></h2>
-            </div>
-            <div class="settings-grid">
-                <div class="settings-card">
-                    <h3>${this.currentLanguage === 'ar' ? 'إعدادات النظام' : 'System Settings'}</h3>
-                    <form onsubmit="propertySystem.saveCompanySettings(event)">
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'اسم الشركة' : 'Company Name'}:</label>
-                            <input type="text" name="companyName" value="${this.propertyDB.settings.companyName}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'العملة' : 'Currency'}:</label>
-                            <select name="currency" required>
-                                <option value="ريال" ${this.propertyDB.settings.currency === 'ريال' ? 'selected' : ''}>ريال سعودي</option>
-                                <option value="دولار" ${this.propertyDB.settings.currency === 'دولار' ? 'selected' : ''}>دولار أمريكي</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}</button>
-                    </form>
-                </div>
-            </div>
-        `;
-    }
-
-    saveCompanySettings(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        this.propertyDB.settings = {
-            companyName: formData.get('companyName'),
-            currency: formData.get('currency'),
-            taxRate: this.propertyDB.settings.taxRate || 15
-        };
-        
-        this.saveCurrentUserDB();
-        this.showNotification(this.currentLanguage === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
-    }
-
-    showPropertyForm() {
+    async showPropertyForm() {
         const formHTML = `
             <div class="modal-overlay" id="propertyModal">
                 <div class="modal-content">
@@ -1124,7 +1326,7 @@ class AdvancedPropertySystem {
         this.showModal(formHTML);
     }
 
-    addProperty(event) {
+    async addProperty(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
@@ -1140,13 +1342,48 @@ class AdvancedPropertySystem {
         };
         
         this.propertyDB.properties.push(newProperty);
-        this.saveCurrentUserDB();
+        
+        // استخدام الحفظ الآمن الذي يحفظ محلياً وفي Firestore
+        await this.safeSave();
+        
         this.closeModal('propertyModal');
         this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة الوحدة العقارية بنجاح!' : 'Property added successfully!');
         this.loadProperties();
     }
 
-    showCustomerForm() {
+    loadCustomers() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-users"></i> <span data-translate="customers">${this.getTranslation('customers')}</span></h2>
+                <button class="btn btn-primary" onclick="propertySystem.showCustomerForm()">
+                    <i class="fas fa-plus"></i> <span data-translate="addCustomer">${this.getTranslation('addCustomer')}</span>
+                </button>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'الاسم' : 'Name'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.customers.map(customer => `
+                            <tr>
+                                <td>${customer.name}</td>
+                                <td>${customer.phone}</td>
+                                <td>${customer.email}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    async showCustomerForm() {
         const formHTML = `
             <div class="modal-overlay" id="customerModal">
                 <div class="modal-content">
@@ -1175,7 +1412,7 @@ class AdvancedPropertySystem {
         this.showModal(formHTML);
     }
 
-    addCustomer(event) {
+    async addCustomer(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
@@ -1188,10 +1425,55 @@ class AdvancedPropertySystem {
         };
         
         this.propertyDB.customers.push(newCustomer);
-        this.saveCurrentUserDB();
+        
+        // استخدام الحفظ الآمن
+        await this.safeSave();
+        
         this.closeModal('customerModal');
         this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة العميل بنجاح!' : 'Customer added successfully!');
         this.loadCustomers();
+    }
+
+    loadSettings() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-cogs"></i> <span data-translate="settings">${this.getTranslation('settings')}</span></h2>
+            </div>
+            <div class="settings-grid">
+                <div class="settings-card">
+                    <h3>${this.currentLanguage === 'ar' ? 'إعدادات النظام' : 'System Settings'}</h3>
+                    <form onsubmit="propertySystem.saveCompanySettings(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'اسم الشركة' : 'Company Name'}:</label>
+                            <input type="text" name="companyName" value="${this.propertyDB.settings.companyName}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'العملة' : 'Currency'}:</label>
+                            <select name="currency" required>
+                                <option value="ريال" ${this.propertyDB.settings.currency === 'ريال' ? 'selected' : ''}>ريال سعودي</option>
+                                <option value="دولار" ${this.propertyDB.settings.currency === 'دولار' ? 'selected' : ''}>دولار أمريكي</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'حفظ الإعدادات' : 'Save Settings'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+    }
+
+    async saveCompanySettings(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        this.propertyDB.settings = {
+            companyName: formData.get('companyName'),
+            currency: formData.get('currency'),
+            taxRate: this.propertyDB.settings.taxRate || 15
+        };
+        
+        await this.safeSave();
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
     }
 
     loadContracts() { this.loadBasicPage('contracts', 'fa-file-contract', 'العقود', 'Contracts'); }
