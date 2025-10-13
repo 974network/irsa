@@ -3434,7 +3434,7 @@ printReport() {
                         <div class="language-option ${this.currentLanguage === 'ar' ? 'active' : ''}" onclick="propertySystem.applyLanguage('ar')">
                             <div class="language-flag">🇸🇦</div>
                             <div class="language-info">
-                                <div class="language-name">العربي</div>
+                                <div class="language-name">العربية</div>
                                 <div class="language-desc">Arabic</div>
                             </div>
                             <div class="language-check">
@@ -4163,4 +4163,5 @@ printReport() {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
