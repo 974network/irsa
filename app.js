@@ -1,4 +1,4 @@
-// قاعدة بيانات كاملة للتطبيق
+// قاعدة بيانات كاملة للتطبيق مع Firebase
 const getPropertyDB = () => {
     const savedDB = localStorage.getItem('propertyDB');
     if (savedDB) {
@@ -43,17 +43,137 @@ const saveMainDB = (db) => {
     localStorage.setItem('propertyDB', JSON.stringify(db));
 };
 
+// مدير Firebase
+class FirebaseManager {
+    constructor() {
+        this.auth = null;
+        this.db = null;
+        this.currentUser = null;
+        this.init();
+    }
+
+    init() {
+        try {
+            // تهيئة Firebase
+            const firebaseConfig = {
+                apiKey: "AIzaSyBUMgt1C6gdDrtgpBcMkyHBZFDeHiDd1HI",
+                authDomain: "mohanad-93df3.firebaseapp.com",
+                projectId: "mohanad-93df3",
+                storageBucket: "mohanad-93df3.appspot.com",
+                messagingSenderId: "1057899918391",
+                appId: "1:1057899918391:web:a1b2c3d4e5f6g7h8i9j0"
+            };
+
+            if (!firebase.apps.length) {
+                firebase.initializeApp(firebaseConfig);
+            }
+            
+            this.auth = firebase.auth();
+            this.db = firebase.firestore();
+            
+            // مراقبة حالة المصادقة
+            this.auth.onAuthStateChanged((user) => {
+                this.currentUser = user;
+                if (user) {
+                    console.log('✅ User signed in:', user.email);
+                } else {
+                    console.log('🔒 User signed out');
+                }
+            });
+            
+            console.log('✅ Firebase Manager initialized');
+        } catch (error) {
+            console.error('❌ Firebase Manager init error:', error);
+        }
+    }
+
+    // تسجيل الدخول
+    async login(email, password) {
+        try {
+            const userCredential = await this.auth.signInWithEmailAndPassword(email, password);
+            this.currentUser = userCredential.user;
+            return { success: true, user: this.currentUser };
+        } catch (error) {
+            let errorMessage = 'فشل في تسجيل الدخول';
+            switch (error.code) {
+                case 'auth/user-not-found': errorMessage = 'المستخدم غير موجود'; break;
+                case 'auth/wrong-password': errorMessage = 'كلمة المرور غير صحيحة'; break;
+                case 'auth/invalid-email': errorMessage = 'البريد الإلكتروني غير صالح'; break;
+                default: errorMessage = error.message;
+            }
+            return { success: false, error: errorMessage };
+        }
+    }
+
+    // إنشاء حساب
+    async createAccount(email, password, userData = {}) {
+        try {
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+            this.currentUser = userCredential.user;
+            
+            // حفظ بيانات المستخدم في Firestore
+            const userProfile = {
+                username: userData.username || email.split('@')[0],
+                fullName: userData.fullName || email.split('@')[0],
+                email: email,
+                phone: userData.phone || '',
+                role: userData.role || 'مدير النظام',
+                joinDate: new Date().toISOString().split('T')[0],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            
+            await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
+            return { success: true, user: this.currentUser };
+        } catch (error) {
+            let errorMessage = 'فشل في إنشاء الحساب';
+            switch (error.code) {
+                case 'auth/email-already-in-use': errorMessage = 'البريد الإلكتروني مستخدم مسبقاً'; break;
+                case 'auth/weak-password': errorMessage = 'كلمة المرور ضعيفة'; break;
+                default: errorMessage = error.message;
+            }
+            return { success: false, error: errorMessage };
+        }
+    }
+
+    // تسجيل الخروج
+    async logout() {
+        try {
+            await this.auth.signOut();
+            this.currentUser = null;
+            return { success: true };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // جلب بيانات المستخدم
+    async getUserData() {
+        if (!this.currentUser) return { success: false, error: 'No user logged in' };
+        
+        try {
+            const doc = await this.db.collection('users').doc(this.currentUser.uid).get();
+            if (doc.exists) {
+                return { success: true, data: doc.data() };
+            }
+            return { success: false, error: 'User data not found' };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+}
+
 // النظام الرئيسي
 class AdvancedPropertySystem {
     constructor() {
         this.currentPage = 'dashboard';
         this.currentLanguage = localStorage.getItem('propertyLanguage') || 'ar';
-        this.mainDB = getPropertyDB(); // قاعدة البيانات الرئيسية
-        this.propertyDB = this.loadUserDB(); // قاعدة بيانات المستخدم الحالي
+        this.mainDB = getPropertyDB();
+        this.propertyDB = this.loadUserDB();
+        this.firebaseManager = new FirebaseManager();
         this.init();
     }
 
-    // 🔥 **دالة محسنة: تحميل قاعدة بيانات المستخدم الحالي**
+    // 🔥 تحميل قاعدة بيانات المستخدم الحالي
     loadUserDB() {
         const currentUser = localStorage.getItem('propertyUser');
         if (currentUser) {
@@ -61,14 +181,13 @@ class AdvancedPropertySystem {
             if (userDB) {
                 return JSON.parse(userDB);
             } else {
-                // إنشاء قاعدة بيانات جديدة للمستخدم
                 return this.createNewUserDB(currentUser);
             }
         }
         return this.getDefaultUserDB();
     }
 
-    // 🔥 **دالة جديدة: قاعدة بيانات افتراضية للمستخدم**
+    // 🔥 قاعدة بيانات افتراضية للمستخدم
     getDefaultUserDB() {
         return {
             currentUser: null,
@@ -93,14 +212,12 @@ class AdvancedPropertySystem {
             }
         };
     }
-    
-    // 🔥 **دالة محسنة: إنشاء قاعدة بيانات جديدة للمستخدم**
+
+    // 🔥 إنشاء قاعدة بيانات جديدة للمستخدم
     createNewUserDB(username) {
         const newUserDB = {
             currentUser: username,
-            users: {
-                [username]: '123456'
-            },
+            users: { [username]: '123456' },
             userProfiles: {
                 [username]: {
                     id: Date.now(),
@@ -108,34 +225,49 @@ class AdvancedPropertySystem {
                     email: `${username}@irsa.com`,
                     phone: '0512345678',
                     role: 'مدير النظام',
+                    permissions: this.getDefaultPermissions('مدير النظام'),
                     joinDate: new Date().toISOString().split('T')[0],
                     profileImage: null
                 }
             },
-            properties: [
-                { id: 1, name: 'A-101', type: 'شقة', area: '120م²', status: 'شاغرة', rent: 1500, tenant: '', contractEnd: '' },
-                { id: 2, name: 'A-102', type: 'شقة', area: '100م²', status: 'شاغرة', rent: 1200, tenant: '', contractEnd: '' },
-                { id: 3, name: 'B-201', type: 'فيلا', area: '200م²', status: 'شاغرة', rent: 2500, tenant: '', contractEnd: '' }
-            ],
-            customers: [
-                { id: 1, name: 'فاطمة محمد', phone: '0512345678', email: 'fatima@email.com', idNumber: '1234567890' },
-                { id: 2, name: 'أحمد خالد', phone: '0554321098', email: 'ahmed@email.com', idNumber: '0987654321' }
-            ],
+            properties: [...this.getDefaultUserDB().properties],
+            customers: [...this.getDefaultUserDB().customers],
             contracts: [],
             payments: [],
             maintenance: [],
-            settings: {
-                companyName: 'نظام إدارة العقارات',
-                currency: 'ريال',
-                taxRate: 15
-            }
+            settings: { ...this.getDefaultUserDB().settings }
         };
         
         localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
         return newUserDB;
     }
 
-    // 🔥 **دالة محسنة: حفظ بيانات المستخدم الحالي**
+    // 🔥 الصلاحيات الافتراضية
+    getDefaultPermissions(role) {
+        const permissions = {
+            'مدير النظام': {
+                viewDashboard: true, manageProperties: true, manageCustomers: true,
+                manageContracts: true, managePayments: true, manageMaintenance: true,
+                viewReports: true, manageSettings: true, manageUsers: true,
+                deleteData: true, editAll: true
+            },
+            'مشرف': {
+                viewDashboard: true, manageProperties: true, manageCustomers: true,
+                manageContracts: true, managePayments: true, manageMaintenance: true,
+                viewReports: true, manageSettings: false, manageUsers: false,
+                deleteData: false, editAll: true
+            },
+            'عضو': {
+                viewDashboard: true, manageProperties: false, manageCustomers: false,
+                manageContracts: false, managePayments: false, manageMaintenance: false,
+                viewReports: false, manageSettings: false, manageUsers: false,
+                deleteData: false, editAll: false
+            }
+        };
+        return permissions[role] || permissions['عضو'];
+    }
+
+    // 🔥 حفظ بيانات المستخدم الحالي
     saveCurrentUserDB() {
         if (!this.propertyDB || !this.propertyDB.currentUser) {
             console.warn('⚠️ لا يمكن حفظ البيانات: لا يوجد مستخدم نشط');
@@ -163,12 +295,10 @@ class AdvancedPropertySystem {
 
     init() {
         try {
-            // تهيئة البيانات الأساسية أولاً
             this.initializeDatabase();
             this.setupLogin();
             this.setupNavigation();
             this.checkAuthStatus();
-            this.setupSessionCheck();
             this.applyLanguage(this.currentLanguage);
             this.setupUserMenu();
         } catch (error) {
@@ -183,13 +313,11 @@ class AdvancedPropertySystem {
         this.showNotification('تم إعادة تهيئة النظام، يرجى تسجيل الدخول مرة أخرى', 'info');
     }
 
-    // 🔥 دالة محسنة لتهيئة قاعدة البيانات
     initializeDatabase() {
         if (!this.propertyDB) {
             this.propertyDB = this.getDefaultUserDB();
         }
         
-        // التأكد من وجود جميع الحقول الأساسية
         if (!this.propertyDB.properties) this.propertyDB.properties = [];
         if (!this.propertyDB.customers) this.propertyDB.customers = [];
         if (!this.propertyDB.contracts) this.propertyDB.contracts = [];
@@ -211,7 +339,7 @@ class AdvancedPropertySystem {
             });
         }
 
-        // إضافة زر إنشاء حساب جديد في صفحة Login
+        // إضافة زر إنشاء حساب جديد
         const loginContainer = document.querySelector('.login-container');
         if (loginContainer && !document.getElementById('createAccountBtn')) {
             const createAccountBtn = document.createElement('button');
@@ -223,7 +351,7 @@ class AdvancedPropertySystem {
             loginContainer.appendChild(createAccountBtn);
         }
 
-        // إعداد أزرار تبديل اللغة في صفحة Login
+        // إعداد أزرار تبديل اللغة
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const lang = e.target.getAttribute('data-lang');
@@ -232,8 +360,8 @@ class AdvancedPropertySystem {
         });
     }
 
-    // 🔥 **دالة محسنة: معالجة تسجيل الدخول**
-    handleLogin() {
+    // 🔥 دالة تسجيل الدخول مع Firebase
+    async handleLogin() {
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
         
@@ -241,9 +369,12 @@ class AdvancedPropertySystem {
             this.showNotification('يرجى ملء جميع الحقول', 'error');
             return;
         }
+
+        // استخدام Firebase للمصادقة
+        const email = username.includes('@') ? username : `${username}@irsa.com`;
+        const result = await this.firebaseManager.login(email, password);
         
-        // البحث في قاعدة البيانات الرئيسية للمستخدمين
-        if (this.mainDB.users[username] === password) {
+        if (result.success) {
             // تحميل قاعدة بيانات المستخدم الخاصة
             const userDBKey = `propertyDB_${username}`;
             const userDB = localStorage.getItem(userDBKey);
@@ -253,21 +384,6 @@ class AdvancedPropertySystem {
             } else {
                 // إنشاء قاعدة بيانات جديدة معزولة
                 this.propertyDB = this.createNewUserDB(username);
-                this.propertyDB.users = { [username]: password };
-                
-                this.propertyDB.userProfiles = {
-                    [username]: {
-                        id: Date.now(),
-                        name: username,
-                        email: `${username}@irsa.com`,
-                        phone: '0512345678',
-                        role: 'مدير النظام',
-                        joinDate: new Date().toISOString().split('T')[0],
-                        profileImage: null
-                    }
-                };
-                
-                this.saveCurrentUserDB();
             }
             
             this.propertyDB.currentUser = username;
@@ -278,14 +394,71 @@ class AdvancedPropertySystem {
             document.getElementById('dashboard').style.display = 'block';
             this.showNotification('مرحباً بك في النظام!');
             
+            this.applyPermissions();
             this.setupUserMenu();
             this.loadDashboard();
         } else {
-            this.showNotification('اسم المستخدم أو كلمة المرور غير صحيحة!', 'error');
+            this.showNotification(result.error, 'error');
         }
     }
 
-    // 🔥 **دالة محسنة: التحقق من حالة المصادقة**
+    // 🔥 دالة إنشاء حساب مع Firebase
+    async createNewAccount(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const username = formData.get('username');
+        const fullName = formData.get('fullName');
+        const email = formData.get('email') || `${username}@irsa.com`;
+        const phone = formData.get('phone');
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+        
+        // التحقق من البيانات
+        if (this.mainDB.users[username]) {
+            this.showNotification('اسم المستخدم موجود مسبقاً!', 'error');
+            return;
+        }
+        
+        if (password !== confirmPassword) {
+            this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
+            return;
+        }
+        
+        // استخدام Firebase لإنشاء الحساب
+        const userData = {
+            username: username,
+            fullName: fullName,
+            phone: phone,
+            role: 'مدير النظام'
+        };
+        
+        const result = await this.firebaseManager.createAccount(email, password, userData);
+        
+        if (result.success) {
+            // إضافة المستخدم إلى قاعدة البيانات الرئيسية
+            this.mainDB.users[username] = password;
+            this.mainDB.userProfiles[username] = userData;
+            
+            // حفظ قاعدة البيانات الرئيسية
+            saveMainDB(this.mainDB);
+            
+            // إنشاء قاعدة بيانات مستقلة للمستخدم الجديد
+            const newUserDB = this.createNewUserDB(username);
+            newUserDB.userProfiles[username] = { ...userData, email: email };
+            
+            // حفظ قاعدة البيانات الجديدة للمستخدم
+            localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
+            
+            this.closeModal('createAccountModal');
+            this.showNotification('تم إنشاء الحساب الجديد بنجاح! يمكنك الآن تسجيل الدخول');
+            
+            event.target.reset();
+        } else {
+            this.showNotification(result.error, 'error');
+        }
+    }
+
     checkAuthStatus() {
         try {
             const savedUser = localStorage.getItem('propertyUser');
@@ -293,10 +466,7 @@ class AdvancedPropertySystem {
                 const userDB = localStorage.getItem(`propertyDB_${savedUser}`);
                 if (userDB) {
                     this.propertyDB = JSON.parse(userDB);
-                    
-                    // التحقق من صحة البيانات
                     this.validateDatabaseStructure();
-                    
                     document.getElementById('loginPage').style.display = 'none';
                     document.getElementById('dashboard').style.display = 'block';
                     this.loadDashboard();
@@ -308,10 +478,8 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 دالة التحقق من هيكل البيانات
     validateDatabaseStructure() {
         const requiredFields = ['properties', 'customers', 'contracts', 'payments', 'maintenance', 'settings'];
-        
         requiredFields.forEach(field => {
             if (!this.propertyDB[field]) {
                 this.propertyDB[field] = this.getDefaultUserDB()[field];
@@ -319,61 +487,42 @@ class AdvancedPropertySystem {
         });
     }
 
-    setupSessionCheck() {
-        setInterval(() => {
-            this.checkSession();
-        }, 60000);
-    }
-
-    checkSession() {
-        const loginTime = localStorage.getItem('loginTime');
-        if (loginTime) {
-            const sessionDuration = 2 * 60 * 60 * 1000;
-            const currentTime = new Date().getTime();
-            const loginTimestamp = new Date(loginTime).getTime();
-            
-            if (currentTime - loginTimestamp > sessionDuration) {
-                this.logout();
-                this.showNotification('انتهت الجلسة، يرجى تسجيل الدخول مرة أخرى', 'warning');
-            }
-        }
-    }
-
-    // 🔥 **دالة محسنة: تسجيل الخروج**
-    logout() {
-        // 1. حفظ بيانات المستخدم الحالي قبل تسجيل الخروج
+    // 🔥 تسجيل الخروج مع Firebase
+    async logout() {
+        // حفظ بيانات المستخدم الحالي قبل تسجيل الخروج
         if (this.propertyDB && this.propertyDB.currentUser) {
             this.saveCurrentUserDB();
         }
         
-        // 2. مسح بيانات الجلسة فقط (ليس بيانات المستخدم)
+        // تسجيل الخروج من Firebase
+        await this.firebaseManager.logout();
+        
+        // مسح بيانات الجلسة
         localStorage.removeItem('propertyUser');
         localStorage.removeItem('loginTime');
         
-        // 3. إعادة تعيين قاعدة البيانات للنظام
+        // إعادة تعيين قاعدة البيانات للنظام
         this.propertyDB = this.getDefaultUserDB();
         
-        // 4. تحديث الواجهة
+        // تحديث الواجهة
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('loginPage').style.display = 'flex';
         
-        // 5. إعادة تعيين الحقول
+        // إعادة تعيين الحقول
         const loginForm = document.getElementById('loginForm');
         if (loginForm) {
             loginForm.reset();
         }
         
-        // 6. إزالة القائمة الجانبية للمستخدم
+        // إزالة القائمة الجانبية للمستخدم
         const userMenu = document.querySelector('.user-menu-sidebar');
         if (userMenu) {
             userMenu.remove();
         }
         
         this.showNotification('تم تسجيل الخروج بنجاح');
-        
-        // 7. تحديث حالة النظام
         this.currentPage = 'dashboard';
-        this.setupNavigation(); // إعادة تعيين التنقل
+        this.setupNavigation();
     }
 
     setupNavigation() {
@@ -409,7 +558,7 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 **تحسين دالة إعداد القائمة الجانبية للمستخدم**
+    // 🔥 دوال واجهة المستخدم الأخرى...
     setupUserMenu() {
         const username = this.propertyDB.currentUser;
         const userProfile = this.propertyDB.userProfiles?.[username] || {};
@@ -453,13 +602,9 @@ class AdvancedPropertySystem {
             </div>
         `;
 
-        // إزالة القائمة القديمة إذا كانت موجودة
         const oldMenu = document.querySelector('.user-menu-sidebar');
-        if (oldMenu) {
-            oldMenu.remove();
-        }
+        if (oldMenu) oldMenu.remove();
 
-        // إضافة القائمة الجديدة
         const sidebar = document.querySelector('.sidebar .nav-links');
         if (sidebar) {
             const userMenuContainer = document.createElement('div');
@@ -489,7 +634,6 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 **دالة محسنة: إنشاء حساب جديد**
     showCreateAccountModal() {
         const createAccountHTML = `
             <div class="modal-overlay" id="createAccountModal">
@@ -538,88 +682,6 @@ class AdvancedPropertySystem {
         this.showModal(createAccountHTML);
     }
 
-    // 🔥 **دالة محسنة: معالجة إنشاء الحساب**
-    createNewAccount(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        const username = formData.get('username');
-        const fullName = formData.get('fullName');
-        const email = formData.get('email');
-        const phone = formData.get('phone');
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
-        
-        // التحقق من البيانات
-        if (this.mainDB.users[username]) {
-            this.showNotification('اسم المستخدم موجود مسبقاً!', 'error');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
-            return;
-        }
-        
-        // إضافة المستخدم إلى قاعدة البيانات الرئيسية
-        this.mainDB.users[username] = password;
-        this.mainDB.userProfiles[username] = {
-            id: Date.now(),
-            name: fullName,
-            email: email || '',
-            phone: phone || '',
-            role: 'مدير النظام',
-            joinDate: new Date().toISOString().split('T')[0]
-        };
-        
-        // حفظ قاعدة البيانات الرئيسية
-        saveMainDB(this.mainDB);
-        
-        // 🔥 إنشاء قاعدة بيانات مستقلة تماماً للمستخدم الجديد
-        const newUserDB = {
-            currentUser: username,
-            users: {
-                [username]: password
-            },
-            userProfiles: {
-                [username]: {
-                    id: Date.now(),
-                    name: fullName,
-                    email: email || '',
-                    phone: phone || '',
-                    role: 'مدير النظام',
-                    joinDate: new Date().toISOString().split('T')[0],
-                    profileImage: null
-                }
-            },
-            properties: [
-                { id: 1, name: 'A-101', type: 'شقة', area: '120م²', status: 'شاغرة', rent: 1500, tenant: '', contractEnd: '' },
-                { id: 2, name: 'A-102', type: 'شقة', area: '100م²', status: 'شاغرة', rent: 1200, tenant: '', contractEnd: '' },
-                { id: 3, name: 'B-201', type: 'فيلا', area: '200م²', status: 'شاغرة', rent: 2500, tenant: '', contractEnd: '' }
-            ],
-            customers: [
-                { id: 1, name: 'فاطمة محمد', phone: '0512345678', email: 'fatima@email.com', idNumber: '1234567890' },
-                { id: 2, name: 'أحمد خالد', phone: '0554321098', email: 'ahmed@email.com', idNumber: '0987654321' }
-            ],
-            contracts: [],
-            payments: [],
-            maintenance: [],
-            settings: {
-                companyName: 'نظام إدارة العقارات',
-                currency: 'ريال',
-                taxRate: 15
-            }
-        };
-        
-        // حفظ قاعدة البيانات الجديدة للمستخدم
-        localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
-        
-        this.closeModal('createAccountModal');
-        this.showNotification('تم إنشاء الحساب الجديد بنجاح! يمكنك الآن تسجيل الدخول');
-        
-        event.target.reset();
-    }
-
     showChangePasswordModal() {
         const passwordHTML = `
             <div class="modal-overlay" id="passwordModal">
@@ -656,7 +718,7 @@ class AdvancedPropertySystem {
         this.showModal(passwordHTML);
     }
 
-    changePassword(event) {
+    async changePassword(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
@@ -664,26 +726,27 @@ class AdvancedPropertySystem {
         const newPassword = formData.get('newPassword');
         const confirmPassword = formData.get('confirmPassword');
         
-        if (this.propertyDB.users[this.propertyDB.currentUser] !== currentPassword) {
-            this.showNotification('كلمة المرور الحالية غير صحيحة!', 'error');
-            return;
-        }
-        
         if (newPassword !== confirmPassword) {
             this.showNotification('كلمتا المرور الجديدتين غير متطابقتين!', 'error');
             return;
         }
         
-        // تحديث كلمة المرور في قاعدة بيانات المستخدم
-        this.propertyDB.users[this.propertyDB.currentUser] = newPassword;
-        this.saveCurrentUserDB();
-        
-        // تحديث كلمة المرور في قاعدة البيانات الرئيسية
-        this.mainDB.users[this.propertyDB.currentUser] = newPassword;
-        saveMainDB(this.mainDB);
-        
-        this.closeModal('passwordModal');
-        this.showNotification('تم تغيير كلمة المرور بنجاح!');
+        try {
+            // إعادة المصادقة لتغيير كلمة المرور
+            const user = this.firebaseManager.currentUser;
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, currentPassword);
+            await user.reauthenticateWithCredential(credential);
+            await user.updatePassword(newPassword);
+            
+            // تحديث كلمة المرور في قاعدة البيانات المحلية
+            this.propertyDB.users[this.propertyDB.currentUser] = newPassword;
+            this.saveCurrentUserDB();
+            
+            this.closeModal('passwordModal');
+            this.showNotification('تم تغيير كلمة المرور بنجاح!');
+        } catch (error) {
+            this.showNotification('كلمة المرور الحالية غير صحيحة!', 'error');
+        }
     }
 
     navigateTo(page) {
@@ -704,30 +767,14 @@ class AdvancedPropertySystem {
         }
 
         switch(page) {
-            case 'dashboard':
-                this.loadDashboard();
-                break;
-            case 'properties':
-                this.loadProperties();
-                break;
-            case 'customers':
-                this.loadCustomers();
-                break;
-            case 'contracts':
-                this.loadContracts();
-                break;
-            case 'payments':
-                this.loadPayments();
-                break;
-            case 'maintenance':
-                this.loadMaintenance();
-                break;
-            case 'reports':
-                this.loadReports();
-                break;
-            case 'settings':
-                this.loadSettings();
-                break;
+            case 'dashboard': this.loadDashboard(); break;
+            case 'properties': this.loadProperties(); break;
+            case 'customers': this.loadCustomers(); break;
+            case 'contracts': this.loadContracts(); break;
+            case 'payments': this.loadPayments(); break;
+            case 'maintenance': this.loadMaintenance(); break;
+            case 'reports': this.loadReports(); break;
+            case 'settings': this.loadSettings(); break;
         }
     }
 
@@ -937,7 +984,7 @@ class AdvancedPropertySystem {
         };
         
         this.saveCurrentUserDB();
-        this.showNotification('تم حفظ الإعدادات بنجاح!');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
     }
 
     showPropertyForm() {
@@ -994,7 +1041,7 @@ class AdvancedPropertySystem {
         this.propertyDB.properties.push(newProperty);
         this.saveCurrentUserDB();
         this.closeModal('propertyModal');
-        this.showNotification('تم إضافة الوحدة العقارية بنجاح!');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة الوحدة العقارية بنجاح!' : 'Property added successfully!');
         this.loadProperties();
     }
 
@@ -1042,7 +1089,7 @@ class AdvancedPropertySystem {
         this.propertyDB.customers.push(newCustomer);
         this.saveCurrentUserDB();
         this.closeModal('customerModal');
-        this.showNotification('تم إضافة العميل بنجاح!');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة العميل بنجاح!' : 'Customer added successfully!');
         this.loadCustomers();
     }
 
@@ -1139,6 +1186,22 @@ class AdvancedPropertySystem {
             const key = element.getAttribute('data-translate');
             element.textContent = this.getTranslation(key);
         });
+    }
+
+    applyPermissions() {
+        // تطبيق الصلاحيات حسب دور المستخدم
+        const currentUser = this.propertyDB.currentUser;
+        const userProfile = this.propertyDB.userProfiles?.[currentUser];
+        
+        if (!userProfile) return;
+        
+        // يمكن إضافة منطق إخفاء الأقسام حسب الصلاحيات هنا
+    }
+
+    hasPermission(permission) {
+        const currentUser = this.propertyDB.currentUser;
+        const userProfile = this.propertyDB.userProfiles?.[currentUser];
+        return userProfile?.permissions?.[permission] || false;
     }
 }
 
