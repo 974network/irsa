@@ -48,6 +48,7 @@ class FirebaseManager {
     constructor() {
         this.auth = null;
         this.db = null;
+        this.storage = null;
         this.currentUser = null;
         this.init();
     }
@@ -70,6 +71,7 @@ class FirebaseManager {
             
             this.auth = firebase.auth();
             this.db = firebase.firestore();
+            this.storage = firebase.storage();
             
             // مراقبة حالة المصادقة
             this.auth.onAuthStateChanged((user) => {
@@ -119,6 +121,11 @@ class FirebaseManager {
                 phone: userData.phone || '',
                 role: userData.role || 'مدير النظام',
                 joinDate: new Date().toISOString().split('T')[0],
+                storage: {
+                    limit: 500, // 500 MB مساحة تخزين
+                    used: 0,    // مساحة مستخدمة حالياً
+                    unit: 'MB'
+                },
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
@@ -160,6 +167,43 @@ class FirebaseManager {
             return { success: false, error: error.message };
         }
     }
+
+    // رفع ملف إلى التخزين
+    async uploadFile(file, path) {
+        if (!this.currentUser) return { success: false, error: 'No user logged in' };
+        
+        try {
+            const storageRef = this.storage.ref();
+            const fileRef = storageRef.child(`${this.currentUser.uid}/${path}/${file.name}`);
+            const snapshot = await fileRef.put(file);
+            const downloadURL = await snapshot.ref.getDownloadURL();
+            
+            return { success: true, url: downloadURL, size: file.size };
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
+
+    // حساب المساحة المستخدمة
+    async getStorageUsage() {
+        if (!this.currentUser) return { success: false, error: 'No user logged in' };
+        
+        try {
+            const storageRef = this.storage.ref();
+            const userRef = storageRef.child(this.currentUser.uid);
+            const result = await userRef.listAll();
+            
+            let totalSize = 0;
+            for (const item of result.items) {
+                const metadata = await item.getMetadata();
+                totalSize += metadata.size;
+            }
+            
+            return { success: true, used: totalSize / (1024 * 1024) }; // بالـ MB
+        } catch (error) {
+            return { success: false, error: error.message };
+        }
+    }
 }
 
 // النظام الرئيسي
@@ -181,7 +225,7 @@ class AdvancedPropertySystem {
             if (userDB) {
                 return JSON.parse(userDB);
             } else {
-                return this.createNewUserDB(currentUser);
+                return this.createNewUserDB(currentUser, localStorage.getItem('propertyEmail'));
             }
         }
         return this.getDefaultUserDB();
@@ -191,6 +235,7 @@ class AdvancedPropertySystem {
     getDefaultUserDB() {
         return {
             currentUser: null,
+            currentEmail: null,
             users: {},
             userProfiles: {},
             properties: [
@@ -209,25 +254,36 @@ class AdvancedPropertySystem {
                 companyName: 'نظام إدارة العقارات',
                 currency: 'ريال',
                 taxRate: 15
+            },
+            storageUsage: {
+                documents: 0,
+                images: 0,
+                total: 0
             }
         };
     }
 
     // 🔥 إنشاء قاعدة بيانات جديدة للمستخدم
-    createNewUserDB(username) {
+    createNewUserDB(username, email) {
         const newUserDB = {
             currentUser: username,
+            currentEmail: email,
             users: { [username]: '123456' },
             userProfiles: {
                 [username]: {
                     id: Date.now(),
                     name: username,
-                    email: `${username}@irsa.com`,
-                    phone: '0512345678',
+                    email: email,
+                    phone: '',
                     role: 'مدير النظام',
                     permissions: this.getDefaultPermissions('مدير النظام'),
                     joinDate: new Date().toISOString().split('T')[0],
-                    profileImage: null
+                    profileImage: null,
+                    storage: {
+                        limit: 500, // 500 MB مساحة تخزين
+                        used: 0,    // مساحة مستخدمة حالياً
+                        unit: 'MB'
+                    }
                 }
             },
             properties: [...this.getDefaultUserDB().properties],
@@ -235,7 +291,12 @@ class AdvancedPropertySystem {
             contracts: [],
             payments: [],
             maintenance: [],
-            settings: { ...this.getDefaultUserDB().settings }
+            settings: { ...this.getDefaultUserDB().settings },
+            storageUsage: {
+                documents: 0,
+                images: 0,
+                total: 0
+            }
         };
         
         localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
@@ -339,18 +400,6 @@ class AdvancedPropertySystem {
             });
         }
 
-        // إضافة زر إنشاء حساب جديد
-        const loginContainer = document.querySelector('.login-container');
-        if (loginContainer && !document.getElementById('createAccountBtn')) {
-            const createAccountBtn = document.createElement('button');
-            createAccountBtn.type = 'button';
-            createAccountBtn.id = 'createAccountBtn';
-            createAccountBtn.className = 'btn btn-secondary';
-            createAccountBtn.innerHTML = '<i class="fas fa-user-plus"></i> إنشاء حساب جديد';
-            createAccountBtn.onclick = () => this.showCreateAccountModal();
-            loginContainer.appendChild(createAccountBtn);
-        }
-
         // إعداد أزرار تبديل اللغة
         document.querySelectorAll('.lang-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -360,21 +409,35 @@ class AdvancedPropertySystem {
         });
     }
 
-    // 🔥 دالة تسجيل الدخول مع Firebase
+    // 🔥 التحقق من صحة البريد الإلكتروني
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    }
+
+    // 🔥 دالة تسجيل الدخول مع Firebase - معدلة
     async handleLogin() {
-        const username = document.getElementById('username').value;
+        const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
-        if (!username || !password) {
+        if (!email || !password) {
             this.showNotification('يرجى ملء جميع الحقول', 'error');
             return;
         }
 
+        // التحقق من صحة البريد الإلكتروني
+        if (!this.isValidEmail(email)) {
+            this.showNotification('البريد الإلكتروني غير صالح', 'error');
+            return;
+        }
+
         // استخدام Firebase للمصادقة
-        const email = username.includes('@') ? username : `${username}@irsa.com`;
         const result = await this.firebaseManager.login(email, password);
         
         if (result.success) {
+            // استخراج اسم المستخدم من البريد الإلكتروني
+            const username = email.split('@')[0];
+            
             // تحميل قاعدة بيانات المستخدم الخاصة
             const userDBKey = `propertyDB_${username}`;
             const userDB = localStorage.getItem(userDBKey);
@@ -383,11 +446,14 @@ class AdvancedPropertySystem {
                 this.propertyDB = JSON.parse(userDB);
             } else {
                 // إنشاء قاعدة بيانات جديدة معزولة
-                this.propertyDB = this.createNewUserDB(username);
+                this.propertyDB = this.createNewUserDB(username, email);
             }
             
             this.propertyDB.currentUser = username;
+            this.propertyDB.currentEmail = email; // حفظ البريد الإلكتروني
+            
             localStorage.setItem('propertyUser', username);
+            localStorage.setItem('propertyEmail', email);
             localStorage.setItem('loginTime', new Date().toISOString());
             
             document.getElementById('loginPage').style.display = 'none';
@@ -402,21 +468,20 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 دالة إنشاء حساب مع Firebase
+    // 🔥 دالة إنشاء حساب مع Firebase - معدلة
     async createNewAccount(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
-        const username = formData.get('username');
+        const email = formData.get('email');
         const fullName = formData.get('fullName');
-        const email = formData.get('email') || `${username}@irsa.com`;
         const phone = formData.get('phone');
         const password = formData.get('password');
         const confirmPassword = formData.get('confirmPassword');
         
-        // التحقق من البيانات
-        if (this.mainDB.users[username]) {
-            this.showNotification('اسم المستخدم موجود مسبقاً!', 'error');
+        // التحقق من صحة البريد الإلكتروني
+        if (!this.isValidEmail(email)) {
+            this.showNotification('البريد الإلكتروني غير صالح!', 'error');
             return;
         }
         
@@ -426,26 +491,29 @@ class AdvancedPropertySystem {
         }
         
         // استخدام Firebase لإنشاء الحساب
+        const username = email.split('@')[0];
         const userData = {
             username: username,
             fullName: fullName,
             phone: phone,
-            role: 'مدير النظام'
+            role: 'مدير النظام',
+            storage: {
+                limit: 500, // 500 MB مساحة تخزين
+                used: 0,    // مساحة مستخدمة حالياً
+                unit: 'MB'
+            },
+            createdAt: new Date().toISOString()
         };
         
         const result = await this.firebaseManager.createAccount(email, password, userData);
         
         if (result.success) {
-            // إضافة المستخدم إلى قاعدة البيانات الرئيسية
-            this.mainDB.users[username] = password;
-            this.mainDB.userProfiles[username] = userData;
-            
-            // حفظ قاعدة البيانات الرئيسية
-            saveMainDB(this.mainDB);
-            
             // إنشاء قاعدة بيانات مستقلة للمستخدم الجديد
-            const newUserDB = this.createNewUserDB(username);
-            newUserDB.userProfiles[username] = { ...userData, email: email };
+            const newUserDB = this.createNewUserDB(username, email);
+            newUserDB.userProfiles[username] = { 
+                ...userData, 
+                email: email
+            };
             
             // حفظ قاعدة البيانات الجديدة للمستخدم
             localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
@@ -499,6 +567,7 @@ class AdvancedPropertySystem {
         
         // مسح بيانات الجلسة
         localStorage.removeItem('propertyUser');
+        localStorage.removeItem('propertyEmail');
         localStorage.removeItem('loginTime');
         
         // إعادة تعيين قاعدة البيانات للنظام
@@ -564,6 +633,8 @@ class AdvancedPropertySystem {
         const userProfile = this.propertyDB.userProfiles?.[username] || {};
         const displayName = userProfile.name || username;
         const profileImage = userProfile.profileImage;
+        const storageUsed = userProfile.storage?.used || 0;
+        const storageLimit = userProfile.storage?.limit || 500;
 
         const userMenuHTML = `
             <div class="user-menu-container">
@@ -583,6 +654,14 @@ class AdvancedPropertySystem {
                         }
                         <div class="user-name">${displayName}</div>
                         <div class="user-role">${userProfile.role || 'مدير النظام'}</div>
+                        <div class="storage-info-dropdown">
+                            <div class="storage-progress">
+                                <div class="storage-progress-bar" style="width: ${(storageUsed / storageLimit) * 100}%"></div>
+                            </div>
+                            <div class="storage-text">
+                                ${storageUsed.toFixed(1)} MB / ${storageLimit} MB مستخدم
+                            </div>
+                        </div>
                     </div>
                     <div class="dropdown-divider"></div>
                     <a href="#" class="dropdown-item" onclick="propertySystem.showProfileModal()">
@@ -644,29 +723,32 @@ class AdvancedPropertySystem {
                     </div>
                     <form onsubmit="propertySystem.createNewAccount(event)">
                         <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'اسم المستخدم' : 'Username'}:</label>
-                            <input type="text" name="username" required minlength="3" placeholder="${this.currentLanguage === 'ar' ? 'أدخل اسم المستخدم' : 'Enter username'}">
+                            <label>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'} *:</label>
+                            <input type="email" name="email" required placeholder="${this.currentLanguage === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email'}">
                         </div>
                         <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'}:</label>
+                            <label>${this.currentLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'} *:</label>
                             <input type="text" name="fullName" required placeholder="${this.currentLanguage === 'ar' ? 'أدخل الاسم الكامل' : 'Enter full name'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}:</label>
-                            <input type="email" name="email" placeholder="${this.currentLanguage === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email'}">
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}:</label>
                             <input type="tel" name="phone" placeholder="${this.currentLanguage === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}">
                         </div>
                         <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'كلمة المرور' : 'Password'}:</label>
+                            <label>${this.currentLanguage === 'ar' ? 'كلمة المرور' : 'Password'} *:</label>
                             <input type="password" name="password" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}">
                         </div>
                         <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}:</label>
+                            <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'} *:</label>
                             <input type="password" name="confirmPassword" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? 'أكد كلمة المرور' : 'Confirm password'}">
                         </div>
+                        
+                        <!-- معلومات المساحة التخزينية -->
+                        <div class="storage-info">
+                            <i class="fas fa-database"></i>
+                            <span>${this.currentLanguage === 'ar' ? 'سيحصل الحساب على مساحة تخزين 500 ميجابايت' : 'Account will get 500 MB storage space'}</span>
+                        </div>
+                        
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> ${this.currentLanguage === 'ar' ? 'إنشاء الحساب' : 'Create Account'}
@@ -781,6 +863,11 @@ class AdvancedPropertySystem {
     loadDashboard() {
         const content = document.querySelector('.main-content');
         const stats = this.calculateStats();
+        const username = this.propertyDB.currentUser;
+        const userProfile = this.propertyDB.userProfiles?.[username] || {};
+        const storageUsed = userProfile.storage?.used || 0;
+        const storageLimit = userProfile.storage?.limit || 500;
+        const storagePercent = (storageUsed / storageLimit) * 100;
         
         content.innerHTML = `
             <div class="dashboard-compact">
@@ -812,6 +899,20 @@ class AdvancedPropertySystem {
                         <div class="stat-value-compact">${this.propertyDB.customers.length}</div>
                         <div class="stat-title-compact">${this.currentLanguage === 'ar' ? 'العملاء' : 'Customers'}</div>
                     </div>
+                </div>
+
+                <!-- مساحة التخزين -->
+                <div class="storage-card">
+                    <h3><i class="fas fa-database"></i> ${this.currentLanguage === 'ar' ? 'مساحة التخزين' : 'Storage Space'}</h3>
+                    <div class="storage-progress-container">
+                        <div class="storage-progress">
+                            <div class="storage-progress-bar" style="width: ${storagePercent}%"></div>
+                        </div>
+                        <div class="storage-text">
+                            ${storageUsed.toFixed(1)} MB / ${storageLimit} MB ${this.currentLanguage === 'ar' ? 'مستخدم' : 'used'}
+                        </div>
+                    </div>
+                    <div class="storage-percent">${storagePercent.toFixed(1)}%</div>
                 </div>
 
                 <div class="activities-compact">
@@ -1162,20 +1263,44 @@ class AdvancedPropertySystem {
     getTranslation(key) {
         const translations = {
             'ar': {
-                'username': 'اسم المستخدم', 'password': 'كلمة المرور', 'login': 'تسجيل الدخول',
-                'dashboard': 'الرئيسية', 'properties': 'إدارة العقارات', 'customers': 'إدارة العملاء',
-                'contracts': 'العقود', 'payments': 'المدفوعات', 'maintenance': 'الصيانة',
-                'reports': 'التقارير', 'settings': 'الإعدادات', 'logout': 'تسجيل الخروج',
-                'addProperty': 'إضافة وحدة جديدة', 'addCustomer': 'إضافة عميل جديد',
-                'profile': 'الملف الشخصي', 'changePassword': 'تغيير كلمة المرور'
+                'email': 'البريد الإلكتروني',
+                'username': 'اسم المستخدم', 
+                'password': 'كلمة المرور', 
+                'login': 'تسجيل الدخول',
+                'dashboard': 'الرئيسية', 
+                'properties': 'إدارة العقارات', 
+                'customers': 'إدارة العملاء',
+                'contracts': 'العقود', 
+                'payments': 'المدفوعات', 
+                'maintenance': 'الصيانة',
+                'reports': 'التقارير', 
+                'settings': 'الإعدادات', 
+                'logout': 'تسجيل الخروج',
+                'addProperty': 'إضافة وحدة جديدة', 
+                'addCustomer': 'إضافة عميل جديد',
+                'profile': 'الملف الشخصي', 
+                'changePassword': 'تغيير كلمة المرور',
+                'createAccount': 'إنشاء حساب جديد'
             },
             'en': {
-                'username': 'Username', 'password': 'Password', 'login': 'Login',
-                'dashboard': 'Dashboard', 'properties': 'Properties Management', 'customers': 'Customers Management',
-                'contracts': 'Contracts', 'payments': 'Payments', 'maintenance': 'Maintenance',
-                'reports': 'Reports', 'settings': 'Settings', 'logout': 'Logout',
-                'addProperty': 'Add New Property', 'addCustomer': 'Add New Customer',
-                'profile': 'Profile', 'changePassword': 'Change Password'
+                'email': 'Email',
+                'username': 'Username', 
+                'password': 'Password', 
+                'login': 'Login',
+                'dashboard': 'Dashboard', 
+                'properties': 'Properties Management', 
+                'customers': 'Customers Management',
+                'contracts': 'Contracts', 
+                'payments': 'Payments', 
+                'maintenance': 'Maintenance',
+                'reports': 'Reports', 
+                'settings': 'Settings', 
+                'logout': 'Logout',
+                'addProperty': 'Add New Property', 
+                'addCustomer': 'Add New Customer',
+                'profile': 'Profile', 
+                'changePassword': 'Change Password',
+                'createAccount': 'Create New Account'
             }
         };
         return translations[this.currentLanguage][key] || key;
