@@ -6,15 +6,13 @@
     <title>IRSA Trading & Contracting</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- تحديث إصدار Firebase -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
+
     <style>
-        /* حل فوري - يمنع أي حركة للواجهة */
         .login-box {
             position: fixed !important;
             left: 50% !important;
@@ -24,7 +22,6 @@
             transition: none !important;
         }
         
-        /* تثبيت جميع العناصر الداخلية */
         .login-header {
             text-align: center !important;
             margin: 0 auto 30px auto !important;
@@ -56,10 +53,6 @@
             display: block !important;
         }
         
-        .input-group input::placeholder {
-            text-align: center !important;
-        }
-        
         .login-btn, 
         .create-account-btn {
             text-align: center !important;
@@ -69,7 +62,6 @@
             align-items: center !important;
         }
         
-        /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
         [dir="ltr"] .login-box,
         [dir="rtl"] .login-box {
             left: 50% !important;
@@ -77,7 +69,6 @@
             transform: translate(-50%, -50%) !important;
         }
         
-        /* منع أي تحريك من JavaScript */
         .login-container * {
             transition: none !important;
             animation: none !important;
@@ -108,7 +99,6 @@
                     <i class="fas fa-sign-in-alt"></i> <span data-translate="login">تسجيل الدخول</span>
                 </button>
                 
-                <!-- زر إنشاء حساب جديد -->
                 <button type="button" class="btn btn-secondary create-account-btn" onclick="propertySystem.showCreateAccountModal()">
                     <i class="fas fa-user-plus"></i> <span data-translate="createAccount">إنشاء حساب جديد</span>
                 </button>
@@ -125,33 +115,17 @@
                     <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
                 </div>
                 <div class="nav-links">
-                    <!-- سيتم ملؤها ديناميكياً -->
+                    <!-- يتم ملؤها ديناميكياً -->
                 </div>
             </aside>
 
             <!-- المحتوى الرئيسي -->
             <main class="main-content">
-                <!-- سيتم ملؤه ديناميكياً -->
+                <!-- يتم ملؤه ديناميكياً -->
             </main>
         </div>
     </div>
 
-    <!-- إضافة تهيئة Firebase -->
-    <script>
-        // تهيئة Firebase مع بيانات المشروع الخاصة بك
-        const firebaseConfig = {
-            apiKey: "AIzaSyBUMgt1C6gdDrtgpBcMkyHBZFDeHiDd1HI",
-            authDomain: "mohanad-93df3.firebaseapp.com",
-            projectId: "mohanad-93df3",
-            storageBucket: "mohanad-93df3.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        
-        // تهيئة Firebase
-        firebase.initializeApp(firebaseConfig);
-    </script>
-    
     <script src="app.js"></script>
 </body>
 </html>
