@@ -381,14 +381,45 @@ quickSave() {
     return false;
 }
 
-    init() {
+   init() {
+    try {
+        // تهيئة البيانات الأساسية أولاً
+        this.initializeDatabase();
         this.setupLogin();
         this.setupNavigation();
         this.checkAuthStatus();
         this.setupSessionCheck();
         this.applyLanguage(this.currentLanguage);
         this.setupUserMenu();
+    } catch (error) {
+        console.error('Initialization error:', error);
+        this.showEmergencyLogin();
     }
+}
+    showEmergencyLogin() {
+    document.getElementById('loginPage').style.display = 'flex';
+    document.getElementById('dashboard').style.display = 'none';
+    this.showNotification('تم إعادة تهيئة النظام، يرجى تسجيل الدخول مرة أخرى', 'info');
+}
+
+// 🔥 دالة محسنة لتهيئة قاعدة البيانات
+initializeDatabase() {
+    if (!this.propertyDB) {
+        this.propertyDB = this.getDefaultUserDB();
+    }
+    
+    // التأكد من وجود جميع الحقول الأساسية
+    if (!this.propertyDB.properties) this.propertyDB.properties = [];
+    if (!this.propertyDB.customers) this.propertyDB.customers = [];
+    if (!this.propertyDB.contracts) this.propertyDB.contracts = [];
+    if (!this.propertyDB.payments) this.propertyDB.payments = [];
+    if (!this.propertyDB.maintenance) this.propertyDB.maintenance = [];
+    if (!this.propertyDB.settings) this.propertyDB.settings = {
+        companyName: 'نظام إدارة العقارات',
+        currency: 'ريال',
+        taxRate: 15
+    };
+}
 
     setupLogin() {
         const loginForm = document.getElementById('loginForm');
@@ -480,18 +511,39 @@ handleLogin() {
 }
 
     // 🔥 **دالة محسنة: التحقق من حالة المصادقة**
-    checkAuthStatus() {
+    // 🔥 تحديث دالة checkAuthStatus
+checkAuthStatus() {
+    try {
         const savedUser = localStorage.getItem('propertyUser');
         if (savedUser) {
             const userDB = localStorage.getItem(`propertyDB_${savedUser}`);
             if (userDB) {
                 this.propertyDB = JSON.parse(userDB);
+                
+                // التحقق من صحة البيانات
+                this.validateDatabaseStructure();
+                
                 document.getElementById('loginPage').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
                 this.loadDashboard();
             }
         }
+    } catch (error) {
+        console.error('Auth check error:', error);
+        this.logout();
     }
+}
+
+// 🔥 دالة التحقق من هيكل البيانات
+validateDatabaseStructure() {
+    const requiredFields = ['properties', 'customers', 'contracts', 'payments', 'maintenance', 'settings'];
+    
+    requiredFields.forEach(field => {
+        if (!this.propertyDB[field]) {
+            this.propertyDB[field] = this.getDefaultUserDB()[field];
+        }
+    });
+}
 
     setupSessionCheck() {
         setInterval(() => {
@@ -3642,11 +3694,16 @@ printReport() {
 
     // 🔥 **الدوال المساعدة**
     calculateStats() {
-        const totalProperties = this.propertyDB.properties.length;
-        const occupied = this.propertyDB.properties.filter(p => p.status === 'مشغولة').length;
-        const vacant = this.propertyDB.properties.filter(p => p.status === 'شاغرة').length;
+    try {
+        const totalProperties = this.propertyDB.properties?.length || 0;
+        const occupied = this.propertyDB.properties?.filter(p => p.status === 'مشغولة').length || 0;
+        const vacant = this.propertyDB.properties?.filter(p => p.status === 'شاغرة').length || 0;
         const occupancyRate = totalProperties > 0 ? ((occupied / totalProperties) * 100).toFixed(1) : 0;
-        const totalRevenue = this.propertyDB.payments.reduce((sum, payment) => sum + payment.amount, 0);
+        
+        // التحقق من وجود payments
+        const totalRevenue = this.propertyDB.payments?.reduce((sum, payment) => {
+            return sum + (payment.amount || 0);
+        }, 0) || 0;
 
         return {
             totalProperties,
@@ -3655,7 +3712,17 @@ printReport() {
             occupancyRate,
             totalRevenue
         };
+    } catch (error) {
+        console.error('Error in calculateStats:', error);
+        return {
+            totalProperties: 0,
+            occupied: 0,
+            vacant: 0,
+            occupancyRate: 0,
+            totalRevenue: 0
+        };
     }
+}
 
     calculateFinancialStats() {
         const currentYear = new Date().getFullYear();
@@ -4163,5 +4230,6 @@ printReport() {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
