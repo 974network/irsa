@@ -3,84 +3,964 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IRSA Trading & Contracting</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>IRSA Trading & Contracting - نظام إدارة العقارات</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <!-- تحديث إصدار Firebase -->
+    <!-- إصدارات Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* حل فوري - يمنع أي حركة للواجهة */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --accent: #e74c3c;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --sidebar-width: 250px;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            direction: rtl;
+        }
+
+        /* شاشة تسجيل الدخول */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
         .login-box {
-            position: fixed !important;
-            left: 50% !important;
-            top: 50% !important;
-            transform: translate(-50%, -50%) !important;
-            margin: 0 !important;
-            transition: none !important;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        
-        /* تثبيت جميع العناصر الداخلية */
+
         .login-header {
-            text-align: center !important;
-            margin: 0 auto 30px auto !important;
+            text-align: center;
+            margin-bottom: 30px;
         }
-        
+
+        .logo-image {
+            max-width: 120px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .login-header h1 {
+            color: var(--primary);
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
         .language-switcher {
-            text-align: center !important;
-            margin: 20px auto !important;
-            display: flex !important;
-            justify-content: center !important;
-            gap: 10px !important;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
         }
-        
+
+        .lang-btn {
+            padding: 8px 16px;
+            border: 2px solid var(--secondary);
+            background: transparent;
+            color: var(--secondary);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .lang-btn.active {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .lang-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
         .input-group {
-            text-align: center !important;
-            margin: 15px auto !important;
-            display: block !important;
+            margin-bottom: 20px;
         }
-        
+
         .input-group label {
-            text-align: center !important;
-            display: block !important;
-            margin: 0 auto 8px auto !important;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 14px;
         }
-        
+
         .input-group input {
-            text-align: center !important;
-            margin: 0 auto !important;
-            display: block !important;
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
         }
-        
-        .input-group input::placeholder {
-            text-align: center !important;
+
+        .input-group input:focus {
+            border-color: var(--secondary);
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
         }
-        
-        .login-btn, 
+
+        .login-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(52, 152, 219, 0.4);
+        }
+
         .create-account-btn {
-            text-align: center !important;
-            margin: 10px auto !important;
-            display: flex !important;
-            justify-content: center !important;
-            align-items: center !important;
+            width: 100%;
+            padding: 12px;
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-        
-        /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
-        [dir="ltr"] .login-box,
-        [dir="rtl"] .login-box {
-            left: 50% !important;
-            right: auto !important;
-            transform: translate(-50%, -50%) !important;
+
+        .create-account-btn:hover {
+            background: var(--secondary);
+            color: white;
+            transform: translateY(-2px);
         }
-        
-        /* منع أي تحريك من JavaScript */
-        .login-container * {
-            transition: none !important;
-            animation: none !important;
+
+        /* لوحة التحكم */
+        .dashboard {
+            display: none;
+            min-height: 100vh;
+        }
+
+        .dashboard-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* الشريط الجانبي */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--primary) 0%, #34495e 100%);
+            color: white;
+            padding: 20px 0;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .sidebar .logo {
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo {
+            max-width: 150px;
+            height: auto;
+        }
+
+        .nav-links {
+            padding: 0 15px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            border-radius: 8px;
+            margin-bottom: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-link:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            transform: translateX(-5px);
+        }
+
+        .nav-link.active {
+            background: var(--secondary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .nav-link i {
+            margin-left: 10px;
+            font-size: 18px;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            background: #f8f9fa;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .page-header h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .page-header h2 i {
+            margin-left: 10px;
+            color: var(--secondary);
+        }
+
+        .page-description {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 40px 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 25px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--secondary);
+            outline: none;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), #2980b9);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        /* البطاقات والإحصائيات */
+        .stats-grid-compact {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card-compact {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            text-align: center;
+            transition: all 0.3s ease;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .stat-card-compact:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-card-compact i {
+            font-size: 40px;
+            color: var(--secondary);
+            margin-bottom: 15px;
+        }
+
+        .stat-value-compact {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .stat-title-compact {
+            color: #666;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* الجداول */
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th {
+            background: #f8f9fa;
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+            color: var(--primary);
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e9ecef;
+            color: #555;
+        }
+
+        .data-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        /* النماذج */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: var(--secondary);
+            background: white;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        /* المودال */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            color: var(--primary);
+            font-size: 20px;
+            margin: 0;
+        }
+
+        .modal-header h3 i {
+            margin-left: 10px;
+            color: var(--secondary);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #666;
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: #f8f9fa;
+            color: var(--danger);
+        }
+
+        .modal-content form {
+            padding: 25px;
+        }
+
+        /* الإشعارات */
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 1001;
+            max-width: 400px;
+            margin: 0 auto;
+            border-left: 4px solid var(--success);
+        }
+
+        .notification-error {
+            border-left-color: var(--danger);
+        }
+
+        .notification-warning {
+            border-left-color: var(--warning);
+        }
+
+        .notification-info {
+            border-left-color: var(--secondary);
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .notification-content i {
+            font-size: 20px;
+        }
+
+        .notification-success .notification-content i {
+            color: var(--success);
+        }
+
+        .notification-error .notification-content i {
+            color: var(--danger);
+        }
+
+        .notification-warning .notification-content i {
+            color: var(--warning);
+        }
+
+        .notification-info .notification-content i {
+            color: var(--secondary);
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .notification-close:hover {
+            background: #f8f9fa;
+            color: var(--dark);
+        }
+
+        /* قائمة المستخدم */
+        .user-menu-sidebar {
+            padding: 20px 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            margin-top: 20px;
+        }
+
+        .user-menu-container {
+            position: relative;
+        }
+
+        .user-avatar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+        }
+
+        .user-avatar:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .profile-image {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .default-avatar {
+            font-size: 35px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .user-display-name {
+            flex: 1;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .user-dropdown {
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            width: 250px;
+            z-index: 100;
+            display: none;
+            margin-bottom: 10px;
+        }
+
+        .user-dropdown.show {
+            display: block;
+        }
+
+        .user-info {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .profile-image-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 10px;
+        }
+
+        .profile-icon-large {
+            font-size: 60px;
+            color: var(--secondary);
+            margin-bottom: 10px;
+        }
+
+        .user-name {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .user-role {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: #e9ecef;
+            margin: 5px 0;
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            gap: 10px;
+        }
+
+        .dropdown-item:hover {
+            background: #f8f9fa;
+            color: var(--primary);
+        }
+
+        .dropdown-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .logout-item {
+            color: var(--danger);
+        }
+
+        .logout-item:hover {
+            background: #ffe6e6;
+            color: var(--danger);
+        }
+
+        /* إعدادات التخزين */
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .settings-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+        }
+
+        .storage-card {
+            border-left: 4px solid var(--success) !important;
+        }
+
+        .storage-info-container {
+            margin-bottom: 20px;
+        }
+
+        .storage-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .storage-info i {
+            font-size: 24px;
+            color: var(--success);
+        }
+
+        .storage-progress {
+            flex: 1;
+        }
+
+        .storage-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+
+        .storage-used {
+            height: 100%;
+            background: linear-gradient(90deg, var(--success), #27ae60);
+            transition: width 0.3s ease;
+        }
+
+        .storage-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        /* التصفية */
+        .filters-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filters-container select {
+            padding: 8px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            background: white;
+            font-size: 14px;
+            min-width: 150px;
+        }
+
+        /* الحالة */
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-occupied {
+            background: #ffe6e6;
+            color: var(--danger);
+        }
+
+        .status-vacant {
+            background: #e6ffe6;
+            color: var(--success);
+        }
+
+        .status-active {
+            background: #e6f7ff;
+            color: var(--secondary);
+        }
+
+        .status-inactive {
+            background: #f2f2f2;
+            color: #666;
+        }
+
+        /* الأنشطة */
+        .activities-compact {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+        }
+
+        .activities-compact h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
+
+        .activities-compact h3 i {
+            margin-left: 10px;
+            color: var(--secondary);
+        }
+
+        .activity-list-compact {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .activity-item-compact {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .activity-item-compact:hover {
+            background: #e9ecef;
+            transform: translateX(-5px);
+        }
+
+        .activity-icon-compact {
+            width: 40px;
+            height: 40px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .activity-content-compact {
+            flex: 1;
+        }
+
+        .activity-text-compact {
+            color: var(--primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .activity-time-compact {
+            color: #666;
+            font-size: 12px;
+        }
+
+        /* التجاوب */
+        @media (max-width: 768px) {
+            .dashboard-layout {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                height: auto;
+            }
+            
+            .nav-links {
+                display: flex;
+                overflow-x: auto;
+                padding: 10px;
+            }
+            
+            .nav-link {
+                flex-shrink: 0;
+                margin-bottom: 0;
+                margin-left: 10px;
+            }
+            
+            .stats-grid-compact {
+                grid-template-columns: 1fr;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .search-box {
+                min-width: auto;
+                flex: 1;
+            }
+        }
+
+        /* التحميل */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--secondary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -89,31 +969,47 @@
     <div id="loginPage" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <img src="irsa.png" alt="لوجو IRSA" class="logo-image login-logo">
+                <!-- يمكنك استبدال هذا باللوجو الفعلي -->
+                <div class="logo-image" style="background: var(--secondary); color: white; width: 80px; height: 80px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px;">
+                    <i class="fas fa-building" style="font-size: 40px;"></i>
+                </div>
+                <h1>نظام إدارة العقارات</h1>
+                <p>IRSA Trading & Contracting</p>
+                
                 <div class="language-switcher">
-                    <button type="button" class="lang-btn" data-lang="ar">العربية</button>
+                    <button type="button" class="lang-btn active" data-lang="ar">العربية</button>
                     <button type="button" class="lang-btn" data-lang="en">English</button>
                 </div>
             </div>
+            
             <form id="loginForm">
                 <div class="input-group">
-    <label for="username"><i class="fas fa-user"></i> <span data-translate="username">اسم المستخدم</span></label>
-    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
-    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
-        سيسجل دخولك كـ username@irsa.com
-    </small>
-</div>
-<div class="input-group">
-    <label for="password"><i class="fas fa-lock"></i> <span data-translate="password">كلمة المرور</span></label>
-    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
-</div>
+                    <label for="username">
+                        <i class="fas fa-user"></i> 
+                        <span data-translate="username">اسم المستخدم</span>
+                    </label>
+                    <input type="text" id="username" placeholder="أدخل اسم المستخدم" required>
+                    <small style="color: #666; font-size: 12px; display: block; margin-top: 5px;">
+                        سيسجل دخولك كـ username@irsa.com
+                    </small>
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i> 
+                        <span data-translate="password">كلمة المرور</span>
+                    </label>
+                    <input type="password" id="password" placeholder="أدخل كلمة المرور" required>
+                </div>
+                
                 <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> <span data-translate="login">تسجيل الدخول</span>
+                    <i class="fas fa-sign-in-alt"></i> 
+                    <span data-translate="login">تسجيل الدخول</span>
                 </button>
                 
-                <!-- زر إنشاء حساب جديد -->
-                <button type="button" class="btn btn-secondary create-account-btn" onclick="propertySystem.showCreateAccountModal()">
-                    <i class="fas fa-user-plus"></i> <span data-translate="createAccount">إنشاء حساب جديد</span>
+                <button type="button" class="create-account-btn" onclick="propertySystem.showCreateAccountModal()">
+                    <i class="fas fa-user-plus"></i> 
+                    <span data-translate="createAccount">إنشاء حساب جديد</span>
                 </button>
             </form>
         </div>
@@ -125,37 +1021,108 @@
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="logo">
-                    <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
+                    <!-- يمكنك استبدال هذا باللوجو الفعلي -->
+                    <div class="sidebar-logo" style="background: white; color: var(--secondary); width: 120px; height: 120px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                        <i class="fas fa-building" style="font-size: 50px;"></i>
+                    </div>
+                    <h3 style="margin-top: 10px; color: white;">IRSA</h3>
                 </div>
+                
                 <div class="nav-links">
+                    <a href="#" class="nav-link active" id="nav-dashboard" data-page="dashboard">
+                        <i class="fas fa-home"></i>
+                        <span data-translate="dashboard">الرئيسية</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-properties" data-page="properties">
+                        <i class="fas fa-building"></i>
+                        <span data-translate="properties">إدارة العقارات</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-customers" data-page="customers">
+                        <i class="fas fa-users"></i>
+                        <span data-translate="customers">إدارة العملاء</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-contracts" data-page="contracts">
+                        <i class="fas fa-file-contract"></i>
+                        <span data-translate="contracts">العقود</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-payments" data-page="payments">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <span data-translate="payments">المدفوعات</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-maintenance" data-page="maintenance">
+                        <i class="fas fa-tools"></i>
+                        <span data-translate="maintenance">الصيانة</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-reports" data-page="reports">
+                        <i class="fas fa-chart-bar"></i>
+                        <span data-translate="reports">التقارير</span>
+                    </a>
+                    <a href="#" class="nav-link" id="nav-settings" data-page="settings">
+                        <i class="fas fa-cog"></i>
+                        <span data-translate="settings">الإعدادات</span>
+                    </a>
+                </div>
+                
+                <!-- قائمة المستخدم (سيتم إضافتها ديناميكياً) -->
+                <div class="user-menu-sidebar" id="userMenuContainer">
                     <!-- سيتم ملؤها ديناميكياً -->
                 </div>
             </aside>
 
             <!-- المحتوى الرئيسي -->
-            <main class="main-content">
+            <main class="main-content" id="mainContent">
                 <!-- سيتم ملؤه ديناميكياً -->
+                <div class="page-header">
+                    <div>
+                        <h2><i class="fas fa-home"></i> <span data-translate="dashboard">الرئيسية</span></h2>
+                        <p class="page-description">مرحباً بك في نظام إدارة العقارات المتكامل</p>
+                    </div>
+                </div>
+                
+                <div class="stats-grid-compact">
+                    <div class="stat-card-compact">
+                        <i class="fas fa-building"></i>
+                        <div class="stat-value-compact">0</div>
+                        <div class="stat-title-compact">إجمالي الوحدات</div>
+                    </div>
+                    <div class="stat-card-compact">
+                        <i class="fas fa-check-circle"></i>
+                        <div class="stat-value-compact">0</div>
+                        <div class="stat-title-compact">وحدات مشغولة</div>
+                    </div>
+                    <div class="stat-card-compact">
+                        <i class="fas fa-money-bill-wave"></i>
+                        <div class="stat-value-compact">0</div>
+                        <div class="stat-title-compact">إجمالي الإيرادات</div>
+                    </div>
+                    <div class="stat-card-compact">
+                        <i class="fas fa-users"></i>
+                        <div class="stat-value-compact">0</div>
+                        <div class="stat-title-compact">العملاء</div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>
 
-    <!-- إضافة تهيئة Firebase -->
+    <!-- النماذج ستظهر هنا ديناميكياً -->
+
     <script>
-        // تهيئة Firebase مع بيانات المشروع الخاصة بك
+        // تهيئة Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyBUMgt1C6gdDrtgpBcMkyHBZFDeHiDd1HI",
             authDomain: "mohanad-93df3.firebaseapp.com",
             projectId: "mohanad-93df3",
             storageBucket: "mohanad-93df3.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
+            messagingSenderId: "1057899918391",
+            appId: "1:1057899918391:web:a1b2c3d4e5f6g7h8i9j0"
         };
-        
+
         // تهيئة Firebase
         firebase.initializeApp(firebaseConfig);
+        console.log('✅ Firebase initialized successfully');
     </script>
-    
+
     <script src="app.js"></script>
 </body>
 </html>
-
