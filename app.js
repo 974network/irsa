@@ -106,34 +106,35 @@ class FirebaseManager {
     }
 
     // إنشاء حساب
-    async createAccount(email, password, userData = {}) {
-        try {
-            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
-            this.currentUser = userCredential.user;
-            
-            // حفظ بيانات المستخدم في Firestore
-            const userProfile = {
-                username: userData.username || email.split('@')[0],
-                fullName: userData.fullName || email.split('@')[0],
-                email: email,
-                phone: userData.phone || '',
-                role: userData.role || 'مدير النظام',
-                joinDate: new Date().toISOString().split('T')[0],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-            
-            await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
-            return { success: true, user: this.currentUser };
-        } catch (error) {
-            let errorMessage = 'فشل في إنشاء الحساب';
-            switch (error.code) {
-                case 'auth/email-already-in-use': errorMessage = 'البريد الإلكتروني مستخدم مسبقاً'; break;
-                case 'auth/weak-password': errorMessage = 'كلمة المرور ضعيفة'; break;
-                default: errorMessage = error.message;
-            }
-            return { success: false, error: errorMessage };
+    // إنشاء حساب
+async createAccount(email, password, userData = {}) {
+    try {
+        const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+        this.currentUser = userCredential.user;
+        
+        // حفظ بيانات المستخدم في Firestore
+        const userProfile = {
+            username: userData.username || email.split('@')[0],
+            fullName: userData.fullName || email.split('@')[0],
+            email: email,  // استخدام الإيميل الذي تم تمريره
+            phone: userData.phone || '',
+            role: userData.role || 'مدير النظام',
+            joinDate: new Date().toISOString().split('T')[0],
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        
+        await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
+        return { success: true, user: this.currentUser };
+    } catch (error) {
+        let errorMessage = 'فشل في إنشاء الحساب';
+        switch (error.code) {
+            case 'auth/email-already-in-use': errorMessage = 'اسم المستخدم مستخدم مسبقاً'; break;
+            case 'auth/weak-password': errorMessage = 'كلمة المرور ضعيفة'; break;
+            default: errorMessage = error.message;
         }
+        return { success: false, error: errorMessage };
     }
+}
 
     // تسجيل الخروج
     async logout() {
@@ -215,32 +216,34 @@ class AdvancedPropertySystem {
 
     // 🔥 إنشاء قاعدة بيانات جديدة للمستخدم
     createNewUserDB(username) {
-        const newUserDB = {
-            currentUser: username,
-            users: { [username]: '123456' },
-            userProfiles: {
-                [username]: {
-                    id: Date.now(),
-                    name: username,
-                    email: `${username}@irsa.com`,
-                    phone: '0512345678',
-                    role: 'مدير النظام',
-                    permissions: this.getDefaultPermissions('مدير النظام'),
-                    joinDate: new Date().toISOString().split('T')[0],
-                    profileImage: null
-                }
-            },
-            properties: [...this.getDefaultUserDB().properties],
-            customers: [...this.getDefaultUserDB().customers],
-            contracts: [],
-            payments: [],
-            maintenance: [],
-            settings: { ...this.getDefaultUserDB().settings }
-        };
-        
-        localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
-        return newUserDB;
-    }
+    const email = this.formatUsernameToEmail(username);
+    
+    const newUserDB = {
+        currentUser: username,
+        users: { [username]: '123456' },
+        userProfiles: {
+            [username]: {
+                id: Date.now(),
+                name: username,
+                email: email,  // استخدام الإيميل التلقائي
+                phone: '0512345678',
+                role: 'مدير النظام',
+                permissions: this.getDefaultPermissions('مدير النظام'),
+                joinDate: new Date().toISOString().split('T')[0],
+                profileImage: null
+            }
+        },
+        properties: [...this.getDefaultUserDB().properties],
+        customers: [...this.getDefaultUserDB().customers],
+        contracts: [],
+        payments: [],
+        maintenance: [],
+        settings: { ...this.getDefaultUserDB().settings }
+    };
+    
+    localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
+    return newUserDB;
+}
 
     // 🔥 الصلاحيات الافتراضية
     getDefaultPermissions(role) {
@@ -362,102 +365,120 @@ class AdvancedPropertySystem {
 
     // 🔥 دالة تسجيل الدخول مع Firebase
     async handleLogin() {
-        const username = document.getElementById('username').value;
-        const password = document.getElementById('password').value;
-        
-        if (!username || !password) {
-            this.showNotification('يرجى ملء جميع الحقول', 'error');
-            return;
-        }
-
-        // استخدام Firebase للمصادقة
-        const email = username.includes('@') ? username : `${username}@irsa.com`;
-        const result = await this.firebaseManager.login(email, password);
-        
-        if (result.success) {
-            // تحميل قاعدة بيانات المستخدم الخاصة
-            const userDBKey = `propertyDB_${username}`;
-            const userDB = localStorage.getItem(userDBKey);
-            
-            if (userDB) {
-                this.propertyDB = JSON.parse(userDB);
-            } else {
-                // إنشاء قاعدة بيانات جديدة معزولة
-                this.propertyDB = this.createNewUserDB(username);
-            }
-            
-            this.propertyDB.currentUser = username;
-            localStorage.setItem('propertyUser', username);
-            localStorage.setItem('loginTime', new Date().toISOString());
-            
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-            this.showNotification('مرحباً بك في النظام!');
-            
-            this.applyPermissions();
-            this.setupUserMenu();
-            this.loadDashboard();
-        } else {
-            this.showNotification(result.error, 'error');
-        }
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+    
+    if (!username || !password) {
+        this.showNotification('يرجى ملء جميع الحقول', 'error');
+        return;
     }
+
+    // تحويل اسم المستخدم إلى إيميل تلقائياً
+    const email = this.formatUsernameToEmail(username);
+    
+    // استخدام Firebase للمصادقة
+    const result = await this.firebaseManager.login(email, password);
+    
+    if (result.success) {
+        // تحميل قاعدة بيانات المستخدم الخاصة
+        const userDBKey = `propertyDB_${username}`;
+        const userDB = localStorage.getItem(userDBKey);
+        
+        if (userDB) {
+            this.propertyDB = JSON.parse(userDB);
+        } else {
+            // إنشاء قاعدة بيانات جديدة معزولة
+            this.propertyDB = this.createNewUserDB(username);
+        }
+        
+        this.propertyDB.currentUser = username;
+        localStorage.setItem('propertyUser', username);
+        localStorage.setItem('loginTime', new Date().toISOString());
+        
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('dashboard').style.display = 'block';
+        this.showNotification('مرحباً بك في النظام!');
+        
+        this.applyPermissions();
+        this.setupUserMenu();
+        this.loadDashboard();
+    } else {
+        this.showNotification(result.error, 'error');
+    }
+}
+
+// 🔥 دالة لتحويل اسم المستخدم إلى إيميل
+formatUsernameToEmail(username) {
+    // إذا كان الإدخال يحتوي على @ فهو إيميل، وإلا نضيف النطاق
+    if (username.includes('@')) {
+        return username;
+    } else {
+        return `${username}@irsa.com`;
+    }
+}
 
     // 🔥 دالة إنشاء حساب مع Firebase
-    async createNewAccount(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    // 🔥 دالة إنشاء حساب مع Firebase - بدون حقل الإيميل المنفصل
+async createNewAccount(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    const username = formData.get('username');
+    const fullName = formData.get('fullName');
+    const phone = formData.get('phone');
+    const password = formData.get('password');
+    const confirmPassword = formData.get('confirmPassword');
+    
+    // التحقق من البيانات
+    if (this.mainDB.users[username]) {
+        this.showNotification('اسم المستخدم موجود مسبقاً!', 'error');
+        return;
+    }
+    
+    if (password !== confirmPassword) {
+        this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
+        return;
+    }
+    
+    // تحويل اسم المستخدم إلى إيميل
+    const email = this.formatUsernameToEmail(username);
+    
+    // استخدام Firebase لإنشاء الحساب
+    const userData = {
+        username: username,
+        fullName: fullName,
+        phone: phone,
+        role: 'مدير النظام'
+    };
+    
+    const result = await this.firebaseManager.createAccount(email, password, userData);
+    
+    if (result.success) {
+        // إضافة المستخدم إلى قاعدة البيانات الرئيسية
+        this.mainDB.users[username] = password;
+        this.mainDB.userProfiles[username] = userData;
         
-        const username = formData.get('username');
-        const fullName = formData.get('fullName');
-        const email = formData.get('email') || `${username}@irsa.com`;
-        const phone = formData.get('phone');
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
+        // حفظ قاعدة البيانات الرئيسية
+        saveMainDB(this.mainDB);
         
-        // التحقق من البيانات
-        if (this.mainDB.users[username]) {
-            this.showNotification('اسم المستخدم موجود مسبقاً!', 'error');
-            return;
-        }
-        
-        if (password !== confirmPassword) {
-            this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
-            return;
-        }
-        
-        // استخدام Firebase لإنشاء الحساب
-        const userData = {
-            username: username,
-            fullName: fullName,
-            phone: phone,
-            role: 'مدير النظام'
+        // إنشاء قاعدة بيانات مستقلة للمستخدم الجديد
+        const newUserDB = this.createNewUserDB(username);
+        newUserDB.userProfiles[username] = { 
+            ...userData, 
+            email: email  // حفظ الإيميل التلقائي
         };
         
-        const result = await this.firebaseManager.createAccount(email, password, userData);
+        // حفظ قاعدة البيانات الجديدة للمستخدم
+        localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
         
-        if (result.success) {
-            // إضافة المستخدم إلى قاعدة البيانات الرئيسية
-            this.mainDB.users[username] = password;
-            this.mainDB.userProfiles[username] = userData;
-            
-            // حفظ قاعدة البيانات الرئيسية
-            saveMainDB(this.mainDB);
-            
-            // إنشاء قاعدة بيانات مستقلة للمستخدم الجديد
-            const newUserDB = this.createNewUserDB(username);
-            newUserDB.userProfiles[username] = { ...userData, email: email };
-            
-            // حفظ قاعدة البيانات الجديدة للمستخدم
-            localStorage.setItem(`propertyDB_${username}`, JSON.stringify(newUserDB));
-            
-            this.closeModal('createAccountModal');
-            this.showNotification('تم إنشاء الحساب الجديد بنجاح! يمكنك الآن تسجيل الدخول');
-            
-            event.target.reset();
-        } else {
-            this.showNotification(result.error, 'error');
-        }
+        this.closeModal('createAccountModal');
+        this.showNotification('تم إنشاء الحساب الجديد بنجاح! يمكنك الآن تسجيل الدخول');
+        
+        event.target.reset();
+    } else {
+        this.showNotification(result.error, 'error');
     }
+}
 
     checkAuthStatus() {
         try {
@@ -635,52 +656,58 @@ class AdvancedPropertySystem {
     }
 
     showCreateAccountModal() {
-        const createAccountHTML = `
-            <div class="modal-overlay" id="createAccountModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-user-plus"></i> ${this.currentLanguage === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}</h3>
-                        <button class="close-btn" onclick="propertySystem.closeModal('createAccountModal')">&times;</button>
-                    </div>
-                    <form onsubmit="propertySystem.createNewAccount(event)">
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'اسم المستخدم' : 'Username'}:</label>
-                            <input type="text" name="username" required minlength="3" placeholder="${this.currentLanguage === 'ar' ? 'أدخل اسم المستخدم' : 'Enter username'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'}:</label>
-                            <input type="text" name="fullName" required placeholder="${this.currentLanguage === 'ar' ? 'أدخل الاسم الكامل' : 'Enter full name'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}:</label>
-                            <input type="email" name="email" placeholder="${this.currentLanguage === 'ar' ? 'أدخل البريد الإلكتروني' : 'Enter email'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}:</label>
-                            <input type="tel" name="phone" placeholder="${this.currentLanguage === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'كلمة المرور' : 'Password'}:</label>
-                            <input type="password" name="password" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}:</label>
-                            <input type="password" name="confirmPassword" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? 'أكد كلمة المرور' : 'Confirm password'}">
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-save"></i> ${this.currentLanguage === 'ar' ? 'إنشاء الحساب' : 'Create Account'}
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('createAccountModal')">
-                                ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
-                            </button>
-                        </div>
-                    </form>
+    const createAccountHTML = `
+        <div class="modal-overlay" id="createAccountModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-plus"></i> ${this.currentLanguage === 'ar' ? 'إنشاء حساب جديد' : 'Create New Account'}</h3>
+                    <button class="close-btn" onclick="propertySystem.closeModal('createAccountModal')">&times;</button>
                 </div>
+                <form onsubmit="propertySystem.createNewAccount(event)">
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'اسم المستخدم' : 'Username'}:</label>
+                        <input type="text" name="username" required minlength="3" 
+                               placeholder="${this.currentLanguage === 'ar' ? 'سيتم استخدامه كبريد إلكتروني' : 'Will be used as email'}">
+                        <small style="color: #666; font-size: 12px;">
+                            ${this.currentLanguage === 'ar' ? 
+                                'سيتم إضافة @irsa.com تلقائياً' : 
+                                '@irsa.com will be added automatically'}
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'}:</label>
+                        <input type="text" name="fullName" required 
+                               placeholder="${this.currentLanguage === 'ar' ? 'أدخل الاسم الكامل' : 'Enter full name'}">
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}:</label>
+                        <input type="tel" name="phone" 
+                               placeholder="${this.currentLanguage === 'ar' ? 'أدخل رقم الهاتف' : 'Enter phone number'}">
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'كلمة المرور' : 'Password'}:</label>
+                        <input type="password" name="password" required minlength="6" 
+                               placeholder="${this.currentLanguage === 'ar' ? 'أدخل كلمة المرور' : 'Enter password'}">
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}:</label>
+                        <input type="password" name="confirmPassword" required minlength="6" 
+                               placeholder="${this.currentLanguage === 'ar' ? 'أكد كلمة المرور' : 'Confirm password'}">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i> ${this.currentLanguage === 'ar' ? 'إنشاء الحساب' : 'Create Account'}
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('createAccountModal')">
+                            ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
+                        </button>
+                    </div>
+                </form>
             </div>
-        `;
-        this.showModal(createAccountHTML);
-    }
+        </div>
+    `;
+    this.showModal(createAccountHTML);
+}
 
     showChangePasswordModal() {
         const passwordHTML = `
@@ -1209,3 +1236,4 @@ class AdvancedPropertySystem {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
