@@ -15,76 +15,80 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* ستايل واجهة تسجيل الدخول القديم */
+        /* ستايل واجهة تسجيل الدخول القديم - خلفية سوداء وإطار ذهبي */
         .login-container {
-            background: linear-gradient(45deg, #1e3c72, #2a5298);
+            background: #000000;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: 'Arial', sans-serif;
+            font-family: Arial, sans-serif;
         }
 
         .login-box {
-            background: white;
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+            background: #1a1a1a;
+            padding: 40px 30px;
+            border-radius: 15px;
+            border: 3px solid #d4af37;
+            box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
             width: 100%;
-            max-width: 350px;
+            max-width: 400px;
             position: fixed;
             left: 50%;
             top: 50%;
             transform: translate(-50%, -50%);
             margin: 0;
-            transition: none;
         }
 
         .login-header {
             text-align: center;
-            margin: 0 auto 25px auto;
+            margin: 0 auto 30px auto;
         }
 
         .login-logo {
-            max-width: 120px;
-            margin-bottom: 15px;
+            max-width: 150px;
+            margin-bottom: 25px;
+            filter: brightness(0) invert(1);
         }
 
         .language-switcher {
             text-align: center;
-            margin: 15px auto;
+            margin: 20px auto;
             display: flex;
             justify-content: center;
-            gap: 8px;
+            gap: 15px;
         }
 
         .lang-btn {
-            background: #f8f9fa;
-            border: 1px solid #ced4da;
-            padding: 6px 12px;
-            border-radius: 4px;
+            background: transparent;
+            border: 2px solid #d4af37;
+            color: #d4af37;
+            padding: 10px 20px;
+            border-radius: 25px;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
         .lang-btn:hover {
-            background: #e9ecef;
+            background: #d4af37;
+            color: #000;
         }
 
         .input-group {
             text-align: center;
-            margin: 15px auto;
+            margin: 20px auto;
             display: block;
         }
 
         .input-group label {
             text-align: center;
             display: block;
-            margin: 0 auto 8px auto;
-            color: #333;
-            font-weight: 500;
-            font-size: 13px;
+            margin: 0 auto 10px auto;
+            color: #d4af37;
+            font-weight: bold;
+            font-size: 14px;
         }
 
         .input-group input {
@@ -92,70 +96,75 @@
             margin: 0 auto;
             display: block;
             width: 100%;
-            max-width: 280px;
-            padding: 12px 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            background: #fff;
-            transition: all 0.2s ease;
+            max-width: 300px;
+            padding: 15px;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #2a2a2a;
+            color: #fff;
+            transition: all 0.3s ease;
         }
 
         .input-group input:focus {
-            border-color: #2a5298;
+            border-color: #ffd700;
+            background: #333;
             outline: none;
-            box-shadow: 0 0 5px rgba(42, 82, 152, 0.3);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
         }
 
         .input-group input::placeholder {
             text-align: center;
-            color: #999;
+            color: #888;
         }
 
         .login-btn {
             text-align: center;
-            margin: 20px auto 10px auto;
+            margin: 25px auto 15px auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #2a5298;
-            color: white;
+            background: #d4af37;
+            color: #000;
             border: none;
-            padding: 12px 30px;
-            border-radius: 5px;
+            padding: 15px 40px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
             width: 100%;
-            max-width: 280px;
+            max-width: 300px;
         }
 
         .login-btn:hover {
-            background: #1e3c72;
-            transform: translateY(-1px);
+            background: #ffd700;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
         }
 
         .create-account-btn {
             text-align: center;
-            margin: 8px auto;
+            margin: 10px auto;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: #6c757d;
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 5px;
+            background: transparent;
+            color: #d4af37;
+            border: 2px solid #d4af37;
+            padding: 12px 30px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
             width: 100%;
-            max-width: 280px;
+            max-width: 300px;
         }
 
         .create-account-btn:hover {
-            background: #5a6268;
+            background: #d4af37;
+            color: #000;
         }
 
         /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
@@ -168,119 +177,18 @@
 
         /* منع أي تحريك من JavaScript */
         .login-container * {
-            transition: none;
-            animation: none;
+            transition: none !important;
+            animation: none !important;
         }
 
-        /* أنماط المساحة التخزينية للوحة التحكم */
-        .storage-info {
-            background: #e3f2fd;
-            border: 1px solid #2196f3;
-            border-radius: 6px;
-            padding: 8px;
-            margin: 12px 0;
-            text-align: center;
-            font-size: 13px;
-        }
-
-        .storage-info i {
-            color: #2196f3;
-            margin-left: 5px;
-        }
-
-        .storage-info span {
-            color: #1976d2;
-            font-weight: 500;
-        }
-
-        .storage-card {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin: 15px 0;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
-        }
-
-        .storage-progress-container {
-            margin-bottom: 8px;
-        }
-
-        .storage-progress {
-            background: #f0f0f0;
-            border-radius: 6px;
-            height: 10px;
-            overflow: hidden;
-            margin-bottom: 6px;
-        }
-
-        .storage-progress-bar {
-            background: linear-gradient(90deg, #4CAF50, #45a049);
-            height: 100%;
-            transition: width 0.3s ease;
-            border-radius: 6px;
-        }
-
-        .storage-text {
-            font-size: 13px;
-            color: #666;
-            text-align: center;
-        }
-
-        .storage-percent {
-            text-align: center;
-            font-size: 14px;
-            font-weight: bold;
-            color: #4CAF50;
-            margin-top: 4px;
-        }
-
-        /* حالة المزامنة */
-        .sync-status {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: #e8f5e8;
-            color: #2e7d32;
-            padding: 6px 10px;
-            border-radius: 15px;
-            font-size: 11px;
-            font-weight: 500;
-            border: 1px solid #c8e6c9;
-            margin-top: 8px;
-        }
-
-        .sync-status i {
-            font-size: 12px;
-        }
-
-        .dashboard-header-compact {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        /* تأثيرات إضافية */
+        /* تأثيرات الأيقونات */
         .input-group i {
-            color: #2a5298;
-            margin-left: 5px;
+            color: #d4af37;
+            margin-left: 8px;
         }
 
         .login-btn i, .create-account-btn i {
-            margin-left: 6px;
-        }
-
-        /* تحسينات للشريط الجانبي */
-        .sidebar .logo {
-            padding: 15px;
-            text-align: center;
-            border-bottom: 1px solid #e0e0e0;
-        }
-
-        .sidebar-logo {
-            max-width: 100px;
-            margin-bottom: 10px;
+            margin-left: 10px;
         }
     </style>
 </head>
@@ -323,10 +231,6 @@
             <aside class="sidebar">
                 <div class="logo">
                     <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
-                    <div class="sync-status">
-                        <i class="fas fa-cloud"></i>
-                        <span data-translate="cloudSync">مزامنة مع السحابة</span>
-                    </div>
                 </div>
                 <div class="nav-links">
                     <!-- سيتم ملؤها ديناميكياً -->
