@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IRSA Trading & Contracting</title>
-    <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- تحديث إصدار Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -15,14 +13,28 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* ستايل واجهة تسجيل الدخول القديم - خلفية سوداء وإطار ذهبي */
+        /* إعادة تعيين عام */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* تصميم شاشة تسجيل الدخول */
         .login-container {
-            background: #000000;
+            background: #000;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-family: Arial, sans-serif;
+            padding: 20px;
         }
 
         .login-box {
@@ -33,27 +45,23 @@
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
             width: 100%;
             max-width: 400px;
-            position: fixed;
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-            margin: 0;
+            margin: 0 auto;
         }
 
         .login-header {
             text-align: center;
-            margin: 0 auto 30px auto;
+            margin-bottom: 30px;
         }
 
         .login-logo {
             max-width: 150px;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
             filter: brightness(0) invert(1);
         }
 
         .language-switcher {
             text-align: center;
-            margin: 20px auto;
+            margin: 20px 0;
             display: flex;
             justify-content: center;
             gap: 15px;
@@ -77,26 +85,19 @@
         }
 
         .input-group {
-            text-align: center;
-            margin: 20px auto;
-            display: block;
+            margin-bottom: 20px;
         }
 
         .input-group label {
-            text-align: center;
             display: block;
-            margin: 0 auto 10px auto;
+            margin-bottom: 8px;
             color: #d4af37;
             font-weight: bold;
             font-size: 14px;
         }
 
         .input-group input {
-            text-align: center;
-            margin: 0 auto;
-            display: block;
             width: 100%;
-            max-width: 300px;
             padding: 15px;
             border: 2px solid #d4af37;
             border-radius: 8px;
@@ -104,6 +105,7 @@
             background: #2a2a2a;
             color: #fff;
             transition: all 0.3s ease;
+            text-align: center;
         }
 
         .input-group input:focus {
@@ -114,27 +116,26 @@
         }
 
         .input-group input::placeholder {
-            text-align: center;
             color: #888;
+            text-align: center;
         }
 
         .login-btn {
-            text-align: center;
-            margin: 25px auto 15px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background: #d4af37;
             color: #000;
             border: none;
-            padding: 15px 40px;
+            padding: 15px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 16px;
             font-weight: bold;
             transition: all 0.3s ease;
             width: 100%;
-            max-width: 300px;
+            margin: 20px 0 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         .login-btn:hover {
@@ -144,41 +145,25 @@
         }
 
         .create-account-btn {
-            text-align: center;
-            margin: 10px auto;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             background: transparent;
             color: #d4af37;
             border: 2px solid #d4af37;
-            padding: 12px 30px;
+            padding: 12px;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
             font-weight: bold;
             transition: all 0.3s ease;
             width: 100%;
-            max-width: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
         }
 
         .create-account-btn:hover {
             background: #d4af37;
             color: #000;
-        }
-
-        /* إلغاء أي تأثيرات للاتجاه RTL/LTR */
-        [dir="ltr"] .login-box,
-        [dir="rtl"] .login-box {
-            left: 50%;
-            right: auto;
-            transform: translate(-50%, -50%);
-        }
-
-        /* منع أي تحريك من JavaScript */
-        .login-container * {
-            transition: none !important;
-            animation: none !important;
         }
 
         /* تأثيرات الأيقونات */
@@ -187,8 +172,29 @@
             margin-left: 8px;
         }
 
-        .login-btn i, .create-account-btn i {
-            margin-left: 10px;
+        /* تصميم متجاوب للشاشات الصغيرة */
+        @media (max-width: 480px) {
+            .login-box {
+                padding: 30px 20px;
+            }
+            
+            .login-logo {
+                max-width: 120px;
+            }
+            
+            .language-switcher {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .lang-btn {
+                width: 100%;
+            }
+        }
+
+        /* إخفاء لوحة التحكم */
+        .dashboard {
+            display: none;
         }
     </style>
 </head>
@@ -217,7 +223,7 @@
                 </button>
                 
                 <!-- زر إنشاء حساب جديد -->
-                <button type="button" class="btn btn-secondary create-account-btn" onclick="propertySystem.showCreateAccountModal()">
+                <button type="button" class="create-account-btn" onclick="propertySystem.showCreateAccountModal()">
                     <i class="fas fa-user-plus"></i> <span data-translate="createAccount">إنشاء حساب جديد</span>
                 </button>
             </form>
@@ -225,7 +231,7 @@
     </div>
 
     <!-- لوحة التحكم -->
-    <div id="dashboard" class="dashboard" style="display: none;">
+    <div id="dashboard" class="dashboard">
         <div class="dashboard-layout">
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
@@ -260,6 +266,15 @@
         firebase.initializeApp(firebaseConfig);
     </script>
     
-    <script src="app.js"></script>
+    <script>
+        // كود بديل مؤقت حتى يتم تحميل app.js
+        window.propertySystem = {
+            showCreateAccountModal: function() {
+                alert("سيتم فتح نافذة إنشاء حساب جديد");
+            }
+        };
+    </script>
+    
+    <!-- <script src="app.js"></script> -->
 </body>
 </html>
