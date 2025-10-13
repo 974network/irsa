@@ -4,7 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>IRSA Trading & Contracting</title>
+    
+    <!-- إزالة المرجع لملف styles.css غير الموجود -->
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- تحديث إصدار Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
@@ -13,7 +18,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
     
     <style>
-        /* إعادة تعيين عام */
+        /* إعادة تعيين CSS */
         * {
             margin: 0;
             padding: 0;
@@ -29,7 +34,7 @@
 
         /* تصميم شاشة تسجيل الدخول */
         .login-container {
-            background: #000;
+            background: #000000;
             min-height: 100vh;
             display: flex;
             align-items: center;
@@ -45,7 +50,6 @@
             box-shadow: 0 0 30px rgba(212, 175, 55, 0.3);
             width: 100%;
             max-width: 400px;
-            margin: 0 auto;
         }
 
         .login-header {
@@ -94,6 +98,7 @@
             color: #d4af37;
             font-weight: bold;
             font-size: 14px;
+            text-align: center;
         }
 
         .input-group input {
@@ -196,6 +201,165 @@
         .dashboard {
             display: none;
         }
+
+        /* ستايلات الإشعارات */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #1a1a1a;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            padding: 15px 20px;
+            color: white;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .notification-success {
+            border-color: #28a745;
+        }
+
+        .notification-error {
+            border-color: #dc3545;
+        }
+
+        .notification-info {
+            border-color: #17a2b8;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .notification-close {
+            background: none;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        /* ستايلات المودال */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-content {
+            background: #1a1a1a;
+            border: 3px solid #d4af37;
+            border-radius: 15px;
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 15px;
+        }
+
+        .modal-header h3 {
+            color: #d4af37;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 24px;
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #d4af37;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #d4af37;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #fff;
+            font-size: 16px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: #d4af37;
+            color: #000;
+        }
+
+        .btn-primary:hover {
+            background: #ffd700;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #d4af37;
+            border: 2px solid #d4af37;
+        }
+
+        .btn-secondary:hover {
+            background: #d4af37;
+            color: #000;
+        }
     </style>
 </head>
 <body>
@@ -203,7 +367,10 @@
     <div id="loginPage" class="login-container">
         <div class="login-box">
             <div class="login-header">
-                <img src="irsa.png" alt="لوجو IRSA" class="logo-image login-logo">
+                <!-- استخدم صورة افتراضية إذا لم توجد irsa.png -->
+                <div class="login-logo" style="background: #d4af37; width: 150px; height: 80px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin: 0 auto 20px;">
+                    <span style="color: #000; font-weight: bold; font-size: 18px;">IRSA LOGO</span>
+                </div>
                 <div class="language-switcher">
                     <button type="button" class="lang-btn" data-lang="ar">العربية</button>
                     <button type="button" class="lang-btn" data-lang="en">English</button>
@@ -236,7 +403,9 @@
             <!-- الشريط الجانبي -->
             <aside class="sidebar">
                 <div class="logo">
-                    <img src="irsa.png" alt="لوجو IRSA" class="logo-image sidebar-logo">
+                    <div style="background: #d4af37; width: 120px; height: 60px; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin: 20px auto;">
+                        <span style="color: #000; font-weight: bold;">IRSA LOGO</span>
+                    </div>
                 </div>
                 <div class="nav-links">
                     <!-- سيتم ملؤها ديناميكياً -->
@@ -266,15 +435,6 @@
         firebase.initializeApp(firebaseConfig);
     </script>
     
-    <script>
-        // كود بديل مؤقت حتى يتم تحميل app.js
-        window.propertySystem = {
-            showCreateAccountModal: function() {
-                alert("سيتم فتح نافذة إنشاء حساب جديد");
-            }
-        };
-    </script>
-    
-    <!-- <script src="app.js"></script> -->
+    <script src="app.js"></script>
 </body>
 </html>
