@@ -137,6 +137,12 @@ class AdvancedPropertySystem {
             contracts: [],
             payments: [],
             maintenance: [],
+            sales: [],
+            commissions: [],
+            inventory: [],
+            accounts: [],
+            invoices: [],
+            messages: [],
             settings: {
                 companyName: 'نظام إدارة العقارات',
                 currency: 'ريال',
@@ -239,9 +245,15 @@ class AdvancedPropertySystem {
             { id: 'nav-dashboard', icon: 'fa-home', text: 'dashboard', page: 'dashboard' },
             { id: 'nav-properties', icon: 'fa-building', text: 'properties', page: 'properties' },
             { id: 'nav-customers', icon: 'fa-users', text: 'customers', page: 'customers' },
+            { id: 'nav-sales', icon: 'fa-shopping-cart', text: 'sales', page: 'sales' },
             { id: 'nav-contracts', icon: 'fa-file-contract', text: 'contracts', page: 'contracts' },
             { id: 'nav-payments', icon: 'fa-money-bill', text: 'payments', page: 'payments' },
+            { id: 'nav-commissions', icon: 'fa-handshake', text: 'commissions', page: 'commissions' },
             { id: 'nav-maintenance', icon: 'fa-tools', text: 'maintenance', page: 'maintenance' },
+            { id: 'nav-inventory', icon: 'fa-boxes', text: 'inventory', page: 'inventory' },
+            { id: 'nav-accounts', icon: 'fa-chart-line', text: 'accounts', page: 'accounts' },
+            { id: 'nav-invoices', icon: 'fa-receipt', text: 'invoices', page: 'invoices' },
+            { id: 'nav-messages', icon: 'fa-comments', text: 'messages', page: 'messages' },
             { id: 'nav-reports', icon: 'fa-chart-bar', text: 'reports', page: 'reports' },
             { id: 'nav-settings', icon: 'fa-cog', text: 'settings', page: 'settings' },
         ];
@@ -347,9 +359,15 @@ class AdvancedPropertySystem {
             case 'dashboard': this.loadDashboard(); break;
             case 'properties': this.loadProperties(); break;
             case 'customers': this.loadCustomers(); break;
+            case 'sales': this.loadSales(); break;
             case 'contracts': this.loadContracts(); break;
             case 'payments': this.loadPayments(); break;
+            case 'commissions': this.loadCommissions(); break;
             case 'maintenance': this.loadMaintenance(); break;
+            case 'inventory': this.loadInventory(); break;
+            case 'accounts': this.loadAccounts(); break;
+            case 'invoices': this.loadInvoices(); break;
+            case 'messages': this.loadMessages(); break;
             case 'reports': this.loadReports(); break;
             case 'settings': this.loadSettings(); break;
         }
@@ -449,6 +467,589 @@ class AdvancedPropertySystem {
         `).join('');
     }
 
+    // 🔥 قسم المبيعات
+    async loadSales() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-shopping-cart"></i> <span data-translate="sales">${this.getTranslation('sales')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showSaleForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إضافة عملية بيع' : 'Add Sale'}
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'رقم العملية' : 'Sale ID'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.sales.map(sale => `
+                            <tr>
+                                <td>${sale.id}</td>
+                                <td>${sale.customer}</td>
+                                <td>${sale.amount} ${this.propertyDB.settings.currency}</td>
+                                <td>${sale.date}</td>
+                                <td><span class="status-badge status-${sale.status === 'مكتمل' ? 'active' : 'pending'}">${sale.status}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.sales.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد عمليات بيع' : 'No sales records'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    showSaleForm() {
+        const formHTML = `
+            <div class="modal-overlay" id="saleModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-shopping-cart"></i> ${this.currentLanguage === 'ar' ? 'إضافة عملية بيع جديدة' : 'Add New Sale'}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('saleModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.addSale(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}:</label>
+                            <select name="customer" required>
+                                <option value="">${this.currentLanguage === 'ar' ? 'اختر العميل' : 'Select Customer'}</option>
+                                ${this.propertyDB.customers.map(customer => `
+                                    <option value="${customer.name}">${customer.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
+                            <input type="number" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}:</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}:</label>
+                            <select name="status" required>
+                                <option value="مكتمل">${this.currentLanguage === 'ar' ? 'مكتمل' : 'Completed'}</option>
+                                <option value="معلق">${this.currentLanguage === 'ar' ? 'معلق' : 'Pending'}</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العملية' : 'Add Sale'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async addSale(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newSale = {
+            id: this.propertyDB.sales.length > 0 ? Math.max(...this.propertyDB.sales.map(s => s.id)) + 1 : 1,
+            customer: formData.get('customer'),
+            amount: parseInt(formData.get('amount')),
+            date: formData.get('date'),
+            status: formData.get('status')
+        };
+        
+        this.propertyDB.sales.push(newSale);
+        await this.saveUserData();
+        this.closeModal('saleModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة عملية البيع بنجاح!' : 'Sale added successfully!');
+        this.loadSales();
+    }
+
+    // 🔥 قسم العمولات
+    async loadCommissions() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-handshake"></i> <span data-translate="commissions">${this.getTranslation('commissions')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showCommissionForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إضافة عمولة' : 'Add Commission'}
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'الوسيط' : 'Agent'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'العملية' : 'Transaction'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'نسبة العمولة' : 'Commission %'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.commissions.map(commission => `
+                            <tr>
+                                <td>${commission.agent}</td>
+                                <td>${commission.transaction}</td>
+                                <td>${commission.percentage}%</td>
+                                <td>${commission.amount} ${this.propertyDB.settings.currency}</td>
+                                <td><span class="status-badge status-${commission.status === 'مدفوعة' ? 'paid' : 'pending'}">${commission.status}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.commissions.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد عمولات' : 'No commissions'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    showCommissionForm() {
+        const formHTML = `
+            <div class="modal-overlay" id="commissionModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-handshake"></i> ${this.currentLanguage === 'ar' ? 'إضافة عمولة جديدة' : 'Add New Commission'}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('commissionModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.addCommission(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'اسم الوسيط' : 'Agent Name'}:</label>
+                            <input type="text" name="agent" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'العملية' : 'Transaction'}:</label>
+                            <input type="text" name="transaction" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'نسبة العمولة %' : 'Commission %'}:</label>
+                            <input type="number" name="percentage" min="1" max="100" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
+                            <input type="number" name="amount" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العمولة' : 'Add Commission'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async addCommission(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newCommission = {
+            id: this.propertyDB.commissions.length > 0 ? Math.max(...this.propertyDB.commissions.map(c => c.id)) + 1 : 1,
+            agent: formData.get('agent'),
+            transaction: formData.get('transaction'),
+            percentage: parseInt(formData.get('percentage')),
+            amount: parseInt(formData.get('amount')),
+            status: 'معلقة'
+        };
+        
+        this.propertyDB.commissions.push(newCommission);
+        await this.saveUserData();
+        this.closeModal('commissionModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة العمولة بنجاح!' : 'Commission added successfully!');
+        this.loadCommissions();
+    }
+
+    // 🔥 قسم الجرد
+    async loadInventory() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-boxes"></i> <span data-translate="inventory">${this.getTranslation('inventory')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showInventoryForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إضافة عنصر' : 'Add Item'}
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'اسم العنصر' : 'Item Name'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الفئة' : 'Category'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الكمية' : 'Quantity'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'السعر' : 'Price'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.inventory.map(item => `
+                            <tr>
+                                <td>${item.name}</td>
+                                <td>${item.category}</td>
+                                <td>${item.quantity}</td>
+                                <td>${item.price} ${this.propertyDB.settings.currency}</td>
+                                <td><span class="status-badge status-${item.quantity > 10 ? 'active' : item.quantity > 0 ? 'warning' : 'inactive'}">${item.quantity > 10 ? 'متوفر' : item.quantity > 0 ? 'منخفض' : 'نافذ'}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.inventory.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد عناصر في المخزون' : 'No items in inventory'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    showInventoryForm() {
+        const formHTML = `
+            <div class="modal-overlay" id="inventoryModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-boxes"></i> ${this.currentLanguage === 'ar' ? 'إضافة عنصر جديد' : 'Add New Item'}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('inventoryModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.addInventoryItem(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'اسم العنصر' : 'Item Name'}:</label>
+                            <input type="text" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الفئة' : 'Category'}:</label>
+                            <select name="category" required>
+                                <option value="أدوات">${this.currentLanguage === 'ar' ? 'أدوات' : 'Tools'}</option>
+                                <option value="مواد بناء">${this.currentLanguage === 'ar' ? 'مواد بناء' : 'Construction Materials'}</option>
+                                <option value="كهرباء">${this.currentLanguage === 'ar' ? 'كهرباء' : 'Electrical'}</option>
+                                <option value="سباكة">${this.currentLanguage === 'ar' ? 'سباكة' : 'Plumbing'}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الكمية' : 'Quantity'}:</label>
+                            <input type="number" name="quantity" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'السعر' : 'Price'}:</label>
+                            <input type="number" name="price" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العنصر' : 'Add Item'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async addInventoryItem(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newItem = {
+            id: this.propertyDB.inventory.length > 0 ? Math.max(...this.propertyDB.inventory.map(i => i.id)) + 1 : 1,
+            name: formData.get('name'),
+            category: formData.get('category'),
+            quantity: parseInt(formData.get('quantity')),
+            price: parseInt(formData.get('price'))
+        };
+        
+        this.propertyDB.inventory.push(newItem);
+        await this.saveUserData();
+        this.closeModal('inventoryModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة العنصر بنجاح!' : 'Item added successfully!');
+        this.loadInventory();
+    }
+
+    // 🔥 قسم الحسابات
+    async loadAccounts() {
+        const content = document.querySelector('.main-content');
+        const stats = this.calculateFinancialStats();
+        
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-chart-line"></i> <span data-translate="accounts">${this.getTranslation('accounts')}</span></h2>
+            </div>
+            
+            <div class="stats-grid" style="margin-bottom: 30px;">
+                <div class="stat-card">
+                    <i class="fas fa-money-bill-wave"></i>
+                    <div class="stat-value">${stats.totalRevenue.toLocaleString()}</div>
+                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الإيرادات' : 'Total Revenue'}</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-receipt"></i>
+                    <div class="stat-value">${stats.totalExpenses.toLocaleString()}</div>
+                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي المصروفات' : 'Total Expenses'}</div>
+                </div>
+                <div class="stat-card">
+                    <i class="fas fa-chart-bar"></i>
+                    <div class="stat-value">${stats.netProfit.toLocaleString()}</div>
+                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'صافي الربح' : 'Net Profit'}</div>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'النوع' : 'Type'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.accounts.map(account => `
+                            <tr>
+                                <td>${account.date}</td>
+                                <td>${account.description}</td>
+                                <td><span class="status-badge status-${account.type === 'إيراد' ? 'active' : 'inactive'}">${account.type}</span></td>
+                                <td>${account.amount} ${this.propertyDB.settings.currency}</td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.accounts.length === 0 ? `
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد حركات مالية' : 'No financial transactions'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    calculateFinancialStats() {
+        const totalRevenue = this.propertyDB.accounts
+            ?.filter(a => a.type === 'إيراد')
+            ?.reduce((sum, account) => sum + (account.amount || 0), 0) || 0;
+            
+        const totalExpenses = this.propertyDB.accounts
+            ?.filter(a => a.type === 'مصروف')
+            ?.reduce((sum, account) => sum + (account.amount || 0), 0) || 0;
+            
+        const netProfit = totalRevenue - totalExpenses;
+
+        return { totalRevenue, totalExpenses, netProfit };
+    }
+
+    // 🔥 قسم الفواتير
+    async loadInvoices() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-receipt"></i> <span data-translate="invoices">${this.getTranslation('invoices')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showInvoiceForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إنشاء فاتورة' : 'Create Invoice'}
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'رقم الفاتورة' : 'Invoice No'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.invoices.map(invoice => `
+                            <tr>
+                                <td>#${invoice.id}</td>
+                                <td>${invoice.customer}</td>
+                                <td>${invoice.amount} ${this.propertyDB.settings.currency}</td>
+                                <td>${invoice.date}</td>
+                                <td><span class="status-badge status-${invoice.status === 'مدفوعة' ? 'paid' : 'pending'}">${invoice.status}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.invoices.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد فواتير' : 'No invoices'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    showInvoiceForm() {
+        const formHTML = `
+            <div class="modal-overlay" id="invoiceModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-receipt"></i> ${this.currentLanguage === 'ar' ? 'إنشاء فاتورة جديدة' : 'Create New Invoice'}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('invoiceModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.addInvoice(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}:</label>
+                            <select name="customer" required>
+                                <option value="">${this.currentLanguage === 'ar' ? 'اختر العميل' : 'Select Customer'}</option>
+                                ${this.propertyDB.customers.map(customer => `
+                                    <option value="${customer.name}">${customer.name}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
+                            <input type="number" name="amount" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}:</label>
+                            <input type="date" name="date" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}:</label>
+                            <textarea name="description" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إنشاء الفاتورة' : 'Create Invoice'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async addInvoice(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newInvoice = {
+            id: this.propertyDB.invoices.length > 0 ? Math.max(...this.propertyDB.invoices.map(i => i.id)) + 1 : 1,
+            customer: formData.get('customer'),
+            amount: parseInt(formData.get('amount')),
+            date: formData.get('date'),
+            description: formData.get('description'),
+            status: 'معلقة'
+        };
+        
+        this.propertyDB.invoices.push(newInvoice);
+        await this.saveUserData();
+        this.closeModal('invoiceModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إنشاء الفاتورة بنجاح!' : 'Invoice created successfully!');
+        this.loadInvoices();
+    }
+
+    // 🔥 قسم المحادثات
+    async loadMessages() {
+        const content = document.querySelector('.main-content');
+        content.innerHTML = `
+            <div class="page-header">
+                <h2><i class="fas fa-comments"></i> <span data-translate="messages">${this.getTranslation('messages')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showNewMessageForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'رسالة جديدة' : 'New Message'}
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>${this.currentLanguage === 'ar' ? 'المرسل' : 'Sender'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'المستلم' : 'Receiver'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الموضوع' : 'Subject'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${this.propertyDB.messages.map(message => `
+                            <tr>
+                                <td>${message.sender}</td>
+                                <td>${message.receiver}</td>
+                                <td>${message.subject}</td>
+                                <td>${message.date}</td>
+                                <td><span class="status-badge status-${message.status === 'مقروء' ? 'active' : 'pending'}">${message.status}</span></td>
+                            </tr>
+                        `).join('')}
+                        ${this.propertyDB.messages.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--gray-light);">
+                                    ${this.currentLanguage === 'ar' ? 'لا توجد رسائل' : 'No messages'}
+                                </td>
+                            </tr>
+                        ` : ''}
+                    </tbody>
+                </table>
+            </div>
+        `;
+    }
+
+    showNewMessageForm() {
+        const formHTML = `
+            <div class="modal-overlay" id="messageModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-comments"></i> ${this.currentLanguage === 'ar' ? 'رسالة جديدة' : 'New Message'}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('messageModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.sendMessage(event)">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'المستلم' : 'Receiver'}:</label>
+                            <input type="text" name="receiver" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الموضوع' : 'Subject'}:</label>
+                            <input type="text" name="subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الرسالة' : 'Message'}:</label>
+                            <textarea name="message" rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إرسال الرسالة' : 'Send Message'}</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async sendMessage(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newMessage = {
+            id: this.propertyDB.messages.length > 0 ? Math.max(...this.propertyDB.messages.map(m => m.id)) + 1 : 1,
+            sender: this.propertyDB.currentUser,
+            receiver: formData.get('receiver'),
+            subject: formData.get('subject'),
+            message: formData.get('message'),
+            date: new Date().toISOString().split('T')[0],
+            status: 'غير مقروء'
+        };
+        
+        this.propertyDB.messages.push(newMessage);
+        await this.saveUserData();
+        this.closeModal('messageModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إرسال الرسالة بنجاح!' : 'Message sent successfully!');
+        this.loadMessages();
+    }
+
+    // 🔥 الأقسام الأساسية الموجودة سابقاً
     async loadProperties() {
         const content = document.querySelector('.main-content');
         content.innerHTML = `
@@ -848,7 +1449,8 @@ class AdvancedPropertySystem {
                 'reports': 'التقارير', 'settings': 'الإعدادات', 'logout': 'تسجيل الخروج',
                 'addProperty': 'إضافة وحدة جديدة', 'addCustomer': 'إضافة عميل جديد',
                 'profile': 'الملف الشخصي', 'changePassword': 'تغيير كلمة المرور',
-                'createAccount': 'إنشاء حساب جديد'
+                'createAccount': 'إنشاء حساب جديد', 'sales': 'المبيعات', 'commissions': 'العمولات',
+                'inventory': 'الجرد', 'accounts': 'الحسابات', 'invoices': 'الفواتير', 'messages': 'المحادثات'
             },
             'en': {
                 'username': 'Username', 'password': 'Password', 'login': 'Login',
@@ -857,7 +1459,8 @@ class AdvancedPropertySystem {
                 'reports': 'Reports', 'settings': 'Settings', 'logout': 'Logout',
                 'addProperty': 'Add New Property', 'addCustomer': 'Add New Customer',
                 'profile': 'Profile', 'changePassword': 'Change Password',
-                'createAccount': 'Create New Account'
+                'createAccount': 'Create New Account', 'sales': 'Sales', 'commissions': 'Commissions',
+                'inventory': 'Inventory', 'accounts': 'Accounts', 'invoices': 'Invoices', 'messages': 'Messages'
             }
         };
         return translations[this.currentLanguage][key] || key;
@@ -1009,6 +1612,12 @@ class FirebaseManager {
             contracts: [],
             payments: [],
             maintenance: [],
+            sales: [],
+            commissions: [],
+            inventory: [],
+            accounts: [],
+            invoices: [],
+            messages: [],
             settings: {
                 companyName: 'نظام إدارة العقارات',
                 currency: 'ريال',
