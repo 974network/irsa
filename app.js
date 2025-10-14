@@ -604,7 +604,7 @@ class AdvancedPropertySystem {
                     </div>
                     <div class="stat-card-compact">
                         <i class="fas fa-users"></i>
-                        <div class="stat-value-compact">${this.propertyDB.customers.length}</div>
+                        <div class="stat-value-compact">${this.propertyDB.customers?.length || 0}</div>
                         <div class="stat-title-compact">${this.currentLanguage === 'ar' ? 'العملاء' : 'Customers'}</div>
                     </div>
                 </div>
@@ -692,17 +692,17 @@ class AdvancedPropertySystem {
         const activities = [];
         
         // آخر المدفوعات
-        const recentPayments = this.propertyDB.payments.slice(-3).reverse();
+        const recentPayments = (this.propertyDB.payments || []).slice(-3).reverse();
         recentPayments.forEach(payment => {
             activities.push({
                 icon: 'fa-money-bill-wave',
-                text: `${this.currentLanguage === 'ar' ? 'دفعة' : 'Payment'} ${payment.amount} ${this.propertyDB.settings.currency}`,
+                text: `${this.currentLanguage === 'ar' ? 'دفعة' : 'Payment'} ${payment.amount} ${this.propertyDB.settings?.currency || 'ريال'}`,
                 time: payment.date
             });
         });
         
         // آخر العقود
-        const recentContracts = this.propertyDB.contracts.slice(-2).reverse();
+        const recentContracts = (this.propertyDB.contracts || []).slice(-2).reverse();
         recentContracts.forEach(contract => {
             activities.push({
                 icon: 'fa-file-contract',
@@ -712,7 +712,7 @@ class AdvancedPropertySystem {
         });
         
         // آخر الصيانة
-        const recentMaintenance = this.propertyDB.maintenance.slice(-2).reverse();
+        const recentMaintenance = (this.propertyDB.maintenance || []).slice(-2).reverse();
         recentMaintenance.forEach(maintenance => {
             activities.push({
                 icon: 'fa-tools',
@@ -741,7 +741,8 @@ class AdvancedPropertySystem {
             </div>
         `).join('');
     }
-        // 🔥 قسم إدارة العقارات
+
+    // 🔥 قسم إدارة العقارات
     async loadProperties() {
         const content = document.querySelector('.main-content');
         content.innerHTML = `
@@ -757,17 +758,17 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-building"></i>
-                    <div class="stat-value">${this.propertyDB.properties.length}</div>
+                    <div class="stat-value">${this.propertyDB.properties?.length || 0}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الوحدات' : 'Total Units'}</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-check-circle"></i>
-                    <div class="stat-value">${this.propertyDB.properties.filter(p => p.status === 'مشغولة').length}</div>
+                    <div class="stat-value">${(this.propertyDB.properties || []).filter(p => p.status === 'مشغولة').length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'وحدات مشغولة' : 'Occupied Units'}</div>
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-home"></i>
-                    <div class="stat-value">${this.propertyDB.properties.filter(p => p.status === 'شاغرة').length}</div>
+                    <div class="stat-value">${(this.propertyDB.properties || []).filter(p => p.status === 'شاغرة').length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'وحدات شاغرة' : 'Vacant Units'}</div>
                 </div>
             </div>
@@ -786,7 +787,7 @@ class AdvancedPropertySystem {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.properties.map(property => `
+                        ${(this.propertyDB.properties || []).map(property => `
                             <tr>
                                 <td><strong>${property.name}</strong></td>
                                 <td>${property.type}</td>
@@ -796,7 +797,7 @@ class AdvancedPropertySystem {
                                         ${property.status}
                                     </span>
                                 </td>
-                                <td>${property.rent} ${this.propertyDB.settings.currency}</td>
+                                <td>${property.rent} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                 <td>${property.tenant || '-'}</td>
                                 <td class="actions-column">
                                     <div class="action-buttons">
@@ -883,7 +884,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newProperty = {
-            id: this.propertyDB.properties.length > 0 ? Math.max(...this.propertyDB.properties.map(p => p.id)) + 1 : 1,
+            id: (this.propertyDB.properties || []).length > 0 ? Math.max(...this.propertyDB.properties.map(p => p.id)) + 1 : 1,
             name: formData.get('name'),
             type: formData.get('type'),
             area: formData.get('area'),
@@ -894,6 +895,7 @@ class AdvancedPropertySystem {
             contractEnd: ''
         };
         
+        if (!this.propertyDB.properties) this.propertyDB.properties = [];
         this.propertyDB.properties.push(newProperty);
         await this.saveUserData();
         this.closeModal('propertyModal');
@@ -902,7 +904,7 @@ class AdvancedPropertySystem {
     }
 
     editProperty(propertyId) {
-        const property = this.propertyDB.properties.find(p => p.id === propertyId);
+        const property = (this.propertyDB.properties || []).find(p => p.id === propertyId);
         if (property) {
             this.showPropertyForm(property);
         }
@@ -912,7 +914,7 @@ class AdvancedPropertySystem {
         event.preventDefault();
         const formData = new FormData(event.target);
         
-        const propertyIndex = this.propertyDB.properties.findIndex(p => p.id === propertyId);
+        const propertyIndex = (this.propertyDB.properties || []).findIndex(p => p.id === propertyId);
         if (propertyIndex !== -1) {
             this.propertyDB.properties[propertyIndex] = {
                 ...this.propertyDB.properties[propertyIndex],
@@ -934,7 +936,7 @@ class AdvancedPropertySystem {
 
     async deleteProperty(propertyId) {
         if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذه الوحدة؟' : 'Are you sure you want to delete this property?')) {
-            this.propertyDB.properties = this.propertyDB.properties.filter(p => p.id !== propertyId);
+            this.propertyDB.properties = (this.propertyDB.properties || []).filter(p => p.id !== propertyId);
             await this.saveUserData();
             this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف الوحدة العقارية بنجاح!' : 'Property deleted successfully!');
             this.loadProperties();
@@ -967,7 +969,7 @@ class AdvancedPropertySystem {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.customers.map(customer => `
+                        ${(this.propertyDB.customers || []).map(customer => `
                             <tr>
                                 <td><strong>${customer.name}</strong></td>
                                 <td>${customer.phone}</td>
@@ -1042,7 +1044,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newCustomer = {
-            id: this.propertyDB.customers.length > 0 ? Math.max(...this.propertyDB.customers.map(c => c.id)) + 1 : 1,
+            id: (this.propertyDB.customers || []).length > 0 ? Math.max(...this.propertyDB.customers.map(c => c.id)) + 1 : 1,
             name: formData.get('name'),
             phone: formData.get('phone'),
             email: formData.get('email'),
@@ -1050,6 +1052,7 @@ class AdvancedPropertySystem {
             address: formData.get('address')
         };
         
+        if (!this.propertyDB.customers) this.propertyDB.customers = [];
         this.propertyDB.customers.push(newCustomer);
         await this.saveUserData();
         this.closeModal('customerModal');
@@ -1058,7 +1061,7 @@ class AdvancedPropertySystem {
     }
 
     editCustomer(customerId) {
-        const customer = this.propertyDB.customers.find(c => c.id === customerId);
+        const customer = (this.propertyDB.customers || []).find(c => c.id === customerId);
         if (customer) {
             this.showCustomerForm(customer);
         }
@@ -1068,7 +1071,7 @@ class AdvancedPropertySystem {
         event.preventDefault();
         const formData = new FormData(event.target);
         
-        const customerIndex = this.propertyDB.customers.findIndex(c => c.id === customerId);
+        const customerIndex = (this.propertyDB.customers || []).findIndex(c => c.id === customerId);
         if (customerIndex !== -1) {
             this.propertyDB.customers[customerIndex] = {
                 ...this.propertyDB.customers[customerIndex],
@@ -1088,18 +1091,18 @@ class AdvancedPropertySystem {
 
     async deleteCustomer(customerId) {
         if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذا العميل؟' : 'Are you sure you want to delete this customer?')) {
-            this.propertyDB.customers = this.propertyDB.customers.filter(c => c.id !== customerId);
+            this.propertyDB.customers = (this.propertyDB.customers || []).filter(c => c.id !== customerId);
             await this.saveUserData();
             this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف العميل بنجاح!' : 'Customer deleted successfully!');
             this.loadCustomers();
         }
     }
 
-    // 🔥 قسم المبيعات
+    // 🔥 قسم المبيعات - تم إصلاحه
     async loadSales() {
         const content = document.querySelector('.main-content');
-        const totalSales = this.propertyDB.sales.reduce((sum, sale) => sum + sale.amount, 0);
-        const totalCommissions = this.propertyDB.sales.reduce((sum, sale) => sum + (sale.commission || 0), 0);
+        const totalSales = (this.propertyDB.sales || []).reduce((sum, sale) => sum + (sale.amount || 0), 0);
+        const totalCommissions = (this.propertyDB.sales || []).reduce((sum, sale) => sum + (sale.commission || 0), 0);
         
         content.innerHTML = `
             <div class="page-header">
@@ -1114,7 +1117,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-money-bill-wave"></i>
-                    <div class="stat-value">${this.propertyDB.sales.length}</div>
+                    <div class="stat-value">${(this.propertyDB.sales || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي المبيعات' : 'Total Sales'}</div>
                 </div>
                 <div class="stat-card">
@@ -1140,24 +1143,35 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'العمولة' : 'Commission'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.sales.map(sale => {
-                            const customer = this.propertyDB.customers.find(c => c.id === sale.customerId);
-                            const property = this.propertyDB.properties.find(p => p.id === sale.propertyId);
+                        ${(this.propertyDB.sales || []).map(sale => {
+                            const customer = (this.propertyDB.customers || []).find(c => c.id === sale.customerId);
+                            const property = (this.propertyDB.properties || []).find(p => p.id === sale.propertyId);
                             return `
                                 <tr>
                                     <td>#${sale.id}</td>
                                     <td>${customer?.name || 'غير معروف'}</td>
                                     <td>${property?.name || 'غير معروف'}</td>
-                                    <td>${sale.amount.toLocaleString()} ${this.propertyDB.settings.currency}</td>
-                                    <td>${sale.commission ? sale.commission.toLocaleString() + ' ' + this.propertyDB.settings.currency : '-'}</td>
-                                    <td>${sale.date}</td>
+                                    <td>${(sale.amount || 0).toLocaleString()} ${this.propertyDB.settings?.currency || 'ريال'}</td>
+                                    <td>${sale.commission ? (sale.commission || 0).toLocaleString() + ' ' + (this.propertyDB.settings?.currency || 'ريال') : '-'}</td>
+                                    <td>${sale.date || ''}</td>
                                     <td>
                                         <span class="status-badge status-${sale.status === 'مكتمل' ? 'active' : 'pending'}">
-                                            ${sale.status}
+                                            ${sale.status || 'معلق'}
                                         </span>
+                                    </td>
+                                    <td class="actions-column">
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-edit" onclick="propertySystem.editSale(${sale.id})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteSale(${sale.id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             `;
@@ -1168,21 +1182,22 @@ class AdvancedPropertySystem {
         `;
     }
 
-    showSaleForm() {
+    showSaleForm(sale = null) {
+        const isEdit = sale !== null;
         const formHTML = `
             <div class="modal-overlay" id="saleModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-shopping-cart"></i> ${this.currentLanguage === 'ar' ? 'إضافة عملية بيع جديدة' : 'Add New Sale'}</h3>
+                        <h3><i class="fas fa-shopping-cart"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل عملية البيع' : 'Edit Sale') : (this.currentLanguage === 'ar' ? 'إضافة عملية بيع جديدة' : 'Add New Sale')}</h3>
                         <button class="close-btn" onclick="propertySystem.closeModal('saleModal')">&times;</button>
                     </div>
-                    <form onsubmit="propertySystem.addSale(event)">
+                    <form onsubmit="propertySystem.${isEdit ? 'updateSale' : 'addSale'}(event, ${isEdit ? sale.id : ''})">
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}:</label>
                             <select name="customerId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر العميل' : 'Select Customer'}</option>
-                                ${this.propertyDB.customers.map(customer => `
-                                    <option value="${customer.id}">${customer.name}</option>
+                                ${(this.propertyDB.customers || []).map(customer => `
+                                    <option value="${customer.id}" ${isEdit && sale.customerId === customer.id ? 'selected' : ''}>${customer.name}</option>
                                 `).join('')}
                             </select>
                         </div>
@@ -1190,32 +1205,32 @@ class AdvancedPropertySystem {
                             <label>${this.currentLanguage === 'ar' ? 'الوحدة' : 'Property'}:</label>
                             <select name="propertyId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر الوحدة' : 'Select Property'}</option>
-                                ${this.propertyDB.properties.map(property => `
-                                    <option value="${property.id}">${property.name} - ${property.type}</option>
+                                ${(this.propertyDB.properties || []).map(property => `
+                                    <option value="${property.id}" ${isEdit && sale.propertyId === property.id ? 'selected' : ''}>${property.name} - ${property.type}</option>
                                 `).join('')}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
-                            <input type="number" name="amount" required>
+                            <input type="number" name="amount" value="${isEdit ? sale.amount : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'نسبة العمولة %' : 'Commission %'}:</label>
-                            <input type="number" name="commissionPercentage" min="0" max="100" value="5">
+                            <input type="number" name="commissionPercentage" min="0" max="100" value="${isEdit ? ((sale.commission / sale.amount) * 100) || 5 : 5}">
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}:</label>
-                            <input type="date" name="date" required>
+                            <input type="date" name="date" value="${isEdit ? sale.date : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}:</label>
                             <select name="status" required>
-                                <option value="مكتمل">${this.currentLanguage === 'ar' ? 'مكتمل' : 'Completed'}</option>
-                                <option value="معلق">${this.currentLanguage === 'ar' ? 'معلق' : 'Pending'}</option>
+                                <option value="مكتمل" ${isEdit && sale.status === 'مكتمل' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'مكتمل' : 'Completed'}</option>
+                                <option value="معلق" ${isEdit && sale.status === 'معلق' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'معلق' : 'Pending'}</option>
                             </select>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العملية' : 'Add Sale'}</button>
+                            <button type="submit" class="btn btn-primary">${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث العملية' : 'Update Sale') : (this.currentLanguage === 'ar' ? 'إضافة العملية' : 'Add Sale')}</button>
                             <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('saleModal')">
                                 ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
                             </button>
@@ -1236,7 +1251,7 @@ class AdvancedPropertySystem {
         const commission = (amount * commissionPercentage) / 100;
         
         const newSale = {
-            id: this.propertyDB.sales.length > 0 ? Math.max(...this.propertyDB.sales.map(s => s.id)) + 1 : 1,
+            id: (this.propertyDB.sales || []).length > 0 ? Math.max(...this.propertyDB.sales.map(s => s.id)) + 1 : 1,
             customerId: parseInt(formData.get('customerId')),
             propertyId: parseInt(formData.get('propertyId')),
             amount: amount,
@@ -1245,6 +1260,7 @@ class AdvancedPropertySystem {
             status: formData.get('status')
         };
         
+        if (!this.propertyDB.sales) this.propertyDB.sales = [];
         this.propertyDB.sales.push(newSale);
         await this.saveUserData();
         this.closeModal('saleModal');
@@ -1252,11 +1268,54 @@ class AdvancedPropertySystem {
         this.loadSales();
     }
 
+    editSale(saleId) {
+        const sale = (this.propertyDB.sales || []).find(s => s.id === saleId);
+        if (sale) {
+            this.showSaleForm(sale);
+        }
+    }
+
+    async updateSale(event, saleId) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const amount = parseInt(formData.get('amount'));
+        const commissionPercentage = parseInt(formData.get('commissionPercentage'));
+        const commission = (amount * commissionPercentage) / 100;
+        
+        const saleIndex = (this.propertyDB.sales || []).findIndex(s => s.id === saleId);
+        if (saleIndex !== -1) {
+            this.propertyDB.sales[saleIndex] = {
+                ...this.propertyDB.sales[saleIndex],
+                customerId: parseInt(formData.get('customerId')),
+                propertyId: parseInt(formData.get('propertyId')),
+                amount: amount,
+                commission: commission,
+                date: formData.get('date'),
+                status: formData.get('status')
+            };
+            
+            await this.saveUserData();
+            this.closeModal('saleModal');
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم تحديث عملية البيع بنجاح!' : 'Sale updated successfully!');
+            this.loadSales();
+        }
+    }
+
+    async deleteSale(saleId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف عملية البيع هذه؟' : 'Are you sure you want to delete this sale?')) {
+            this.propertyDB.sales = (this.propertyDB.sales || []).filter(s => s.id !== saleId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف عملية البيع بنجاح!' : 'Sale deleted successfully!');
+            this.loadSales();
+        }
+    }
+
     // 🔥 قسم العقود
     async loadContracts() {
         const content = document.querySelector('.main-content');
-        const activeContracts = this.propertyDB.contracts.filter(c => c.status === 'نشط').length;
-        const expiredContracts = this.propertyDB.contracts.filter(c => c.status === 'منتهي').length;
+        const activeContracts = (this.propertyDB.contracts || []).filter(c => c.status === 'نشط').length;
+        const expiredContracts = (this.propertyDB.contracts || []).filter(c => c.status === 'منتهي').length;
         
         content.innerHTML = `
             <div class="page-header">
@@ -1271,7 +1330,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-file-contract"></i>
-                    <div class="stat-value">${this.propertyDB.contracts.length}</div>
+                    <div class="stat-value">${(this.propertyDB.contracts || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي العقود' : 'Total Contracts'}</div>
                 </div>
                 <div class="stat-card">
@@ -1300,9 +1359,9 @@ class AdvancedPropertySystem {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.contracts.map(contract => {
-                            const property = this.propertyDB.properties.find(p => p.id === contract.propertyId);
-                            const customer = this.propertyDB.customers.find(c => c.id === contract.customerId);
+                        ${(this.propertyDB.contracts || []).map(contract => {
+                            const property = (this.propertyDB.properties || []).find(p => p.id === contract.propertyId);
+                            const customer = (this.propertyDB.customers || []).find(c => c.id === contract.customerId);
                             return `
                                 <tr>
                                     <td>#${contract.id}</td>
@@ -1310,7 +1369,7 @@ class AdvancedPropertySystem {
                                     <td>${customer?.name || 'غير معروف'}</td>
                                     <td>${contract.startDate}</td>
                                     <td>${contract.endDate}</td>
-                                    <td>${contract.rentAmount} ${this.propertyDB.settings.currency}</td>
+                                    <td>${contract.rentAmount} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                     <td>
                                         <span class="status-badge status-${contract.status === 'نشط' ? 'active' : 'inactive'}">
                                             ${contract.status}
@@ -1338,7 +1397,7 @@ class AdvancedPropertySystem {
                             <label>${this.currentLanguage === 'ar' ? 'الوحدة' : 'Property'}:</label>
                             <select name="propertyId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر الوحدة' : 'Select Property'}</option>
-                                ${this.propertyDB.properties.map(property => `
+                                ${(this.propertyDB.properties || []).map(property => `
                                     <option value="${property.id}">${property.name} - ${property.type}</option>
                                 `).join('')}
                             </select>
@@ -1347,7 +1406,7 @@ class AdvancedPropertySystem {
                             <label>${this.currentLanguage === 'ar' ? 'المستأجر' : 'Tenant'}:</label>
                             <select name="customerId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر المستأجر' : 'Select Tenant'}</option>
-                                ${this.propertyDB.customers.map(customer => `
+                                ${(this.propertyDB.customers || []).map(customer => `
                                     <option value="${customer.id}">${customer.name}</option>
                                 `).join('')}
                             </select>
@@ -1386,7 +1445,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newContract = {
-            id: this.propertyDB.contracts.length > 0 ? Math.max(...this.propertyDB.contracts.map(c => c.id)) + 1 : 1,
+            id: (this.propertyDB.contracts || []).length > 0 ? Math.max(...this.propertyDB.contracts.map(c => c.id)) + 1 : 1,
             propertyId: parseInt(formData.get('propertyId')),
             customerId: parseInt(formData.get('customerId')),
             startDate: formData.get('startDate'),
@@ -1396,6 +1455,7 @@ class AdvancedPropertySystem {
             notes: formData.get('notes')
         };
         
+        if (!this.propertyDB.contracts) this.propertyDB.contracts = [];
         this.propertyDB.contracts.push(newContract);
         await this.saveUserData();
         this.closeModal('contractModal');
@@ -1406,8 +1466,8 @@ class AdvancedPropertySystem {
     // 🔥 قسم المدفوعات
     async loadPayments() {
         const content = document.querySelector('.main-content');
-        const totalPaid = this.propertyDB.payments.filter(p => p.status === 'مدفوع').reduce((sum, p) => sum + p.amount, 0);
-        const totalPending = this.propertyDB.payments.filter(p => p.status === 'معلقة').reduce((sum, p) => sum + p.amount, 0);
+        const totalPaid = (this.propertyDB.payments || []).filter(p => p.status === 'مدفوع').reduce((sum, p) => sum + p.amount, 0);
+        const totalPending = (this.propertyDB.payments || []).filter(p => p.status === 'معلقة').reduce((sum, p) => sum + p.amount, 0);
         
         content.innerHTML = `
             <div class="page-header">
@@ -1422,7 +1482,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-money-bill-wave"></i>
-                    <div class="stat-value">${this.propertyDB.payments.length}</div>
+                    <div class="stat-value">${(this.propertyDB.payments || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الدفعات' : 'Total Payments'}</div>
                 </div>
                 <div class="stat-card">
@@ -1451,13 +1511,13 @@ class AdvancedPropertySystem {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.payments.map(payment => {
-                            const contract = this.propertyDB.contracts.find(c => c.id === payment.contractId);
+                        ${(this.propertyDB.payments || []).map(payment => {
+                            const contract = (this.propertyDB.contracts || []).find(c => c.id === payment.contractId);
                             return `
                                 <tr>
                                     <td>#${payment.id}</td>
                                     <td>${contract ? `عقد #${contract.id}` : 'غير معروف'}</td>
-                                    <td>${payment.amount} ${this.propertyDB.settings.currency}</td>
+                                    <td>${payment.amount} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                     <td>${payment.date}</td>
                                     <td>${payment.method}</td>
                                     <td>${payment.description}</td>
@@ -1488,7 +1548,7 @@ class AdvancedPropertySystem {
                             <label>${this.currentLanguage === 'ar' ? 'العقد' : 'Contract'}:</label>
                             <select name="contractId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر العقد' : 'Select Contract'}</option>
-                                ${this.propertyDB.contracts.map(contract => `
+                                ${(this.propertyDB.contracts || []).map(contract => `
                                     <option value="${contract.id}">عقد #${contract.id}</option>
                                 `).join('')}
                             </select>
@@ -1539,7 +1599,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newPayment = {
-            id: this.propertyDB.payments.length > 0 ? Math.max(...this.propertyDB.payments.map(p => p.id)) + 1 : 1,
+            id: (this.propertyDB.payments || []).length > 0 ? Math.max(...this.propertyDB.payments.map(p => p.id)) + 1 : 1,
             contractId: parseInt(formData.get('contractId')),
             amount: parseInt(formData.get('amount')),
             date: formData.get('date'),
@@ -1548,6 +1608,7 @@ class AdvancedPropertySystem {
             status: formData.get('status')
         };
         
+        if (!this.propertyDB.payments) this.propertyDB.payments = [];
         this.propertyDB.payments.push(newPayment);
         await this.saveUserData();
         this.closeModal('paymentModal');
@@ -1555,12 +1616,12 @@ class AdvancedPropertySystem {
         this.loadPayments();
     }
 
-    // 🔥 قسم العمولات
+    // 🔥 قسم العمولات - تم إصلاحه
     async loadCommissions() {
         const content = document.querySelector('.main-content');
-        const totalCommissions = this.propertyDB.commissions.reduce((sum, c) => sum + c.amount, 0);
-        const paidCommissions = this.propertyDB.commissions.filter(c => c.status === 'مدفوعة').reduce((sum, c) => sum + c.amount, 0);
-        const pendingCommissions = this.propertyDB.commissions.filter(c => c.status === 'معلقة').reduce((sum, c) => sum + c.amount, 0);
+        const totalCommissions = (this.propertyDB.commissions || []).reduce((sum, c) => sum + (c.amount || 0), 0);
+        const paidCommissions = (this.propertyDB.commissions || []).filter(c => c.status === 'مدفوعة').reduce((sum, c) => sum + (c.amount || 0), 0);
+        const pendingCommissions = (this.propertyDB.commissions || []).filter(c => c.status === 'معلقة').reduce((sum, c) => sum + (c.amount || 0), 0);
         
         content.innerHTML = `
             <div class="page-header">
@@ -1575,7 +1636,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-handshake"></i>
-                    <div class="stat-value">${this.propertyDB.commissions.length}</div>
+                    <div class="stat-value">${(this.propertyDB.commissions || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي العمولات' : 'Total Commissions'}</div>
                 </div>
                 <div class="stat-card">
@@ -1600,20 +1661,31 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.commissions.map(commission => `
+                        ${(this.propertyDB.commissions || []).map(commission => `
                             <tr>
                                 <td>${commission.agent}</td>
                                 <td>${commission.transaction}</td>
                                 <td>${commission.percentage}%</td>
-                                <td>${commission.amount} ${this.propertyDB.settings.currency}</td>
+                                <td>${(commission.amount || 0).toLocaleString()} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                 <td>${commission.date}</td>
                                 <td>
                                     <span class="status-badge status-${commission.status === 'مدفوعة' ? 'paid' : 'pending'}">
                                         ${commission.status}
                                     </span>
+                                </td>
+                                <td class="actions-column">
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-edit" onclick="propertySystem.editCommission(${commission.id})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteCommission(${commission.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `).join('')}
@@ -1623,44 +1695,45 @@ class AdvancedPropertySystem {
         `;
     }
 
-    showCommissionForm() {
+    showCommissionForm(commission = null) {
+        const isEdit = commission !== null;
         const formHTML = `
             <div class="modal-overlay" id="commissionModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-handshake"></i> ${this.currentLanguage === 'ar' ? 'إضافة عمولة جديدة' : 'Add New Commission'}</h3>
+                        <h3><i class="fas fa-handshake"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل العمولة' : 'Edit Commission') : (this.currentLanguage === 'ar' ? 'إضافة عمولة جديدة' : 'Add New Commission')}</h3>
                         <button class="close-btn" onclick="propertySystem.closeModal('commissionModal')">&times;</button>
                     </div>
-                    <form onsubmit="propertySystem.addCommission(event)">
+                    <form onsubmit="propertySystem.${isEdit ? 'updateCommission' : 'addCommission'}(event, ${isEdit ? commission.id : ''})">
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'اسم الوسيط' : 'Agent Name'}:</label>
-                            <input type="text" name="agent" required>
+                            <input type="text" name="agent" value="${isEdit ? commission.agent : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'العملية' : 'Transaction'}:</label>
-                            <input type="text" name="transaction" required>
+                            <input type="text" name="transaction" value="${isEdit ? commission.transaction : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'نسبة العمولة %' : 'Commission %'}:</label>
-                            <input type="number" name="percentage" min="1" max="100" required>
+                            <input type="number" name="percentage" min="1" max="100" value="${isEdit ? commission.percentage : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
-                            <input type="number" name="amount" required>
+                            <input type="number" name="amount" value="${isEdit ? commission.amount : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}:</label>
-                            <input type="date" name="date" required>
+                            <input type="date" name="date" value="${isEdit ? commission.date : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}:</label>
                             <select name="status" required>
-                                <option value="مدفوعة">${this.currentLanguage === 'ar' ? 'مدفوعة' : 'Paid'}</option>
-                                <option value="معلقة">${this.currentLanguage === 'ar' ? 'معلقة' : 'Pending'}</option>
+                                <option value="مدفوعة" ${isEdit && commission.status === 'مدفوعة' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'مدفوعة' : 'Paid'}</option>
+                                <option value="معلقة" ${isEdit && commission.status === 'معلقة' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'معلقة' : 'Pending'}</option>
                             </select>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العمولة' : 'Add Commission'}</button>
+                            <button type="submit" class="btn btn-primary">${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث العمولة' : 'Update Commission') : (this.currentLanguage === 'ar' ? 'إضافة العمولة' : 'Add Commission')}</button>
                             <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('commissionModal')">
                                 ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
                             </button>
@@ -1677,7 +1750,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newCommission = {
-            id: this.propertyDB.commissions.length > 0 ? Math.max(...this.propertyDB.commissions.map(c => c.id)) + 1 : 1,
+            id: (this.propertyDB.commissions || []).length > 0 ? Math.max(...this.propertyDB.commissions.map(c => c.id)) + 1 : 1,
             agent: formData.get('agent'),
             transaction: formData.get('transaction'),
             percentage: parseInt(formData.get('percentage')),
@@ -1686,6 +1759,7 @@ class AdvancedPropertySystem {
             status: formData.get('status')
         };
         
+        if (!this.propertyDB.commissions) this.propertyDB.commissions = [];
         this.propertyDB.commissions.push(newCommission);
         await this.saveUserData();
         this.closeModal('commissionModal');
@@ -1693,12 +1767,51 @@ class AdvancedPropertySystem {
         this.loadCommissions();
     }
 
+    editCommission(commissionId) {
+        const commission = (this.propertyDB.commissions || []).find(c => c.id === commissionId);
+        if (commission) {
+            this.showCommissionForm(commission);
+        }
+    }
+
+    async updateCommission(event, commissionId) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const commissionIndex = (this.propertyDB.commissions || []).findIndex(c => c.id === commissionId);
+        if (commissionIndex !== -1) {
+            this.propertyDB.commissions[commissionIndex] = {
+                ...this.propertyDB.commissions[commissionIndex],
+                agent: formData.get('agent'),
+                transaction: formData.get('transaction'),
+                percentage: parseInt(formData.get('percentage')),
+                amount: parseInt(formData.get('amount')),
+                date: formData.get('date'),
+                status: formData.get('status')
+            };
+            
+            await this.saveUserData();
+            this.closeModal('commissionModal');
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم تحديث العمولة بنجاح!' : 'Commission updated successfully!');
+            this.loadCommissions();
+        }
+    }
+
+    async deleteCommission(commissionId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذه العمولة؟' : 'Are you sure you want to delete this commission?')) {
+            this.propertyDB.commissions = (this.propertyDB.commissions || []).filter(c => c.id !== commissionId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف العمولة بنجاح!' : 'Commission deleted successfully!');
+            this.loadCommissions();
+        }
+    }
+
     // 🔥 قسم الصيانة
     async loadMaintenance() {
         const content = document.querySelector('.main-content');
-        const completed = this.propertyDB.maintenance.filter(m => m.status === 'مكتمل').length;
-        const inProgress = this.propertyDB.maintenance.filter(m => m.status === 'قيد التنفيذ').length;
-        const pending = this.propertyDB.maintenance.filter(m => m.status === 'معلقة').length;
+        const completed = (this.propertyDB.maintenance || []).filter(m => m.status === 'مكتمل').length;
+        const inProgress = (this.propertyDB.maintenance || []).filter(m => m.status === 'قيد التنفيذ').length;
+        const pending = (this.propertyDB.maintenance || []).filter(m => m.status === 'معلقة').length;
         
         content.innerHTML = `
             <div class="page-header">
@@ -1713,7 +1826,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-tools"></i>
-                    <div class="stat-value">${this.propertyDB.maintenance.length}</div>
+                    <div class="stat-value">${(this.propertyDB.maintenance || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الطلبات' : 'Total Requests'}</div>
                 </div>
                 <div class="stat-card">
@@ -1742,15 +1855,15 @@ class AdvancedPropertySystem {
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.maintenance.map(maintenance => {
-                            const property = this.propertyDB.properties.find(p => p.id === maintenance.propertyId);
+                        ${(this.propertyDB.maintenance || []).map(maintenance => {
+                            const property = (this.propertyDB.properties || []).find(p => p.id === maintenance.propertyId);
                             return `
                                 <tr>
                                     <td>#${maintenance.id}</td>
                                     <td>${property?.name || 'غير معروف'}</td>
                                     <td>${maintenance.type}</td>
                                     <td>${maintenance.description}</td>
-                                    <td>${maintenance.cost} ${this.propertyDB.settings.currency}</td>
+                                    <td>${maintenance.cost} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                     <td>${maintenance.date}</td>
                                     <td>
                                         <span class="status-badge status-${maintenance.status === 'مكتمل' ? 'active' : maintenance.status === 'قيد التنفيذ' ? 'in-progress' : 'pending'}">
@@ -1779,7 +1892,7 @@ class AdvancedPropertySystem {
                             <label>${this.currentLanguage === 'ar' ? 'الوحدة' : 'Property'}:</label>
                             <select name="propertyId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر الوحدة' : 'Select Property'}</option>
-                                ${this.propertyDB.properties.map(property => `
+                                ${(this.propertyDB.properties || []).map(property => `
                                     <option value="${property.id}">${property.name} - ${property.type}</option>
                                 `).join('')}
                             </select>
@@ -1831,7 +1944,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newMaintenance = {
-            id: this.propertyDB.maintenance.length > 0 ? Math.max(...this.propertyDB.maintenance.map(m => m.id)) + 1 : 1,
+            id: (this.propertyDB.maintenance || []).length > 0 ? Math.max(...this.propertyDB.maintenance.map(m => m.id)) + 1 : 1,
             propertyId: parseInt(formData.get('propertyId')),
             type: formData.get('type'),
             description: formData.get('description'),
@@ -1840,6 +1953,7 @@ class AdvancedPropertySystem {
             status: formData.get('status')
         };
         
+        if (!this.propertyDB.maintenance) this.propertyDB.maintenance = [];
         this.propertyDB.maintenance.push(newMaintenance);
         await this.saveUserData();
         this.closeModal('maintenanceModal');
@@ -1847,12 +1961,12 @@ class AdvancedPropertySystem {
         this.loadMaintenance();
     }
 
-    // 🔥 قسم الجرد
+    // 🔥 قسم الجرد - تم إصلاحه
     async loadInventory() {
         const content = document.querySelector('.main-content');
-        const totalItems = this.propertyDB.inventory.length;
-        const lowStock = this.propertyDB.inventory.filter(item => item.quantity <= item.minQuantity).length;
-        const totalValue = this.propertyDB.inventory.reduce((sum, item) => sum + (item.quantity * item.price), 0);
+        const totalItems = (this.propertyDB.inventory || []).length;
+        const lowStock = (this.propertyDB.inventory || []).filter(item => item.quantity <= item.minQuantity).length;
+        const totalValue = (this.propertyDB.inventory || []).reduce((sum, item) => sum + (item.quantity * item.price), 0);
         
         content.innerHTML = `
             <div class="page-header">
@@ -1893,10 +2007,11 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'السعر' : 'Price'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'القيمة' : 'Value'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.inventory.map(item => {
+                        ${(this.propertyDB.inventory || []).map(item => {
                             const totalValue = item.quantity * item.price;
                             let status = 'متوفر';
                             let statusClass = 'active';
@@ -1915,12 +2030,22 @@ class AdvancedPropertySystem {
                                     <td>${item.category}</td>
                                     <td>${item.quantity}</td>
                                     <td>${item.minQuantity}</td>
-                                    <td>${item.price} ${this.propertyDB.settings.currency}</td>
-                                    <td>${totalValue} ${this.propertyDB.settings.currency}</td>
+                                    <td>${item.price} ${this.propertyDB.settings?.currency || 'ريال'}</td>
+                                    <td>${totalValue} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                     <td>
                                         <span class="status-badge status-${statusClass}">
                                             ${status}
                                         </span>
+                                    </td>
+                                    <td class="actions-column">
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-edit" onclick="propertySystem.editInventoryItem(${item.id})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteInventoryItem(${item.id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             `;
@@ -1931,43 +2056,44 @@ class AdvancedPropertySystem {
         `;
     }
 
-    showInventoryForm() {
+    showInventoryForm(item = null) {
+        const isEdit = item !== null;
         const formHTML = `
             <div class="modal-overlay" id="inventoryModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-boxes"></i> ${this.currentLanguage === 'ar' ? 'إضافة عنصر جديد' : 'Add New Item'}</h3>
+                        <h3><i class="fas fa-boxes"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل العنصر' : 'Edit Item') : (this.currentLanguage === 'ar' ? 'إضافة عنصر جديد' : 'Add New Item')}</h3>
                         <button class="close-btn" onclick="propertySystem.closeModal('inventoryModal')">&times;</button>
                     </div>
-                    <form onsubmit="propertySystem.addInventoryItem(event)">
+                    <form onsubmit="propertySystem.${isEdit ? 'updateInventoryItem' : 'addInventoryItem'}(event, ${isEdit ? item.id : ''})">
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'اسم العنصر' : 'Item Name'}:</label>
-                            <input type="text" name="name" required>
+                            <input type="text" name="name" value="${isEdit ? item.name : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الفئة' : 'Category'}:</label>
                             <select name="category" required>
-                                <option value="أدوات">${this.currentLanguage === 'ar' ? 'أدوات' : 'Tools'}</option>
-                                <option value="مواد بناء">${this.currentLanguage === 'ar' ? 'مواد بناء' : 'Construction Materials'}</option>
-                                <option value="كهرباء">${this.currentLanguage === 'ar' ? 'كهرباء' : 'Electrical'}</option>
-                                <option value="سباكة">${this.currentLanguage === 'ar' ? 'سباكة' : 'Plumbing'}</option>
-                                <option value="دهانات">${this.currentLanguage === 'ar' ? 'دهانات' : 'Paints'}</option>
+                                <option value="أدوات" ${isEdit && item.category === 'أدوات' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'أدوات' : 'Tools'}</option>
+                                <option value="مواد بناء" ${isEdit && item.category === 'مواد بناء' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'مواد بناء' : 'Construction Materials'}</option>
+                                <option value="كهرباء" ${isEdit && item.category === 'كهرباء' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'كهرباء' : 'Electrical'}</option>
+                                <option value="سباكة" ${isEdit && item.category === 'سباكة' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'سباكة' : 'Plumbing'}</option>
+                                <option value="دهانات" ${isEdit && item.category === 'دهانات' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'دهانات' : 'Paints'}</option>
                             </select>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الكمية' : 'Quantity'}:</label>
-                            <input type="number" name="quantity" required>
+                            <input type="number" name="quantity" value="${isEdit ? item.quantity : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الحد الأدنى' : 'Min Quantity'}:</label>
-                            <input type="number" name="minQuantity" value="1" required>
+                            <input type="number" name="minQuantity" value="${isEdit ? item.minQuantity : 1}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'السعر' : 'Price'}:</label>
-                            <input type="number" name="price" required>
+                            <input type="number" name="price" value="${isEdit ? item.price : ''}" required>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إضافة العنصر' : 'Add Item'}</button>
+                            <button type="submit" class="btn btn-primary">${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث العنصر' : 'Update Item') : (this.currentLanguage === 'ar' ? 'إضافة العنصر' : 'Add Item')}</button>
                             <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('inventoryModal')">
                                 ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
                             </button>
@@ -1984,7 +2110,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newItem = {
-            id: this.propertyDB.inventory.length > 0 ? Math.max(...this.propertyDB.inventory.map(i => i.id)) + 1 : 1,
+            id: (this.propertyDB.inventory || []).length > 0 ? Math.max(...this.propertyDB.inventory.map(i => i.id)) + 1 : 1,
             name: formData.get('name'),
             category: formData.get('category'),
             quantity: parseInt(formData.get('quantity')),
@@ -1992,6 +2118,7 @@ class AdvancedPropertySystem {
             price: parseInt(formData.get('price'))
         };
         
+        if (!this.propertyDB.inventory) this.propertyDB.inventory = [];
         this.propertyDB.inventory.push(newItem);
         await this.saveUserData();
         this.closeModal('inventoryModal');
@@ -1999,7 +2126,45 @@ class AdvancedPropertySystem {
         this.loadInventory();
     }
 
-    // 🔥 قسم الحسابات
+    editInventoryItem(itemId) {
+        const item = (this.propertyDB.inventory || []).find(i => i.id === itemId);
+        if (item) {
+            this.showInventoryForm(item);
+        }
+    }
+
+    async updateInventoryItem(event, itemId) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const itemIndex = (this.propertyDB.inventory || []).findIndex(i => i.id === itemId);
+        if (itemIndex !== -1) {
+            this.propertyDB.inventory[itemIndex] = {
+                ...this.propertyDB.inventory[itemIndex],
+                name: formData.get('name'),
+                category: formData.get('category'),
+                quantity: parseInt(formData.get('quantity')),
+                minQuantity: parseInt(formData.get('minQuantity')),
+                price: parseInt(formData.get('price'))
+            };
+            
+            await this.saveUserData();
+            this.closeModal('inventoryModal');
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم تحديث العنصر بنجاح!' : 'Item updated successfully!');
+            this.loadInventory();
+        }
+    }
+
+    async deleteInventoryItem(itemId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذا العنصر؟' : 'Are you sure you want to delete this item?')) {
+            this.propertyDB.inventory = (this.propertyDB.inventory || []).filter(i => i.id !== itemId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف العنصر بنجاح!' : 'Item deleted successfully!');
+            this.loadInventory();
+        }
+    }
+
+    // 🔥 قسم الحسابات - تم إصلاحه
     async loadAccounts() {
         const content = document.querySelector('.main-content');
         const stats = this.calculateFinancialStats();
@@ -2007,6 +2172,11 @@ class AdvancedPropertySystem {
         content.innerHTML = `
             <div class="page-header">
                 <h2><i class="fas fa-chart-line"></i> <span data-translate="accounts">${this.getTranslation('accounts')}</span></h2>
+                <div class="header-actions">
+                    <button class="btn btn-primary" onclick="propertySystem.showAccountForm()">
+                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إضافة حركة' : 'Add Transaction'}
+                    </button>
+                </div>
             </div>
             
             <div class="stats-grid" style="margin-bottom: 30px;">
@@ -2035,10 +2205,11 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'النوع' : 'Type'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.accounts.map(account => `
+                        ${(this.propertyDB.accounts || []).map(account => `
                             <tr>
                                 <td>${account.date}</td>
                                 <td>${account.description}</td>
@@ -2047,7 +2218,17 @@ class AdvancedPropertySystem {
                                         ${account.type}
                                     </span>
                                 </td>
-                                <td>${account.amount} ${this.propertyDB.settings.currency}</td>
+                                <td>${account.amount} ${this.propertyDB.settings?.currency || 'ريال'}</td>
+                                <td class="actions-column">
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-edit" onclick="propertySystem.editAccount(${account.id})">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteAccount(${account.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -2057,25 +2238,124 @@ class AdvancedPropertySystem {
     }
 
     calculateFinancialStats() {
-        const totalRevenue = this.propertyDB.accounts
-            ?.filter(a => a.type === 'إيراد')
-            ?.reduce((sum, account) => sum + (account.amount || 0), 0) || 0;
+        const totalRevenue = (this.propertyDB.accounts || [])
+            .filter(a => a.type === 'إيراد')
+            .reduce((sum, account) => sum + (account.amount || 0), 0);
             
-        const totalExpenses = this.propertyDB.accounts
-            ?.filter(a => a.type === 'مصروف')
-            ?.reduce((sum, account) => sum + (account.amount || 0), 0) || 0;
+        const totalExpenses = (this.propertyDB.accounts || [])
+            .filter(a => a.type === 'مصروف')
+            .reduce((sum, account) => sum + (account.amount || 0), 0);
             
         const netProfit = totalRevenue - totalExpenses;
 
         return { totalRevenue, totalExpenses, netProfit };
     }
 
-    // 🔥 قسم الفواتير
+    showAccountForm(account = null) {
+        const isEdit = account !== null;
+        const formHTML = `
+            <div class="modal-overlay" id="accountModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-chart-line"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل الحركة' : 'Edit Transaction') : (this.currentLanguage === 'ar' ? 'إضافة حركة جديدة' : 'Add New Transaction')}</h3>
+                        <button class="close-btn" onclick="propertySystem.closeModal('accountModal')">&times;</button>
+                    </div>
+                    <form onsubmit="propertySystem.${isEdit ? 'updateAccount' : 'addAccount'}(event, ${isEdit ? account.id : ''})">
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}:</label>
+                            <input type="date" name="date" value="${isEdit ? account.date : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}:</label>
+                            <input type="text" name="description" value="${isEdit ? account.description : ''}" required>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'النوع' : 'Type'}:</label>
+                            <select name="type" required>
+                                <option value="إيراد" ${isEdit && account.type === 'إيراد' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'إيراد' : 'Revenue'}</option>
+                                <option value="مصروف" ${isEdit && account.type === 'مصروف' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'مصروف' : 'Expense'}</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
+                            <input type="number" name="amount" value="${isEdit ? account.amount : ''}" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث الحركة' : 'Update Transaction') : (this.currentLanguage === 'ar' ? 'إضافة الحركة' : 'Add Transaction')}</button>
+                            <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('accountModal')">
+                                ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
+        this.showModal(formHTML);
+    }
+
+    async addAccount(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const newAccount = {
+            id: (this.propertyDB.accounts || []).length > 0 ? Math.max(...this.propertyDB.accounts.map(a => a.id)) + 1 : 1,
+            date: formData.get('date'),
+            description: formData.get('description'),
+            type: formData.get('type'),
+            amount: parseInt(formData.get('amount'))
+        };
+        
+        if (!this.propertyDB.accounts) this.propertyDB.accounts = [];
+        this.propertyDB.accounts.push(newAccount);
+        await this.saveUserData();
+        this.closeModal('accountModal');
+        this.showNotification(this.currentLanguage === 'ar' ? 'تم إضافة الحركة بنجاح!' : 'Transaction added successfully!');
+        this.loadAccounts();
+    }
+
+    editAccount(accountId) {
+        const account = (this.propertyDB.accounts || []).find(a => a.id === accountId);
+        if (account) {
+            this.showAccountForm(account);
+        }
+    }
+
+    async updateAccount(event, accountId) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const accountIndex = (this.propertyDB.accounts || []).findIndex(a => a.id === accountId);
+        if (accountIndex !== -1) {
+            this.propertyDB.accounts[accountIndex] = {
+                ...this.propertyDB.accounts[accountIndex],
+                date: formData.get('date'),
+                description: formData.get('description'),
+                type: formData.get('type'),
+                amount: parseInt(formData.get('amount'))
+            };
+            
+            await this.saveUserData();
+            this.closeModal('accountModal');
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم تحديث الحركة بنجاح!' : 'Transaction updated successfully!');
+            this.loadAccounts();
+        }
+    }
+
+    async deleteAccount(accountId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذه الحركة؟' : 'Are you sure you want to delete this transaction?')) {
+            this.propertyDB.accounts = (this.propertyDB.accounts || []).filter(a => a.id !== accountId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف الحركة بنجاح!' : 'Transaction deleted successfully!');
+            this.loadAccounts();
+        }
+    }
+
+    // 🔥 قسم الفواتير - تم إصلاحه
     async loadInvoices() {
         const content = document.querySelector('.main-content');
-        const paidInvoices = this.propertyDB.invoices.filter(i => i.status === 'مدفوعة').length;
-        const pendingInvoices = this.propertyDB.invoices.filter(i => i.status === 'معلقة').length;
-        const totalAmount = this.propertyDB.invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+        const paidInvoices = (this.propertyDB.invoices || []).filter(i => i.status === 'مدفوعة').length;
+        const pendingInvoices = (this.propertyDB.invoices || []).filter(i => i.status === 'معلقة').length;
+        const totalAmount = (this.propertyDB.invoices || []).reduce((sum, invoice) => sum + (invoice.amount || 0), 0);
         
         content.innerHTML = `
             <div class="page-header">
@@ -2090,7 +2370,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-receipt"></i>
-                    <div class="stat-value">${this.propertyDB.invoices.length}</div>
+                    <div class="stat-value">${(this.propertyDB.invoices || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الفواتير' : 'Total Invoices'}</div>
                 </div>
                 <div class="stat-card">
@@ -2116,16 +2396,17 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'تاريخ الاستحقاق' : 'Due Date'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.invoices.map(invoice => {
-                            const customer = this.propertyDB.customers.find(c => c.id === invoice.customerId);
+                        ${(this.propertyDB.invoices || []).map(invoice => {
+                            const customer = (this.propertyDB.customers || []).find(c => c.id === invoice.customerId);
                             return `
                                 <tr>
                                     <td>#${invoice.id}</td>
                                     <td>${customer?.name || 'غير معروف'}</td>
-                                    <td>${invoice.amount} ${this.propertyDB.settings.currency}</td>
+                                    <td>${(invoice.amount || 0).toLocaleString()} ${this.propertyDB.settings?.currency || 'ريال'}</td>
                                     <td>${invoice.date}</td>
                                     <td>${invoice.dueDate}</td>
                                     <td>${invoice.description}</td>
@@ -2133,6 +2414,16 @@ class AdvancedPropertySystem {
                                         <span class="status-badge status-${invoice.status === 'مدفوعة' ? 'paid' : 'pending'}">
                                             ${invoice.status}
                                         </span>
+                                    </td>
+                                    <td class="actions-column">
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-edit" onclick="propertySystem.editInvoice(${invoice.id})">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteInvoice(${invoice.id})">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             `;
@@ -2143,42 +2434,50 @@ class AdvancedPropertySystem {
         `;
     }
 
-    showInvoiceForm() {
+    showInvoiceForm(invoice = null) {
+        const isEdit = invoice !== null;
         const formHTML = `
             <div class="modal-overlay" id="invoiceModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-receipt"></i> ${this.currentLanguage === 'ar' ? 'إنشاء فاتورة جديدة' : 'Create New Invoice'}</h3>
+                        <h3><i class="fas fa-receipt"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل الفاتورة' : 'Edit Invoice') : (this.currentLanguage === 'ar' ? 'إنشاء فاتورة جديدة' : 'Create New Invoice')}</h3>
                         <button class="close-btn" onclick="propertySystem.closeModal('invoiceModal')">&times;</button>
                     </div>
-                    <form onsubmit="propertySystem.addInvoice(event)">
+                    <form onsubmit="propertySystem.${isEdit ? 'updateInvoice' : 'addInvoice'}(event, ${isEdit ? invoice.id : ''})">
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'العميل' : 'Customer'}:</label>
                             <select name="customerId" required>
                                 <option value="">${this.currentLanguage === 'ar' ? 'اختر العميل' : 'Select Customer'}</option>
-                                ${this.propertyDB.customers.map(customer => `
-                                    <option value="${customer.id}">${customer.name}</option>
+                                ${(this.propertyDB.customers || []).map(customer => `
+                                    <option value="${customer.id}" ${isEdit && invoice.customerId === customer.id ? 'selected' : ''}>${customer.name}</option>
                                 `).join('')}
                             </select>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'المبلغ' : 'Amount'}:</label>
-                            <input type="number" name="amount" required>
+                            <input type="number" name="amount" value="${isEdit ? invoice.amount : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'تاريخ الإصدار' : 'Issue Date'}:</label>
-                            <input type="date" name="date" required>
+                            <input type="date" name="date" value="${isEdit ? invoice.date : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'تاريخ الاستحقاق' : 'Due Date'}:</label>
-                            <input type="date" name="dueDate" required>
+                            <input type="date" name="dueDate" value="${isEdit ? invoice.dueDate : ''}" required>
                         </div>
                         <div class="form-group">
                             <label>${this.currentLanguage === 'ar' ? 'الوصف' : 'Description'}:</label>
-                            <textarea name="description" rows="3" required></textarea>
+                            <textarea name="description" rows="3" required>${isEdit ? invoice.description : ''}</textarea>
+                        </div>
+                        <div class="form-group">
+                            <label>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}:</label>
+                            <select name="status" required>
+                                <option value="معلقة" ${isEdit && invoice.status === 'معلقة' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'معلقة' : 'Pending'}</option>
+                                <option value="مدفوعة" ${isEdit && invoice.status === 'مدفوعة' ? 'selected' : ''}>${this.currentLanguage === 'ar' ? 'مدفوعة' : 'Paid'}</option>
+                            </select>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">${this.currentLanguage === 'ar' ? 'إنشاء الفاتورة' : 'Create Invoice'}</button>
+                            <button type="submit" class="btn btn-primary">${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث الفاتورة' : 'Update Invoice') : (this.currentLanguage === 'ar' ? 'إنشاء الفاتورة' : 'Create Invoice')}</button>
                             <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('invoiceModal')">
                                 ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
                             </button>
@@ -2195,15 +2494,16 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newInvoice = {
-            id: this.propertyDB.invoices.length > 0 ? Math.max(...this.propertyDB.invoices.map(i => i.id)) + 1 : 1,
+            id: (this.propertyDB.invoices || []).length > 0 ? Math.max(...this.propertyDB.invoices.map(i => i.id)) + 1 : 1,
             customerId: parseInt(formData.get('customerId')),
             amount: parseInt(formData.get('amount')),
             date: formData.get('date'),
             dueDate: formData.get('dueDate'),
             description: formData.get('description'),
-            status: 'معلقة'
+            status: formData.get('status')
         };
         
+        if (!this.propertyDB.invoices) this.propertyDB.invoices = [];
         this.propertyDB.invoices.push(newInvoice);
         await this.saveUserData();
         this.closeModal('invoiceModal');
@@ -2211,10 +2511,49 @@ class AdvancedPropertySystem {
         this.loadInvoices();
     }
 
-    // 🔥 قسم المحادثات
+    editInvoice(invoiceId) {
+        const invoice = (this.propertyDB.invoices || []).find(i => i.id === invoiceId);
+        if (invoice) {
+            this.showInvoiceForm(invoice);
+        }
+    }
+
+    async updateInvoice(event, invoiceId) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const invoiceIndex = (this.propertyDB.invoices || []).findIndex(i => i.id === invoiceId);
+        if (invoiceIndex !== -1) {
+            this.propertyDB.invoices[invoiceIndex] = {
+                ...this.propertyDB.invoices[invoiceIndex],
+                customerId: parseInt(formData.get('customerId')),
+                amount: parseInt(formData.get('amount')),
+                date: formData.get('date'),
+                dueDate: formData.get('dueDate'),
+                description: formData.get('description'),
+                status: formData.get('status')
+            };
+            
+            await this.saveUserData();
+            this.closeModal('invoiceModal');
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم تحديث الفاتورة بنجاح!' : 'Invoice updated successfully!');
+            this.loadInvoices();
+        }
+    }
+
+    async deleteInvoice(invoiceId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذه الفاتورة؟' : 'Are you sure you want to delete this invoice?')) {
+            this.propertyDB.invoices = (this.propertyDB.invoices || []).filter(i => i.id !== invoiceId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف الفاتورة بنجاح!' : 'Invoice deleted successfully!');
+            this.loadInvoices();
+        }
+    }
+
+    // 🔥 قسم المحادثات - تم إصلاحه
     async loadMessages() {
         const content = document.querySelector('.main-content');
-        const unreadMessages = this.propertyDB.messages.filter(m => m.status === 'غير مقروء').length;
+        const unreadMessages = (this.propertyDB.messages || []).filter(m => m.status === 'غير مقروء').length;
         
         content.innerHTML = `
             <div class="page-header">
@@ -2229,7 +2568,7 @@ class AdvancedPropertySystem {
             <div class="stats-grid" style="margin-bottom: 20px;">
                 <div class="stat-card">
                     <i class="fas fa-comments"></i>
-                    <div class="stat-value">${this.propertyDB.messages.length}</div>
+                    <div class="stat-value">${(this.propertyDB.messages || []).length}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي الرسائل' : 'Total Messages'}</div>
                 </div>
                 <div class="stat-card">
@@ -2239,7 +2578,7 @@ class AdvancedPropertySystem {
                 </div>
                 <div class="stat-card">
                     <i class="fas fa-check-circle"></i>
-                    <div class="stat-value">${this.propertyDB.messages.length - unreadMessages}</div>
+                    <div class="stat-value">${(this.propertyDB.messages || []).length - unreadMessages}</div>
                     <div class="stat-title">${this.currentLanguage === 'ar' ? 'مقروء' : 'Read'}</div>
                 </div>
             </div>
@@ -2254,10 +2593,11 @@ class AdvancedPropertySystem {
                             <th>${this.currentLanguage === 'ar' ? 'الرسالة' : 'Message'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'التاريخ' : 'Date'}</th>
                             <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
+                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
                         </tr>
                     </thead>
                     <tbody>
-                        ${this.propertyDB.messages.map(message => `
+                        ${(this.propertyDB.messages || []).map(message => `
                             <tr>
                                 <td>${message.sender}</td>
                                 <td>${message.receiver}</td>
@@ -2268,6 +2608,16 @@ class AdvancedPropertySystem {
                                     <span class="status-badge status-${message.status === 'مقروء' ? 'active' : 'pending'}">
                                         ${message.status}
                                     </span>
+                                </td>
+                                <td class="actions-column">
+                                    <div class="action-buttons">
+                                        <button class="btn btn-sm btn-view" onclick="propertySystem.viewMessage(${message.id})">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteMessage(${message.id})">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         `).join('')}
@@ -2316,7 +2666,7 @@ class AdvancedPropertySystem {
         const formData = new FormData(event.target);
         
         const newMessage = {
-            id: this.propertyDB.messages.length > 0 ? Math.max(...this.propertyDB.messages.map(m => m.id)) + 1 : 1,
+            id: (this.propertyDB.messages || []).length > 0 ? Math.max(...this.propertyDB.messages.map(m => m.id)) + 1 : 1,
             sender: this.propertyDB.currentUser,
             receiver: formData.get('receiver'),
             subject: formData.get('subject'),
@@ -2325,11 +2675,67 @@ class AdvancedPropertySystem {
             status: 'غير مقروء'
         };
         
+        if (!this.propertyDB.messages) this.propertyDB.messages = [];
         this.propertyDB.messages.push(newMessage);
         await this.saveUserData();
         this.closeModal('messageModal');
         this.showNotification(this.currentLanguage === 'ar' ? 'تم إرسال الرسالة بنجاح!' : 'Message sent successfully!');
         this.loadMessages();
+    }
+
+    viewMessage(messageId) {
+        const message = (this.propertyDB.messages || []).find(m => m.id === messageId);
+        if (message) {
+            const viewHTML = `
+                <div class="modal-overlay" id="viewMessageModal">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h3><i class="fas fa-envelope"></i> ${this.currentLanguage === 'ar' ? 'عرض الرسالة' : 'View Message'}</h3>
+                            <button class="close-btn" onclick="propertySystem.closeModal('viewMessageModal')">&times;</button>
+                        </div>
+                        <div class="message-view">
+                            <div class="message-header">
+                                <div class="message-field">
+                                    <strong>${this.currentLanguage === 'ar' ? 'المرسل:' : 'Sender:'}</strong>
+                                    <span>${message.sender}</span>
+                                </div>
+                                <div class="message-field">
+                                    <strong>${this.currentLanguage === 'ar' ? 'المستلم:' : 'Receiver:'}</strong>
+                                    <span>${message.receiver}</span>
+                                </div>
+                                <div class="message-field">
+                                    <strong>${this.currentLanguage === 'ar' ? 'الموضوع:' : 'Subject:'}</strong>
+                                    <span>${message.subject}</span>
+                                </div>
+                                <div class="message-field">
+                                    <strong>${this.currentLanguage === 'ar' ? 'التاريخ:' : 'Date:'}</strong>
+                                    <span>${message.date}</span>
+                                </div>
+                            </div>
+                            <div class="message-body">
+                                <strong>${this.currentLanguage === 'ar' ? 'الرسالة:' : 'Message:'}</strong>
+                                <div class="message-content">${message.message}</div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('viewMessageModal')">
+                                ${this.currentLanguage === 'ar' ? 'إغلاق' : 'Close'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            this.showModal(viewHTML);
+        }
+    }
+
+    async deleteMessage(messageId) {
+        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذه الرسالة؟' : 'Are you sure you want to delete this message?')) {
+            this.propertyDB.messages = (this.propertyDB.messages || []).filter(m => m.id !== messageId);
+            await this.saveUserData();
+            this.showNotification(this.currentLanguage === 'ar' ? 'تم حذف الرسالة بنجاح!' : 'Message deleted successfully!');
+            this.loadMessages();
+        }
     }
 
     // 🔥 قسم التقارير
@@ -2395,15 +2801,15 @@ class AdvancedPropertySystem {
                 <div class="reports-details-grid">
                     <div class="report-detail-card">
                         <h4><i class="fas fa-users"></i> ${this.currentLanguage === 'ar' ? 'تقرير العملاء' : 'Customers Report'}</h4>
-                        <p><strong>${this.currentLanguage === 'ar' ? 'إجمالي العملاء:' : 'Total Customers:'}</strong> ${this.propertyDB.customers.length}</p>
-                        <p><strong>${this.currentLanguage === 'ar' ? 'عملاء نشطون:' : 'Active Customers:'}</strong> ${this.propertyDB.contracts.filter(c => c.status === 'نشط').length}</p>
+                        <p><strong>${this.currentLanguage === 'ar' ? 'إجمالي العملاء:' : 'Total Customers:'}</strong> ${(this.propertyDB.customers || []).length}</p>
+                        <p><strong>${this.currentLanguage === 'ar' ? 'عملاء نشطون:' : 'Active Customers:'}</strong> ${(this.propertyDB.contracts || []).filter(c => c.status === 'نشط').length}</p>
                     </div>
 
                     <div class="report-detail-card">
                         <h4><i class="fas fa-tools"></i> ${this.currentLanguage === 'ar' ? 'تقرير الصيانة' : 'Maintenance Report'}</h4>
-                        <p><strong>${this.currentLanguage === 'ar' ? 'إجمالي الطلبات:' : 'Total Requests:'}</strong> ${this.propertyDB.maintenance.length}</p>
-                        <p><strong>${this.currentLanguage === 'ar' ? 'مكتملة:' : 'Completed:'}</strong> ${this.propertyDB.maintenance.filter(m => m.status === 'مكتمل').length}</p>
-                        <p><strong>${this.currentLanguage === 'ar' ? 'قيد التنفيذ:' : 'In Progress:'}</strong> ${this.propertyDB.maintenance.filter(m => m.status === 'قيد التنفيذ').length}</p>
+                        <p><strong>${this.currentLanguage === 'ar' ? 'إجمالي الطلبات:' : 'Total Requests:'}</strong> ${(this.propertyDB.maintenance || []).length}</p>
+                        <p><strong>${this.currentLanguage === 'ar' ? 'مكتملة:' : 'Completed:'}</strong> ${(this.propertyDB.maintenance || []).filter(m => m.status === 'مكتمل').length}</p>
+                        <p><strong>${this.currentLanguage === 'ar' ? 'قيد التنفيذ:' : 'In Progress:'}</strong> ${(this.propertyDB.maintenance || []).filter(m => m.status === 'قيد التنفيذ').length}</p>
                     </div>
                 </div>
 
@@ -2470,7 +2876,7 @@ class AdvancedPropertySystem {
                                     <i class="fas fa-signature"></i>
                                     ${this.currentLanguage === 'ar' ? 'اسم الشركة' : 'Company Name'}
                                 </label>
-                                <input type="text" class="modern-input" name="companyName" value="${this.propertyDB.settings.companyName}" required>
+                                <input type="text" class="modern-input" name="companyName" value="${this.propertyDB.settings?.companyName || ''}" required>
                             </div>
                             <div class="form-group">
                                 <label class="form-label">
@@ -2478,9 +2884,9 @@ class AdvancedPropertySystem {
                                     ${this.currentLanguage === 'ar' ? 'العملة' : 'Currency'}
                                 </label>
                                 <select class="modern-select" name="currency" required>
-                                    <option value="ريال" ${this.propertyDB.settings.currency === 'ريال' ? 'selected' : ''}>ريال سعودي</option>
-                                    <option value="دولار" ${this.propertyDB.settings.currency === 'دولار' ? 'selected' : ''}>دولار أمريكي</option>
-                                    <option value="يورو" ${this.propertyDB.settings.currency === 'يورو' ? 'selected' : ''}>يورو</option>
+                                    <option value="ريال" ${(this.propertyDB.settings?.currency || 'ريال') === 'ريال' ? 'selected' : ''}>ريال سعودي</option>
+                                    <option value="دولار" ${(this.propertyDB.settings?.currency || 'ريال') === 'دولار' ? 'selected' : ''}>دولار أمريكي</option>
+                                    <option value="يورو" ${(this.propertyDB.settings?.currency || 'ريال') === 'يورو' ? 'selected' : ''}>يورو</option>
                                 </select>
                             </div>
                             <div class="form-group">
@@ -2489,7 +2895,7 @@ class AdvancedPropertySystem {
                                     ${this.currentLanguage === 'ar' ? 'معدل الضريبة %' : 'Tax Rate %'}
                                 </label>
                                 <div class="tax-input-container">
-                                    <input type="number" class="modern-input tax-rate-input" name="taxRate" value="${this.propertyDB.settings.taxRate}" min="0" max="100" required>
+                                    <input type="number" class="modern-input tax-rate-input" name="taxRate" value="${this.propertyDB.settings?.taxRate || 15}" min="0" max="100" required>
                                     <span class="tax-percent">%</span>
                                 </div>
                             </div>
@@ -2498,21 +2904,21 @@ class AdvancedPropertySystem {
                                     <i class="fas fa-map-marker-alt"></i>
                                     ${this.currentLanguage === 'ar' ? 'عنوان الشركة' : 'Company Address'}
                                 </label>
-                                <input type="text" class="modern-input" name="address" value="${this.propertyDB.settings.address}">
+                                <input type="text" class="modern-input" name="address" value="${this.propertyDB.settings?.address || ''}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">
                                     <i class="fas fa-phone"></i>
                                     ${this.currentLanguage === 'ar' ? 'هاتف الشركة' : 'Company Phone'}
                                 </label>
-                                <input type="tel" class="modern-input" name="phone" value="${this.propertyDB.settings.phone}">
+                                <input type="tel" class="modern-input" name="phone" value="${this.propertyDB.settings?.phone || ''}">
                             </div>
                             <div class="form-group">
                                 <label class="form-label">
                                     <i class="fas fa-envelope"></i>
                                     ${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                                 </label>
-                                <input type="email" class="modern-input" name="email" value="${this.propertyDB.settings.email}">
+                                <input type="email" class="modern-input" name="email" value="${this.propertyDB.settings?.email || ''}">
                             </div>
                             <button type="submit" class="btn-save">
                                 <i class="fas fa-save"></i>
