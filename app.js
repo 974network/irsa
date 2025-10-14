@@ -3236,6 +3236,30 @@ updateMobileTitle(pageName) {
         });
     }
 }
+// 🔥 دالة لتحسين عرض الجداول على الجوال
+optimizeTablesForMobile() {
+    if (window.innerWidth <= 768) {
+        document.querySelectorAll('.data-table td').forEach(td => {
+            const th = td.closest('table').querySelectorAll('th')[td.cellIndex];
+            if (th) {
+                td.setAttribute('data-label', th.textContent);
+            }
+        });
+    }
+}
+
+// استدعاء الدالة عند تحميل كل صفحة بها جداول
+loadProperties() {
+    // الكود الأصلي...
+    setTimeout(() => this.optimizeTablesForMobile(), 100);
+}
+
+loadCustomers() {
+    // الكود الأصلي...
+    setTimeout(() => this.optimizeTablesForMobile(), 100);
+}
+
+// ... وهكذا لباقي الصفحات التي تحتوي على جداول
 
 // مدير Firebase
 class FirebaseManager {
@@ -3608,4 +3632,5 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
