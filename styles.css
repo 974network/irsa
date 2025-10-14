@@ -4340,4 +4340,70 @@ select option {
         margin-top: 80px;
     }
 }
+/* 🔥 تحسين الجداول للجوال */
+@media (max-width: 768px) {
+    .table-container {
+        overflow-x: auto;
+        border-radius: 10px;
+        background: var(--card-bg);
+        border: 1px solid var(--bright-purple);
+        -webkit-overflow-scrolling: touch;
+        margin: 10px 0;
+    }
+    
+    .data-table {
+        min-width: 700px; /* يتناسب مع محتوى الجدول */
+        width: 100%;
+        margin: 0;
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 12px 8px;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        text-align: center;
+    }
+    
+    .data-table th {
+        background: rgba(255, 215, 0, 0.2);
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+    
+    /* تحسين أزرار الإجراءات */
+    .action-buttons {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        flex-wrap: nowrap;
+    }
+    
+    .btn-sm {
+        padding: 8px 10px;
+        font-size: 0.8rem;
+        min-width: 40px;
+    }
+}
+
+/* للشاشات الصغيرة جداً */
+@media (max-width: 480px) {
+    .data-table {
+        min-width: 600px; /* أقل عرض للشاشات الصغيرة */
+    }
+    
+    .data-table th,
+    .data-table td {
+        padding: 10px 6px;
+        font-size: 0.8rem;
+    }
+    
+    /* إخفاء الأعمدة الأقل أهمية إذا لزم الأمر */
+    .data-table td:nth-child(3), /* عمود المساحة */
+    .data-table th:nth-child(3) {
+        display: none;
+    }
+}
+
 
