@@ -2769,6 +2769,55 @@ class AdvancedPropertySystem {
         });
     }
 }
+// 🔥 دوال دعم الجوال
+setupMobileMenu() {
+    const mobileMenuBtn = document.createElement('button');
+    mobileMenuBtn.className = 'mobile-menu-btn';
+    mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+    mobileMenuBtn.onclick = () => this.toggleMobileMenu();
+    
+    const overlay = document.createElement('div');
+    overlay.className = 'overlay';
+    overlay.onclick = () => this.toggleMobileMenu();
+    
+    document.body.appendChild(mobileMenuBtn);
+    document.body.appendChild(overlay);
+}
+
+toggleMobileMenu() {
+    const sidebar = document.querySelector('.sidebar');
+    const overlay = document.querySelector('.overlay');
+    
+    sidebar.classList.toggle('mobile-open');
+    overlay.classList.toggle('active');
+}
+
+// 🔥 تحديث دالة init لإضافة دعم الجوال
+async init() {
+    try {
+        await this.firebaseManager.init();
+        this.setupLogin();
+        this.setupNavigation();
+        this.checkAuthStatus();
+        this.applyLanguage(this.currentLanguage);
+        this.setupMobileMenu(); // 🔥 إضافة دعم الجوال
+    } catch (error) {
+        console.error('Initialization error:', error);
+        this.showEmergencyLogin();
+    }
+}
+
+// 🔥 تحديث دالة navigateTo لإغلاق القائمة في الجوال
+navigateTo(page) {
+    this.currentPage = page;
+    
+    // إغلاق القائمة في الجوال عند التنقل
+    if (window.innerWidth < 768) {
+        this.toggleMobileMenu();
+    }
+    
+    // ... باقي الكود الحالي
+}
 
 // مدير Firebase
 class FirebaseManager {
@@ -3142,4 +3191,5 @@ document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
     
+
 
