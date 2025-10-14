@@ -4266,4 +4266,78 @@ select option {
         flex-direction: column;
     }
 }
+/* 🔥🔥🔥 ضيف هذا الكود في نهاية ملف styles.css */
+
+/* شريط أعلى للجوال */
+.mobile-header {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--primary-dark), var(--secondary-dark));
+    padding: 15px;
+    border-bottom: 2px solid var(--bright-purple);
+    z-index: 9999;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.mobile-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.mobile-title {
+    color: var(--neon-purple);
+    font-size: 1.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.mobile-menu-btn {
+    background: var(--bright-purple);
+    color: black;
+    border: none;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+}
+
+/* تحسينات الجوال */
+@media (max-width: 768px) {
+    .mobile-header {
+        display: block;
+    }
+    
+    .sidebar {
+        position: fixed;
+        right: -100%;
+        top: 0;
+        height: 100vh;
+        width: 280px;
+        transition: all 0.3s ease;
+        z-index: 10000;
+        box-shadow: -5px 0 25px rgba(0, 0, 0, 0.3);
+    }
+    
+    .sidebar.active {
+        right: 0;
+    }
+    
+    .dashboard .main-content {
+        margin-right: 0;
+        width: 100%;
+        padding: 15px;
+        margin-top: 80px;
+    }
+}
 
