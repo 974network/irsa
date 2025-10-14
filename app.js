@@ -9,17 +9,18 @@ class AdvancedPropertySystem {
     }
 
     async init() {
-        try {
-            await this.firebaseManager.init();
-            this.setupLogin();
-            this.setupNavigation();
-            this.checkAuthStatus();
-            this.applyLanguage(this.currentLanguage);
-        } catch (error) {
-            console.error('Initialization error:', error);
-            this.showEmergencyLogin();
-        }
+    try {
+        await this.firebaseManager.init();
+        this.setupLogin();
+        this.setupNavigation();
+        this.setupMobileMenu(); // 🔥 إضافة هذا السطر
+        this.checkAuthStatus();
+        this.applyLanguage(this.currentLanguage);
+    } catch (error) {
+        console.error('Initialization error:', error);
+        this.showEmergencyLogin();
     }
+}
 
     showEmergencyLogin() {
         document.getElementById('loginPage').style.display = 'flex';
@@ -477,6 +478,61 @@ class AdvancedPropertySystem {
             this.navigateTo('dashboard');
         }
     }
+    setupMobileMenu() {
+    // إنشاء شريط أعلى للجوال
+    const mobileHeader = document.createElement('div');
+    mobileHeader.className = 'mobile-header';
+    mobileHeader.innerHTML = `
+        <div class="mobile-header-content">
+            <div class="mobile-title">
+                <i class="fas fa-building"></i>
+                <span>${this.propertyDB?.settings?.companyName || 'Property System'}</span>
+            </div>
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    `;
+    
+    // إضافة العناصر للصفحة
+    document.body.appendChild(mobileHeader);
+    
+    // إضافة event listener للزر
+    document.querySelector('.mobile-menu-btn').addEventListener('click', () => {
+        this.toggleSidebar();
+    });
+}
+
+// 🔥 دالة تبديل الشريط الجانبي
+toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
+    }
+}
+
+// 🔥 تحديث عنوان الصفحة
+updateMobileTitle(pageName) {
+    const titleElement = document.querySelector('.mobile-title span');
+    if (titleElement) {
+        const titles = {
+            'dashboard': 'لوحة التحكم',
+            'properties': 'إدارة العقارات', 
+            'customers': 'إدارة العملاء',
+            'sales': 'المبيعات',
+            'contracts': 'العقود',
+            'payments': 'المدفوعات',
+            'maintenance': 'الصيانة',
+            'inventory': 'الجرد',
+            'accounts': 'الحسابات',
+            'invoices': 'الفواتير',
+            'messages': 'المحادثات',
+            'reports': 'التقارير',
+            'settings': 'الإعدادات'
+        };
+        titleElement.textContent = titles[pageName] || pageName;
+    }
+}
 
     setupUserMenu() {
         const username = this.propertyDB?.currentUser || 'مستخدم';
@@ -540,23 +596,28 @@ class AdvancedPropertySystem {
     }
 
     navigateTo(page) {
-        this.currentPage = page;
-        
-        if (page === 'logout') {
-            this.logout();
-            return;
-        }
-        
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        const activeLink = document.getElementById(`nav-${page}`);
-        if (activeLink) activeLink.classList.add('active');
+    this.currentPage = page;
+    
+    // تحديث عنوان الجوال
+    this.updateMobileTitle(page);
+    
+    // إغلاق الشريط الجانبي على الجوال
+    if (window.innerWidth <= 768) {
+        this.toggleSidebar();
+    }
+    
+    // الكود الأصلي...
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    const activeLink = document.getElementById(`nav-${page}`);
+    if (activeLink) activeLink.classList.add('active');
 
-        switch(page) {
-            case 'dashboard': this.loadDashboard(); break;
-            case 'properties': this.loadProperties(); break;
+    // تحميل المحتوى...
+    switch(page) {
+        case 'dashboard': this.loadDashboard(); break;
+        case 'properties': this.loadProperties(); break;
             case 'customers': this.loadCustomers(); break;
             case 'sales': this.loadSales(); break;
             case 'contracts': this.loadContracts(); break;
@@ -3547,3 +3608,4 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
