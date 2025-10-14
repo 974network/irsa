@@ -538,34 +538,33 @@ updateMobileTitle(pageName) {
         const username = this.propertyDB?.currentUser || 'مستخدم';
         
         const userMenuHTML = `
-            <div class="user-menu-sidebar">
-                <div class="user-menu-container">
-                    <div class="user-avatar" onclick="propertySystem.toggleUserMenu()">
-                        <i class="fas fa-user-circle default-avatar"></i>
-                        <span class="user-display-name">${username}</span>
-                        <i class="fas fa-chevron-down"></i>
+        <div class="user-menu-sidebar">
+            <div class="user-menu-container">
+                <div class="user-avatar" onclick="propertySystem.toggleUserMenu()">
+                    <i class="fas fa-user-circle default-avatar"></i>
+                    <span class="user-display-name">${username}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="user-dropdown" id="userDropdown">
+                    <div class="user-info">
+                        <i class="fas fa-user-circle profile-icon-large"></i>
+                        <div class="user-name">${username}</div>
+                        <div class="user-role">مدير النظام</div>
                     </div>
-                    <div class="user-dropdown" id="userDropdown">
-                        <div class="user-info">
-                            <i class="fas fa-user-circle profile-icon-large"></i>
-                            <div class="user-name">${username}</div>
-                            <div class="user-role">مدير النظام</div>
-                        </div>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item" onclick="propertySystem.showChangePasswordModal()">
-                            <i class="fas fa-key"></i>
-                            <span data-translate="changePassword">تغيير كلمة المرور</span>
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <a href="#" class="dropdown-item logout-item" onclick="propertySystem.logout()">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span data-translate="logout">تسجيل الخروج</span>
-                        </a>
-                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item" onclick="propertySystem.showChangePasswordModal()">
+                        <i class="fas fa-key"></i>
+                        <span data-translate="changePassword">تغيير كلمة المرور</span>
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <a href="#" class="dropdown-item logout-item" onclick="propertySystem.logout()">
+                        <i class="fas fa-sign-out-alt"></i>
+                        <span data-translate="logout">تسجيل الخروج</span>
+                    </a>
                 </div>
             </div>
-        `;
-
+        </div>
+    `;
         const oldMenu = document.querySelector('.user-menu-sidebar');
         if (oldMenu) oldMenu.remove();
 
@@ -3088,40 +3087,54 @@ updateMobileTitle(pageName) {
     }
 
     showChangePasswordModal() {
-        const passwordHTML = `
-            <div class="modal-overlay" id="passwordModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-key"></i> ${this.currentLanguage === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}</h3>
-                        <button class="close-btn" onclick="propertySystem.closeModal('passwordModal')">&times;</button>
-                    </div>
-                    <form onsubmit="propertySystem.changePassword(event)">
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}:</label>
-                            <input type="password" name="currentPassword" required>
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}:</label>
-                            <input type="password" name="newPassword" required minlength="6">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}:</label>
-                            <input type="password" name="confirmPassword" required minlength="6">
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                ${this.currentLanguage === 'ar' ? 'حفظ كلمة المرور' : 'Save Password'}
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('passwordModal')">
-                                ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
-                            </button>
-                        </div>
-                    </form>
+    const username = this.propertyDB?.currentUser || 'مستخدم';
+    
+    const passwordHTML = `
+        <div class="modal-overlay" id="passwordModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> ${this.currentLanguage === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}</h3>
+                    <button class="close-btn" onclick="propertySystem.closeModal('passwordModal')">&times;</button>
                 </div>
+                
+                <!-- 🔥 أضف معلومات المستخدم هنا -->
+                <div class="user-profile-info" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--bright-purple);">
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--neon-purple);"></i>
+                        <div>
+                            <div style="font-weight: bold; color: white; font-size: 1.1rem;">${username}</div>
+                            <div style="color: var(--gray-light); font-size: 0.9rem;">${this.currentLanguage === 'ar' ? 'مدير النظام' : 'System Administrator'}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <form onsubmit="propertySystem.changePassword(event)">
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}:</label>
+                        <input type="password" name="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}:</label>
+                        <input type="password" name="newPassword" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? '6 أحرف على الأقل' : 'Minimum 6 characters'}">
+                    </div>
+                    <div class="form-group">
+                        <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}:</label>
+                        <input type="password" name="confirmPassword" required minlength="6">
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            ${this.currentLanguage === 'ar' ? 'حفظ كلمة المرور' : 'Save Password'}
+                        </button>
+                        <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('passwordModal')">
+                            ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
+                        </button>
+                    </div>
+                </form>
             </div>
-        `;
-        this.showModal(passwordHTML);
-    }
+        </div>
+    `;
+    this.showModal(passwordHTML);
+}
 
     async changePassword(event) {
         event.preventDefault();
@@ -3632,5 +3645,6 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
