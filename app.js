@@ -535,9 +535,9 @@ updateMobileTitle(pageName) {
 }
 
     setupUserMenu() {
-        const username = this.propertyDB?.currentUser || 'مستخدم';
-        
-        const userMenuHTML = `
+    const username = this.propertyDB?.currentUser || 'مستخدم';
+    
+    const userMenuHTML = `
         <div class="user-menu-sidebar">
             <div class="user-menu-container">
                 <div class="user-avatar" onclick="propertySystem.toggleUserMenu()">
@@ -565,16 +565,17 @@ updateMobileTitle(pageName) {
             </div>
         </div>
     `;
-        const oldMenu = document.querySelector('.user-menu-sidebar');
-        if (oldMenu) oldMenu.remove();
 
-        const sidebar = document.querySelector('.sidebar .nav-links');
-        if (sidebar) {
-            sidebar.insertAdjacentHTML('afterend', userMenuHTML);
-        }
+    const oldMenu = document.querySelector('.user-menu-sidebar');
+    if (oldMenu) oldMenu.remove();
 
-        this.setupUserMenuEvents();
+    const sidebar = document.querySelector('.sidebar .nav-links');
+    if (sidebar) {
+        sidebar.insertAdjacentHTML('afterend', userMenuHTML);
     }
+
+    this.setupUserMenuEvents();
+}
 
     setupUserMenuEvents() {
         document.addEventListener('click', (e) => {
@@ -3087,8 +3088,6 @@ updateMobileTitle(pageName) {
     }
 
     showChangePasswordModal() {
-    const username = this.propertyDB?.currentUser || 'مستخدم';
-    
     const passwordHTML = `
         <div class="modal-overlay" id="passwordModal">
             <div class="modal-content">
@@ -3096,18 +3095,6 @@ updateMobileTitle(pageName) {
                     <h3><i class="fas fa-key"></i> ${this.currentLanguage === 'ar' ? 'تغيير كلمة المرور' : 'Change Password'}</h3>
                     <button class="close-btn" onclick="propertySystem.closeModal('passwordModal')">&times;</button>
                 </div>
-                
-                <!-- 🔥 أضف معلومات المستخدم هنا -->
-                <div class="user-profile-info" style="background: rgba(255,215,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid var(--bright-purple);">
-                    <div style="display: flex; align-items: center; gap: 15px;">
-                        <i class="fas fa-user-circle" style="font-size: 2rem; color: var(--neon-purple);"></i>
-                        <div>
-                            <div style="font-weight: bold; color: white; font-size: 1.1rem;">${username}</div>
-                            <div style="color: var(--gray-light); font-size: 0.9rem;">${this.currentLanguage === 'ar' ? 'مدير النظام' : 'System Administrator'}</div>
-                        </div>
-                    </div>
-                </div>
-                
                 <form onsubmit="propertySystem.changePassword(event)">
                     <div class="form-group">
                         <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الحالية' : 'Current Password'}:</label>
@@ -3115,7 +3102,7 @@ updateMobileTitle(pageName) {
                     </div>
                     <div class="form-group">
                         <label>${this.currentLanguage === 'ar' ? 'كلمة المرور الجديدة' : 'New Password'}:</label>
-                        <input type="password" name="newPassword" required minlength="6" placeholder="${this.currentLanguage === 'ar' ? '6 أحرف على الأقل' : 'Minimum 6 characters'}">
+                        <input type="password" name="newPassword" required minlength="6">
                     </div>
                     <div class="form-group">
                         <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور الجديدة' : 'Confirm New Password'}:</label>
@@ -3135,7 +3122,6 @@ updateMobileTitle(pageName) {
     `;
     this.showModal(passwordHTML);
 }
-
     async changePassword(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
