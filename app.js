@@ -59,10 +59,14 @@ class AdvancedPropertySystem {
         
         if (result.success) {
             this.propertyDB = await this.loadUserData();
-            this.propertyDB.currentUser = username;
-            
-            localStorage.setItem('propertyUser', username);
-            localStorage.setItem('loginTime', new Date().toISOString());
+const fullName =
+  this.firebaseManager.currentUser?.displayName ||
+  (username.includes('@') ? username.split('@')[0] : username);
+
+this.propertyDB.currentUser = fullName;
+
+localStorage.setItem('propertyUser', fullName);
+localStorage.setItem('loginTime', new Date().toISOString());
             
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
@@ -3615,4 +3619,5 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
