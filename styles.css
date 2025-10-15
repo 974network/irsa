@@ -4405,5 +4405,321 @@ select option {
         display: none;
     }
 }
+/* تنسيقات متقدمة للبروفايل */
+.user-menu-sidebar {
+    margin-top: auto;
+    padding: 20px 15px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+    border-radius: 15px;
+    margin: 20px 10px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+}
+
+.user-menu-container {
+    position: relative;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-avatar:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.default-avatar {
+    font-size: 2rem;
+    color: rgba(255, 255, 255, 0.9);
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border-radius: 50%;
+    padding: 5px;
+}
+
+.user-display-name {
+    flex: 1;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-avatar .fa-chevron-down {
+    color: rgba(255, 255, 255, 0.7);
+    transition: transform 0.3s ease;
+    font-size: 0.8rem;
+}
+
+.user-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    padding: 0;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+    z-index: 1000;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(20px);
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(-10px);
+}
+
+.user-info {
+    padding: 20px;
+    text-align: center;
+    background: linear-gradient(135deg, var(--neon-purple), var(--neon-blue));
+    border-radius: 15px 15px 0 0;
+    color: white;
+}
+
+.profile-icon-large {
+    font-size: 3.5rem;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding: 10px;
+}
+
+.user-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.user-role {
+    font-size: 0.85rem;
+    opacity: 0.9;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    display: inline-block;
+}
+
+.user-email {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    margin-top: 5px;
+    direction: ltr;
+    text-align: center;
+    word-break: break-all;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 4px 8px;
+    border-radius: 8px;
+    display: inline-block;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.1);
+    margin: 5px 0;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 20px;
+    color: #333;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.dropdown-item:last-child {
+    border-bottom: none;
+}
+
+.dropdown-item:hover {
+    background: rgba(113, 99, 186, 0.1);
+    color: var(--neon-purple);
+    transform: translateX(5px);
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+    font-size: 1rem;
+}
+
+.dropdown-item.logout-item {
+    color: #e74c3c;
+}
+
+.dropdown-item.logout-item:hover {
+    background: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+/* تأثيرات إضافية للبروفايل */
+.user-menu-sidebar::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+    border-radius: 17px;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.user-menu-sidebar:hover::before {
+    opacity: 1;
+}
+
+/* تحسينات للرسائل والإيميل */
+.email-display {
+    direction: ltr;
+    text-align: center;
+    font-family: 'Courier New', monospace;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin: 8px 0;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    word-break: break-all;
+    font-size: 0.85rem;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    margin: 10px 0;
+}
+
+.profile-stat {
+    text-align: center;
+}
+
+.profile-stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: white;
+}
+
+.profile-stat-label {
+    font-size: 0.7rem;
+    opacity: 0.8;
+    color: white;
+}
+
+/* تحسينات للبروفايل في الوضع المظلم */
+@media (prefers-color-scheme: dark) {
+    .user-dropdown {
+        background: #2d3748;
+        color: white;
+    }
+    
+    .dropdown-item {
+        color: white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .dropdown-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+}
+
+/* تحسينات للشاشات الصغيرة */
+@media (max-width: 768px) {
+    .user-menu-sidebar {
+        margin: 10px 5px;
+        padding: 15px 10px;
+    }
+    
+    .user-display-name {
+        font-size: 0.85rem;
+    }
+    
+    .user-dropdown {
+        position: fixed;
+        bottom: 80px;
+        left: 10px;
+        right: 10px;
+        width: auto;
+    }
+}
+
+/* تأثيرات حركية */
+@keyframes profilePulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+.user-avatar:active {
+    animation: profilePulse 0.3s ease;
+}
+
+/* تحسينات إضافية للبروفايل */
+.profile-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #e74c3c;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.user-status {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    opacity: 0.8;
+    margin-top: 5px;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #2ecc71;
+    animation: statusPulse 2s infinite;
+}
+
+@keyframes statusPulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
 
 
