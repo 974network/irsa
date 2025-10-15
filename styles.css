@@ -21,9 +21,9 @@
 }
 
 body {
-    background: linear-gradient(135deg, #000000, #1A1A1A);
-    /* ... باقي الكود ... */
+    background: #000; /* خلفية سوداء صافية */
 }
+
 
 /* تصميم شاشة Login */
 .login-container {
@@ -922,11 +922,13 @@ select option:checked {
 .sidebar .nav-link:hover,
 .sidebar .nav-link.active {
     color: var(--neon-purple);
-    background: rgba(255, 193, 7, 0.15); /* خلفية ذهبية شفافة */
-    transform: translateX(-5px);
-    box-shadow: 0 5px 15px rgba(255, 193, 7, 0.2); /* ظل ذهبي */
-    border-right: 3px solid var(--bright-purple); /* حد ذهبي */
+    background: transparent;              /* لا تعبئة */
+    box-shadow: none;                     /* لا ظل */
+    transform: none;
+    border: 2px solid var(--bright-purple); /* إطار ذهبي كامل */
+    border-radius: 12px;
 }
+
 
 .sidebar .nav-link i {
     font-size: 1.2rem;
@@ -4768,6 +4770,7 @@ select option {
 
 /* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
 .sidebar .user-menu-sidebar + div{ display:none !important; }
+
 
 
 
