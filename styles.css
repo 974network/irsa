@@ -2025,16 +2025,15 @@ select option {
 .user-avatar {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     padding: 12px 15px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0;
     cursor: pointer;
     transition: all 0.3s ease;
-    border: 1px solid rgba(255, 215, 0, 0.3);
-    width: 100%;
-    justify-content: center;
 }
+
 
 .user-avatar:hover {
     background: rgba(255, 215, 0, 0.1);
@@ -4770,6 +4769,7 @@ select option {
 
 /* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
 .sidebar .user-menu-sidebar + div{ display:none !important; }
+
 
 
 
