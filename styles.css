@@ -4760,60 +4760,7 @@ select option {
 
 /* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
 .sidebar .user-menu-sidebar + div{ display:none !important; }
-/* هاتف: إظهار قائمة المستخدم الصغيرة فوق كل شيء */
-@media (max-width: 768px) {
-  .sidebar,
-  .user-menu-sidebar {
-    overflow: visible !important;
-  }
 
-  /* عطّل أي طبقة خلفية */
-  .user-menu-sidebar::before {
-    content: none !important;
-    display: none !important;
-  }
-
-  /* اجعل الصندوق ثابتًا أسفل الشاشة ومصغّر */
-  .user-dropdown,
-  .user-menu {
-    position: fixed !important;
-    bottom: 16px !important;
-    right: 12px !important;   /* بدّل إلى left إذا يناسبك RTL */
-    width: 200px !important;
-    max-height: 50vh;
-    overflow: auto;
-    background: rgba(20,20,20,0.96) !important;
-    border: 1px solid rgba(255,215,0,0.2) !important;
-    border-radius: 12px !important;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
-    z-index: 2147483647 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    pointer-events: auto !important;
-  }
-
-  /* إزالة أي تدرجات أو حواف من عناصر الحساب */
-  .user-avatar,
-  .account-dropdown {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-  }
-
-  /* عناصر الروابط داخل القائمة */
-  .user-dropdown a,
-  .user-menu a {
-    display: block;
-    padding: 10px 14px;
-    font-size: 14px;
-    color: #fff !important;
-  }
-  .user-dropdown a:hover,
-  .user-menu a:hover {
-    background: rgba(255,215,0,0.12) !important;
-    color: #ffd700 !important;
-  }
-}
 
 
 
