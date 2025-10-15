@@ -4585,7 +4585,9 @@ select option {
     left: -2px;
     right: -2px;
     bottom: -2px;
-    background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+    background: transparent !important;
+box-shadow: none !important;
+border: none !important;
     border-radius: 17px;
     z-index: -1;
     opacity: 0;
@@ -4769,6 +4771,7 @@ select option {
 
 /* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
 .sidebar .user-menu-sidebar + div{ display:none !important; }
+
 
 
 
