@@ -4760,58 +4760,62 @@ select option {
 
 /* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
 .sidebar .user-menu-sidebar + div{ display:none !important; }
-/* ===== تصحيح واجهة القائمة الصغيرة للمستخدم ===== */
-.user-menu-sidebar,
-.user-menu-sidebar::before,
-.user-avatar,
-.account-dropdown {
-    background: transparent !important;
-    box-shadow: none !important;
-    border: none !important;
-}
-
-/* تنسيق القائمة المنبثقة (تغيير كلمة المرور / تسجيل الخروج) */
-.user-dropdown,
-.user-menu {
-    position: absolute !important;
-    bottom: 60px; /* ارتفاع فوق الحافة السفلية */
-    right: 15px;
-    width: 240px;
-    background: rgba(20, 20, 20, 0.95) !important;
-    border: 1px solid rgba(255, 215, 0, 0.2);
-    border-radius: 14px;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
-    z-index: 9999;
-}
-
-/* العناصر داخل القائمة */
-.user-dropdown a,
-.user-menu a {
-    display: block;
-    padding: 10px 16px;
-    color: #fff;
-    text-align: right;
-    font-size: 14px;
-    transition: background 0.2s ease;
-}
-
-.user-dropdown a:hover,
-.user-menu a:hover {
-    background: rgba(255, 215, 0, 0.15);
-    color: #ffd700;
-}
-
-/* مظهر متجاوب للجوال */
+/* هاتف: إظهار قائمة المستخدم الصغيرة فوق كل شيء */
 @media (max-width: 768px) {
-    .user-dropdown,
-    .user-menu {
-        bottom: 20px;
-        right: 10px;
-        width: 200px;
-        border-radius: 10px;
-    }
+  .sidebar,
+  .user-menu-sidebar {
+    overflow: visible !important;
+  }
+
+  /* عطّل أي طبقة خلفية */
+  .user-menu-sidebar::before {
+    content: none !important;
+    display: none !important;
+  }
+
+  /* اجعل الصندوق ثابتًا أسفل الشاشة ومصغّر */
+  .user-dropdown,
+  .user-menu {
+    position: fixed !important;
+    bottom: 16px !important;
+    right: 12px !important;   /* بدّل إلى left إذا يناسبك RTL */
+    width: 200px !important;
+    max-height: 50vh;
+    overflow: auto;
+    background: rgba(20,20,20,0.96) !important;
+    border: 1px solid rgba(255,215,0,0.2) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5) !important;
+    z-index: 2147483647 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+
+  /* إزالة أي تدرجات أو حواف من عناصر الحساب */
+  .user-avatar,
+  .account-dropdown {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  /* عناصر الروابط داخل القائمة */
+  .user-dropdown a,
+  .user-menu a {
+    display: block;
+    padding: 10px 14px;
+    font-size: 14px;
+    color: #fff !important;
+  }
+  .user-dropdown a:hover,
+  .user-menu a:hover {
+    background: rgba(255,215,0,0.12) !important;
+    color: #ffd700 !important;
+  }
 }
+
+
 
 
 
