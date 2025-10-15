@@ -4725,6 +4725,89 @@ select option {
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
+/* ===== تنسيق القائمة المنسدلة للمستخدم بالأسود والذهبي ===== */
+.user-menu-sidebar {
+    background: linear-gradient(180deg, #000000, #1A1A1A);
+    border-top: 2px solid #FFD700;
+    border-bottom: 2px solid #FFD700;
+    padding: 15px 0;
+    text-align: center;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    cursor: pointer;
+    color: #FFD700;
+    font-weight: 600;
+}
+
+.user-avatar i {
+    color: #FFD700;
+    font-size: 1.4rem;
+}
+
+.user-dropdown {
+    background: #111111;
+    border: 1px solid #FFD700;
+    border-radius: 10px;
+    position: relative;
+    margin-top: 10px;
+    width: 90%;
+    margin: 10px auto;
+    text-align: right;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+}
+
+.user-dropdown .user-info {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+    text-align: center;
+}
+
+.user-dropdown .user-name {
+    color: #FFD700;
+    font-weight: 700;
+    margin-top: 8px;
+}
+
+.user-dropdown .user-role {
+    color: #AAAAAA;
+    font-size: 0.9rem;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: white;
+    text-decoration: none;
+    transition: background 0.3s;
+}
+
+.dropdown-item:hover {
+    background: rgba(255, 215, 0, 0.1);
+    color: #FFD700;
+}
+
+.dropdown-item i {
+    color: #FFD700;
+}
+
+.logout-item {
+    border-top: 1px solid rgba(255, 215, 0, 0.3);
+    color: #ff4444 !important;
+}
+
+.logout-item:hover {
+    background: rgba(255, 68, 68, 0.1);
+    color: #ff6666 !important;
+}
+
+
 
 
 
