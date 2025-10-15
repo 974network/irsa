@@ -4725,6 +4725,194 @@ select option {
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
+/* تحسينات القائمة المنسدلة للمستخدم فقط */
+.user-menu-sidebar {
+    margin-top: auto;
+    padding: 15px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.user-menu-container {
+    position: relative;
+}
+
+.user-avatar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    color: white;
+    background: rgba(255,255,255,0.05);
+}
+
+.user-avatar:hover {
+    background: rgba(255,215,0,0.1);
+    color: #ffd700;
+}
+
+.default-avatar {
+    font-size: 1.5rem;
+    color: #ffd700;
+}
+
+.user-display-name {
+    font-weight: 500;
+}
+
+.user-avatar i.fa-chevron-down {
+    margin-right: auto;
+    font-size: 0.9rem;
+    color: #ffd700;
+}
+
+.user-dropdown {
+    position: absolute;
+    bottom: 100%;
+    left: 0;
+    right: 0;
+    background: #1a1a1a;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+    display: none;
+    z-index: 1000;
+    margin-bottom: 10px;
+    border: 1px solid #333;
+    overflow: hidden;
+}
+
+.user-dropdown.show {
+    display: block;
+}
+
+.user-info {
+    padding: 20px;
+    text-align: center;
+    background: #2a2a2a;
+    border-bottom: 1px solid #333;
+}
+
+.profile-icon-large {
+    font-size: 2.5rem;
+    color: #ffd700;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+    color: white;
+    margin-bottom: 5px;
+    font-size: 1rem;
+}
+
+.user-role {
+    color: #ffd700;
+    font-size: 0.8rem;
+}
+
+.dropdown-divider {
+    height: 1px;
+    background: #333;
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 20px;
+    color: #ccc;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border-right: 3px solid transparent;
+}
+
+.dropdown-item:hover {
+    background: #333;
+    color: #ffd700;
+    border-right-color: #ffd700;
+}
+
+.dropdown-item i {
+    width: 20px;
+    text-align: center;
+    color: #ffd700;
+}
+
+.logout-item {
+    color: #e74c3c;
+}
+
+.logout-item:hover {
+    color: #ff6b6b;
+    border-right-color: #e74c3c;
+}
+
+/* تحسينات المودال الخاص بتغيير كلمة المرور */
+.modal-overlay {
+    background: rgba(0,0,0,0.8) !important;
+}
+
+.modal-content {
+    background: #1a1a1a !important;
+    border: 1px solid #333 !important;
+    border-radius: 10px !important;
+}
+
+.modal-header {
+    background: #2a2a2a !important;
+    border-bottom: 1px solid #333 !important;
+    padding: 20px !important;
+}
+
+.modal-header h3 {
+    color: #ffd700 !important;
+}
+
+.modal-header h3 i {
+    color: #ffd700 !important;
+}
+
+.close-btn {
+    color: #ffd700 !important;
+}
+
+.close-btn:hover {
+    background: #333 !important;
+}
+
+.modal-content form {
+    background: #1a1a1a !important;
+}
+
+.form-group label {
+    color: #ffd700 !important;
+}
+
+.form-group input {
+    background: #2a2a2a !important;
+    border: 1px solid #333 !important;
+    color: white !important;
+}
+
+.form-group input:focus {
+    border-color: #ffd700 !important;
+    box-shadow: 0 0 0 2px rgba(255,215,0,0.2) !important;
+}
+
+.btn-primary {
+    background: #ffd700 !important;
+    color: #1a1a1a !important;
+    border: none !important;
+}
+
+.btn-secondary {
+    background: #333 !important;
+    color: #ffd700 !important;
+    border: 1px solid #555 !important;
+}
+
 
 
 
