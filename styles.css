@@ -4721,5 +4721,494 @@ select option {
     50% { opacity: 0.5; }
     100% { opacity: 1; }
 }
+/* إضافة في نهاية ملف styles.css */
+
+/* تصميم صفحة الملف الشخصي بورافيلة */
+.profile-page {
+    padding: 30px;
+    background: linear-gradient(135deg, #000000, #1A1A1A);
+    min-height: 100vh;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid var(--bright-purple);
+}
+
+.profile-title {
+    color: var(--neon-purple);
+    font-size: 2.2rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.profile-actions-top {
+    display: flex;
+    gap: 15px;
+}
+
+/* شبكة المحتوى الرئيسية */
+.profile-content-grid {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    margin-bottom: 40px;
+}
+
+/* البطاقة الجانبية */
+.profile-sidebar {
+    background: linear-gradient(135deg, var(--card-bg), rgba(106, 76, 147, 0.3));
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--bright-purple);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    text-align: center;
+}
+
+.profile-avatar-large {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--bright-purple), var(--neon-purple));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    border: 3px solid var(--neon-purple);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-avatar-large i {
+    font-size: 3.5rem;
+    color: black;
+}
+
+.profile-avatar-large img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.change-photo-btn {
+    background: rgba(255, 215, 0, 0.2);
+    border: 1px solid var(--bright-purple);
+    color: var(--neon-purple);
+    padding: 8px 15px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+}
+
+.change-photo-btn:hover {
+    background: var(--bright-purple);
+    color: black;
+    transform: translateY(-2px);
+}
+
+.profile-info-sidebar {
+    margin: 25px 0;
+}
+
+.profile-name {
+    color: var(--text-light);
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.profile-role {
+    color: var(--neon-purple);
+    font-size: 1rem;
+    font-weight: 600;
+    background: rgba(255, 215, 0, 0.1);
+    padding: 5px 15px;
+    border-radius: 15px;
+    display: inline-block;
+}
+
+.profile-stats {
+    display: flex;
+    justify-content: space-around;
+    margin: 25px 0;
+    padding: 20px 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    color: var(--neon-purple);
+    font-size: 1.5rem;
+    font-weight: 700;
+    display: block;
+}
+
+.stat-label {
+    color: var(--gray-light);
+    font-size: 0.8rem;
+}
+
+/* المحتوى الرئيسي */
+.profile-main-content {
+    background: linear-gradient(135deg, var(--card-bg), rgba(106, 76, 147, 0.3));
+    border-radius: 20px;
+    padding: 30px;
+    border: 1px solid var(--bright-purple);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+}
+
+.profile-section {
+    margin-bottom: 40px;
+}
+
+.profile-section:last-child {
+    margin-bottom: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.section-header i {
+    color: var(--neon-purple);
+    font-size: 1.3rem;
+}
+
+.section-header h3 {
+    color: var(--neon-purple);
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+/* نموذج تغيير كلمة المرور */
+.password-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group-enhanced {
+    margin-bottom: 20px;
+}
+
+.form-group-enhanced label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    color: var(--text-light);
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.form-group-enhanced label i {
+    color: var(--neon-purple);
+    width: 16px;
+}
+
+.password-input-container {
+    position: relative;
+}
+
+.password-toggle {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--gray-light);
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.password-toggle:hover {
+    color: var(--neon-purple);
+}
+
+.password-strength {
+    margin-top: 8px;
+    height: 4px;
+    background: var(--gray-dark);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.strength-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.strength-weak {
+    background: var(--danger);
+    width: 33%;
+}
+
+.strength-medium {
+    background: var(--warning);
+    width: 66%;
+}
+
+.strength-strong {
+    background: var(--success);
+    width: 100%;
+}
+
+.password-requirements {
+    margin-top: 15px;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.2);
+}
+
+.password-requirements h5 {
+    color: var(--neon-purple);
+    margin-bottom: 10px;
+    font-size: 0.9rem;
+}
+
+.requirement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.requirement-list li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    color: var(--gray-light);
+}
+
+.requirement-list li.valid {
+    color: var(--success);
+}
+
+.requirement-list li i {
+    font-size: 0.8rem;
+}
+
+/* قسم تسجيل الخروج */
+.logout-section {
+    text-align: center;
+    padding: 30px;
+    background: rgba(220, 53, 69, 0.1);
+    border-radius: 15px;
+    border: 1px solid rgba(220, 53, 69, 0.3);
+}
+
+.logout-warning {
+    color: var(--danger);
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.logout-section h4 {
+    color: var(--text-light);
+    margin-bottom: 10px;
+    font-size: 1.2rem;
+}
+
+.logout-section p {
+    color: var(--gray-light);
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+.btn-logout {
+    background: linear-gradient(135deg, var(--danger), #c82333);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-logout:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(220, 53, 69, 0.4);
+}
+
+/* أزرار الحفظ */
+.form-actions-enhanced {
+    display: flex;
+    gap: 15px;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-save-enhanced {
+    background: linear-gradient(135deg, var(--bright-purple), var(--neon-purple));
+    color: black;
+    border: none;
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-save-enhanced:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
+}
+
+.btn-cancel-enhanced {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-light);
+    border: 1px solid var(--accent-purple);
+    padding: 12px 25px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-cancel-enhanced:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+/* تحسينات للاستجابة */
+@media (max-width: 1024px) {
+    .profile-content-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .profile-sidebar {
+        order: 2;
+    }
+    
+    .profile-main-content {
+        order: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .profile-page {
+        padding: 20px;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .password-form {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-actions-enhanced {
+        flex-direction: column;
+    }
+    
+    .btn-save-enhanced,
+    .btn-cancel-enhanced {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .profile-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .profile-page {
+        padding: 15px;
+    }
+    
+    .profile-title {
+        font-size: 1.8rem;
+    }
+    
+    .profile-avatar-large {
+        width: 100px;
+        height: 100px;
+    }
+    
+    .profile-avatar-large i {
+        font-size: 2.5rem;
+    }
+    
+    .profile-main-content,
+    .profile-sidebar {
+        padding: 20px;
+    }
+}
+
+/* تأثيرات إضافية */
+.profile-card-hover {
+    transition: all 0.3s ease;
+}
+
+.profile-card-hover:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(255, 215, 0, 0.15);
+}
+
+.security-badge {
+    background: rgba(255, 215, 0, 0.1);
+    color: var(--neon-purple);
+    padding: 5px 12px;
+    border-radius: 15px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-left: 10px;
+}
+
+.last-login {
+    color: var(--gray-light);
+    font-size: 0.85rem;
+    margin-top: 5px;
+    font-style: italic;
+}
+
 
 
