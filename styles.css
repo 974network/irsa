@@ -4725,30 +4725,51 @@ select option {
   --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 8px 15px rgba(0, 0, 0, 0.15);
 }
-/* === تعديل صفحة البروفايل الصغيرة (القائمة المنسدلة) === */
-.user-dropdown {
-    background: #000 !important;
-    border: 1px solid #FFD700 !important;
-    border-radius: 10px !important;
-    box-shadow: 0 4px 10px rgba(255, 215, 0, 0.15) !important;
+/* بطاقة البروفايل: أسود وذهبي فقط */
+.user-menu-sidebar,
+.user-menu-sidebar .user-dropdown,
+.user-menu-sidebar .user-info{
+  background:#000 !important;
+  border:1px solid #FFD700 !important;
+  color:#fff !important;
 }
 
-.user-dropdown .dropdown-item {
-    color: #FFD700 !important;
-    background: transparent !important;
-    padding: 10px 15px !important;
-    transition: all 0.2s ease !important;
+/* الأفاتار: أيقونة بيضاء فقط */
+.profile-icon-large{
+  font-size:48px !important;
+  color:#fff !important;
+  background:none !important;
+  box-shadow:none !important;
+  border:none !important;
+}
+.user-info::before,
+.user-info::after{ display:none !important; }
+
+/* الاسم بلون ذهبي وعدم قصّه بنقاط */
+.user-name{
+  color:#FFD700 !important;
+  white-space:nowrap !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
 }
 
-.user-dropdown .dropdown-item:hover {
-    background: rgba(255, 215, 0, 0.08) !important; /* ظل ذهبي خفيف */
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.2) inset !important;
-    color: #FFD700 !important;
+/* العناصر داخل القائمة */
+.user-dropdown .dropdown-item{
+  color:#fff !important;
+  background:transparent !important;
+  padding:12px 16px !important;
+  transition:box-shadow .15s, background .15s !important;
 }
+.user-dropdown .dropdown-item:hover{
+  background:rgba(255,215,0,.08) !important;     /* ظل ذهبي خفيف */
+  box-shadow:inset 0 0 10px rgba(255,215,0,.15) !important;
+}
+.user-dropdown .dropdown-item i{ color:#FFD700 !important; }
 
-.user-dropdown .dropdown-item i {
-    color: #FFD700 !important;
-}
+/* إخفاء الكارد المتدرّج تحت البروفايل (الأزرق/الأصفر) */
+.sidebar .user-menu-sidebar + div{ display:none !important; }
+
+
 
 
 
