@@ -565,7 +565,6 @@ updateMobileTitle(pageName) {
             </div>
         </div>
     `;
-
     const oldMenu = document.querySelector('.user-menu-sidebar');
     if (oldMenu) oldMenu.remove();
 
@@ -3631,6 +3630,7 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
 
