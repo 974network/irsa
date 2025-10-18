@@ -4870,6 +4870,22 @@ select option {
     border-radius: 10px !important;
   }
 }
+/* إعادة تمرير الشريط الجانبي على الجوال */
+@media (max-width: 768px) {
+  .sidebar{
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100vh !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* لو الشعار وقائمة المستخدم طويلة، امنح الروابط حيّزًا قابلاً للتمرير */
+  .sidebar .nav-links{
+    max-height: calc(100vh - 320px);
+    overflow-y: auto;
+  }
+}
+
 
 
 
