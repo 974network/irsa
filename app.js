@@ -445,22 +445,23 @@ localStorage.setItem('loginTime', new Date().toISOString());
     }
 
     setupNavigation() {
-        const navLinks = [
-            { id: 'nav-dashboard', icon: 'fa-home', text: 'dashboard', page: 'dashboard' },
-            { id: 'nav-properties', icon: 'fa-building', text: 'properties', page: 'properties' },
-            { id: 'nav-customers', icon: 'fa-users', text: 'customers', page: 'customers' },
-            { id: 'nav-sales', icon: 'fa-shopping-cart', text: 'sales', page: 'sales' },
-            { id: 'nav-contracts', icon: 'fa-file-contract', text: 'contracts', page: 'contracts' },
-            { id: 'nav-payments', icon: 'fa-money-bill', text: 'payments', page: 'payments' },
-            { id: 'nav-commissions', icon: 'fa-handshake', text: 'commissions', page: 'commissions' },
-            { id: 'nav-maintenance', icon: 'fa-tools', text: 'maintenance', page: 'maintenance' },
-            { id: 'nav-inventory', icon: 'fa-boxes', text: 'inventory', page: 'inventory' },
-            { id: 'nav-accounts', icon: 'fa-chart-line', text: 'accounts', page: 'accounts' },
-            { id: 'nav-invoices', icon: 'fa-receipt', text: 'invoices', page: 'invoices' },
-            { id: 'nav-messages', icon: 'fa-comments', text: 'messages', page: 'messages' },
-            { id: 'nav-reports', icon: 'fa-chart-bar', text: 'reports', page: 'reports' },
-            { id: 'nav-settings', icon: 'fa-cog', text: 'settings', page: 'settings' },
-        ];
+const navLinks = [
+    { id: 'nav-dashboard', icon: 'fa-home', text: 'dashboard', page: 'dashboard' },
+    { id: 'nav-properties', icon: 'fa-building', text: 'properties', page: 'properties' },
+    { id: 'nav-customers', icon: 'fa-users', text: 'customers', page: 'customers' },
+    { id: 'nav-sales', icon: 'fa-shopping-cart', text: 'sales', page: 'sales' },
+    { id: 'nav-contracts', icon: 'fa-file-contract', text: 'contracts', page: 'contracts' },
+    { id: 'nav-payments', icon: 'fa-money-bill', text: 'payments', page: 'payments' },
+    { id: 'nav-commissions', icon: 'fa-handshake', text: 'commissions', page: 'commissions' },
+    { id: 'nav-maintenance', icon: 'fa-tools', text: 'maintenance', page: 'maintenance' },
+    { id: 'nav-inventory', icon: 'fa-boxes', text: 'inventory', page: 'inventory' },
+    { id: 'nav-accounts', icon: 'fa-chart-line', text: 'accounts', page: 'accounts' },
+    { id: 'nav-invoices', icon: 'fa-receipt', text: 'invoices', page: 'invoices' },
+    { id: 'nav-messages', icon: 'fa-comments', text: 'messages', page: 'messages' },
+    { id: 'nav-users', icon: 'fa-users-cog', text: 'userManagement', page: 'users' }, // 🔥 هون ضفته
+    { id: 'nav-reports', icon: 'fa-chart-bar', text: 'reports', page: 'reports' },
+    { id: 'nav-settings', icon: 'fa-cog', text: 'settings', page: 'settings' },
+];
 
         const navContainer = document.querySelector('.sidebar .nav-links');
         if (navContainer) {
@@ -619,19 +620,22 @@ updateMobileTitle(pageName) {
 
     switch(page) {
         case 'dashboard': this.loadDashboard(); break;
-        case 'properties': this.loadProperties(); break;
-        case 'customers': this.loadCustomers(); break;
-        case 'sales': this.loadSales(); break;
-        case 'contracts': this.loadContracts(); break;
-        case 'payments': this.loadPayments(); break;
-        case 'commissions': this.loadCommissions(); break;
-        case 'maintenance': this.loadMaintenance(); break;
-        case 'inventory': this.loadInventory(); break;
-        case 'accounts': this.loadAccounts(); break;
-        case 'invoices': this.loadInvoices(); break;
-        case 'messages': this.loadMessages(); break;
-        case 'reports': this.loadReports(); break;
-        case 'settings': this.loadSettings(); break;
+    case 'properties': this.loadProperties(); break;
+    case 'customers': this.loadCustomers(); break;
+    case 'sales': this.loadSales(); break;
+    case 'contracts': this.loadContracts(); break;
+    case 'payments': this.loadPayments(); break;
+    case 'commissions': this.loadCommissions(); break;
+    case 'maintenance': this.loadMaintenance(); break;
+    case 'inventory': this.loadInventory(); break;
+    case 'accounts': this.loadAccounts(); break;
+    case 'invoices': this.loadInvoices(); break;
+    case 'messages': this.loadMessages(); break;
+    case 'users': this.loadUserManagement(); break; // 🔥 هون ضفته
+    case 'reports': this.loadReports(); break;
+    case 'settings': this.loadSettings(); break;
+}
+            
     }
 }
 
@@ -2800,6 +2804,186 @@ updateMobileTitle(pageName) {
             this.loadMessages();
         }
     }
+    // 🔥 قسم إدارة المستخدمين المبسط
+async loadUserManagement() {
+    const content = document.querySelector('.main-content');
+    
+    content.innerHTML = `
+        <div class="page-header">
+            <h2><i class="fas fa-users-cog"></i> إدارة المستخدمين</h2>
+            <button class="btn btn-primary" onclick="propertySystem.showSimpleUserForm()">
+                <i class="fas fa-user-plus"></i> إضافة مستخدم
+            </button>
+        </div>
+
+        <div class="simple-users-grid">
+            ${this.renderUsersList()}
+        </div>
+    `;
+}
+
+renderUsersList() {
+    const users = this.propertyDB.subUsers || [];
+    if (users.length === 0) {
+        return '<div class="no-data">لا يوجد مستخدمين مضافين بعد</div>';
+    }
+
+    return users.map(user => `
+        <div class="user-card">
+            <div class="user-header">
+                <i class="fas fa-user-circle"></i>
+                <h3>${user.fullName}</h3>
+                <span class="user-role">${user.role}</span>
+            </div>
+            <div class="user-info">
+                <p><i class="fas fa-envelope"></i> ${user.email}</p>
+                <p><i class="fas fa-calendar"></i> ${user.joinDate}</p>
+                <p><i class="fas fa-key"></i> ${user.permissions.length} صلاحية</p>
+            </div>
+            <div class="user-actions">
+                <button class="btn btn-sm" onclick="propertySystem.editUserPermissions('${user.id}')">
+                    <i class="fas fa-edit"></i> تعديل
+                </button>
+                <button class="btn btn-sm btn-danger" onclick="propertySystem.deleteUser('${user.id}')">
+                    <i class="fas fa-trash"></i> حذف
+                </button>
+            </div>
+        </div>
+    `).join('');
+}
+
+showSimpleUserForm() {
+    const formHTML = `
+        <div class="modal-overlay" id="userModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
+                    <button class="close-btn" onclick="propertySystem.closeModal('userModal')">&times;</button>
+                </div>
+                <form onsubmit="propertySystem.addSimpleUser(event)">
+                    <div class="form-group">
+                        <label>الاسم الكامل:</label>
+                        <input type="text" name="fullName" required placeholder="أدخل الاسم الكامل">
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني:</label>
+                        <input type="email" name="email" required placeholder="example@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>كلمة المرور:</label>
+                        <input type="password" name="password" required minlength="6">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>الصلاحيات:</label>
+                        <div class="simple-permissions">
+                            <label><input type="checkbox" name="permissions" value="properties"> إدارة العقارات</label>
+                            <label><input type="checkbox" name="permissions" value="customers"> إدارة العملاء</label>
+                            <label><input type="checkbox" name="permissions" value="payments"> إدارة المدفوعات</label>
+                            <label><input type="checkbox" name="permissions" value="reports"> عرض التقارير</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">إضافة المستخدم</button>
+                        <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('userModal')">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    this.showModal(formHTML);
+}
+
+async addSimpleUser(event) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    
+    const userData = {
+        fullName: formData.get('fullName'),
+        email: formData.get('email'),
+        password: formData.get('password'),
+        permissions: formData.getAll('permissions'),
+        role: 'مدير مساعد',
+        joinDate: new Date().toISOString().split('T')[0]
+    };
+    
+    try {
+        if (!this.propertyDB.subUsers) this.propertyDB.subUsers = [];
+        
+        const newUser = {
+            id: Date.now().toString(),
+            ...userData,
+            status: 'active'
+        };
+        
+        this.propertyDB.subUsers.push(newUser);
+        await this.saveUserData();
+        
+        this.closeModal('userModal');
+        this.showNotification('تم إضافة المستخدم بنجاح!');
+        this.loadUserManagement();
+        
+    } catch (error) {
+        this.showNotification('فشل في إضافة المستخدم', 'error');
+    }
+}
+
+editUserPermissions(userId) {
+    const user = (this.propertyDB.subUsers || []).find(u => u.id === userId);
+    if (!user) return;
+    
+    const formHTML = `
+        <div class="modal-overlay" id="editUserModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3><i class="fas fa-key"></i> صلاحيات ${user.fullName}</h3>
+                    <button class="close-btn" onclick="propertySystem.closeModal('editUserModal')">&times;</button>
+                </div>
+                <form onsubmit="propertySystem.updateUserPermissions(event, '${userId}')">
+                    <div class="form-group">
+                        <label>الصلاحيات:</label>
+                        <div class="simple-permissions">
+                            <label><input type="checkbox" name="permissions" value="properties" ${user.permissions.includes('properties') ? 'checked' : ''}> إدارة العقارات</label>
+                            <label><input type="checkbox" name="permissions" value="customers" ${user.permissions.includes('customers') ? 'checked' : ''}> إدارة العملاء</label>
+                            <label><input type="checkbox" name="permissions" value="payments" ${user.permissions.includes('payments') ? 'checked' : ''}> إدارة المدفوعات</label>
+                            <label><input type="checkbox" name="permissions" value="reports" ${user.permissions.includes('reports') ? 'checked' : ''}> عرض التقارير</label>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                        <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('editUserModal')">إلغاء</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    `;
+    this.showModal(formHTML);
+}
+
+async updateUserPermissions(event, userId) {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const permissions = formData.getAll('permissions');
+    
+    const userIndex = (this.propertyDB.subUsers || []).findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+        this.propertyDB.subUsers[userIndex].permissions = permissions;
+        await this.saveUserData();
+        this.closeModal('editUserModal');
+        this.showNotification('تم تحديث الصلاحيات بنجاح!');
+        this.loadUserManagement();
+    }
+}
+
+async deleteUser(userId) {
+    if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
+        this.propertyDB.subUsers = (this.propertyDB.subUsers || []).filter(u => u.id !== userId);
+        await this.saveUserData();
+        this.showNotification('تم حذف المستخدم بنجاح!');
+        this.loadUserManagement();
+    }
+}
 
     // 🔥 قسم التقارير
     async loadReports() {
@@ -3219,15 +3403,31 @@ optimizeTablesForMobile() {
     getTranslation(key) {
         const translations = {
             'ar': {
-                'username': 'اسم المستخدم', 'password': 'كلمة المرور', 'login': 'تسجيل الدخول',
-                'dashboard': 'الرئيسية', 'properties': 'إدارة العقارات', 'customers': 'إدارة العملاء',
-                'contracts': 'العقود', 'payments': 'المدفوعات', 'maintenance': 'الصيانة',
-                'reports': 'التقارير', 'settings': 'الإعدادات', 'logout': 'تسجيل الخروج',
-                'addProperty': 'إضافة وحدة جديدة', 'addCustomer': 'إضافة عميل جديد',
-                'profile': 'الملف الشخصي', 'changePassword': 'تغيير كلمة المرور',
-                'createAccount': 'إنشاء حساب جديد', 'sales': 'المبيعات', 'commissions': 'العمولات',
-                'inventory': 'الجرد', 'accounts': 'الحسابات', 'invoices': 'الفواتير', 'messages': 'المحادثات'
-            },
+    'username': 'اسم المستخدم', 
+    'password': 'كلمة المرور', 
+    'login': 'تسجيل الدخول',
+    'dashboard': 'الرئيسية', 
+    'properties': 'إدارة العقارات', 
+    'customers': 'إدارة العملاء',
+    'contracts': 'العقود', 
+    'payments': 'المدفوعات', 
+    'maintenance': 'الصيانة',
+    'reports': 'التقارير', 
+    'settings': 'الإعدادات', 
+    'logout': 'تسجيل الخروج',
+    'addProperty': 'إضافة وحدة جديدة', 
+    'addCustomer': 'إضافة عميل جديد',
+    'profile': 'الملف الشخصي', 
+    'changePassword': 'تغيير كلمة المرور',
+    'createAccount': 'إنشاء حساب جديد', 
+    'sales': 'المبيعات', 
+    'commissions': 'العمولات',
+    'inventory': 'الجرد', 
+    'accounts': 'الحسابات', 
+    'invoices': 'الفواتير', 
+    'messages': 'المحادثات',
+    'userManagement': 'إدارة المستخدمين' // 🔥 هون ضفته
+},
             'en': {
                 'username': 'Username', 'password': 'Password', 'login': 'Login',
                 'dashboard': 'Dashboard', 'properties': 'Properties Management', 'customers': 'Customers Management',
@@ -3621,6 +3821,7 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
 
