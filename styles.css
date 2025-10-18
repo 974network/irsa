@@ -4837,6 +4837,41 @@ select option {
   justify-content: space-between !important;
   align-items: center !important;
 }
+/* User menu as bottom sheet on mobile */
+@media (max-width: 768px) {
+  .sidebar { overflow: visible !important; }
+
+  .user-menu-sidebar { position: static !important; z-index: 1 !important; }
+
+  .user-dropdown {
+    position: fixed !important;
+    left: 16px !important;
+    right: 16px !important;
+    bottom: 20px !important;
+    top: auto !important;
+    width: auto !important;
+    max-height: 50vh !important;
+    overflow: auto !important;
+
+    background: #111 !important;
+    border: 1px solid #FFD700 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 10px 30px rgba(0,0,0,.6) !important;
+
+    display: none !important;
+    z-index: 9999 !important;
+  }
+  .user-dropdown.show { display: block !important; }
+
+  .user-avatar {
+    cursor: pointer !important;
+    background: rgba(255,215,0,.12) !important;
+    padding: 10px 14px !important;
+    border-radius: 10px !important;
+  }
+}
+
+
 
 
 
