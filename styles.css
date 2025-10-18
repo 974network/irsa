@@ -4907,6 +4907,34 @@ select option {
   display: inline-block !important;
   vertical-align: middle !important;
 }
+/* Sidebar mobile: slide-in + scroll */
+@media (max-width: 768px){
+  .dashboard .main-content{ margin-right:0 !important; width:100% !important; }
+
+  .sidebar{
+    width: 82vw !important;
+    right: 0 !important;
+    transform: translateX(100%) !important;   /* مخفي */
+    transition: transform .25s ease !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    height: 100vh !important;
+    -webkit-overflow-scrolling: touch;
+    z-index: 10000 !important;
+  }
+  .sidebar.active{ transform: translateX(0) !important; } /* ظاهر */
+
+  /* مساحة تمرير داخل الروابط لو طال المحتوى */
+  .sidebar .nav-links{
+    max-height: calc(100vh - 300px) !important;
+    overflow-y: auto !important;
+  }
+
+  /* منع تمرير الصفحة عند فتح القائمة */
+  body.menu-open{ overflow: hidden !important; }
+}
+
+
 
 
 
