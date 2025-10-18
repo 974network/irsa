@@ -511,11 +511,13 @@ setupMobileMenu() {
 
 // 🔥 دالة تبديل الشريط الجانبي
 toggleSidebar() {
-    const sidebar = document.querySelector('.sidebar');
-    if (sidebar) {
-        sidebar.classList.toggle('active');
-    }
+  const sidebar = document.querySelector('.sidebar');
+  if (sidebar) {
+    sidebar.classList.toggle('active');
+    document.body.classList.toggle('menu-open', sidebar.classList.contains('active'));
+  }
 }
+
 
 // 🔥 تحديث عنوان الصفحة
 updateMobileTitle(pageName) {
@@ -3619,5 +3621,6 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
 
 
