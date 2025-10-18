@@ -4885,6 +4885,30 @@ select option {
     overflow-y: auto;
   }
 }
+/* جعل عناصر قائمة المستخدم تحت بعض */
+.user-dropdown a.dropdown-item {
+  display: block !important;
+  width: 100% !important;
+  text-align: right !important;
+  padding: 14px 18px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+.user-dropdown a.dropdown-item:last-child {
+  border-bottom: none !important;
+}
+
+.user-dropdown a.dropdown-item i {
+  width: 24px !important;
+  text-align: center !important;
+}
+
+.user-dropdown a.dropdown-item span {
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+
 
 
 
