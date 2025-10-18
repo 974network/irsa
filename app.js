@@ -1,27 +1,26 @@
-// النظام الرئيسي مع Firebase Firestore - الإصدار الكامل مع إدارة المستخدمين
+// النظام الرئيسي مع Firebase Firestore - الإصدار الكامل والشغال
 class AdvancedPropertySystem {
     constructor() {
         this.currentPage = 'dashboard';
         this.currentLanguage = localStorage.getItem('propertyLanguage') || 'ar';
         this.firebaseManager = new FirebaseManager();
         this.propertyDB = null;
-        this.currentUserRole = 'admin'; // دور المستخدم الحالي
         this.init();
     }
 
     async init() {
-        try {
-            await this.firebaseManager.init();
-            this.setupLogin();
-            this.setupNavigation();
-            this.setupMobileMenu();
-            this.checkAuthStatus();
-            this.applyLanguage(this.currentLanguage);
-        } catch (error) {
-            console.error('Initialization error:', error);
-            this.showEmergencyLogin();
-        }
+    try {
+        await this.firebaseManager.init();
+        this.setupLogin();
+        this.setupNavigation();
+        this.setupMobileMenu(); // 🔥 إضافة هذا السطر
+        this.checkAuthStatus();
+        this.applyLanguage(this.currentLanguage);
+    } catch (error) {
+        console.error('Initialization error:', error);
+        this.showEmergencyLogin();
     }
+}
 
     showEmergencyLogin() {
         document.getElementById('loginPage').style.display = 'flex';
@@ -60,25 +59,20 @@ class AdvancedPropertySystem {
         
         if (result.success) {
             this.propertyDB = await this.loadUserData();
-            
-            // 🔥 تحديد دور المستخدم من بيانات Firebase
-            const userData = await this.firebaseManager.getUserProfile(this.firebaseManager.currentUser.uid);
-            this.currentUserRole = userData?.role || 'sales';
-            
-            const fullName = this.firebaseManager.currentUser?.displayName || 
-                            (username.includes('@') ? username.split('@')[0] : username);
+const fullName =
+  this.firebaseManager.currentUser?.displayName ||
+  (username.includes('@') ? username.split('@')[0] : username);
 
-            this.propertyDB.currentUser = fullName;
-            localStorage.setItem('propertyUser', fullName);
-            localStorage.setItem('loginTime', new Date().toISOString());
-            localStorage.setItem('userRole', this.currentUserRole);
+this.propertyDB.currentUser = fullName;
+
+localStorage.setItem('propertyUser', fullName);
+localStorage.setItem('loginTime', new Date().toISOString());
             
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('dashboard').style.display = 'block';
-            this.showNotification(`مرحباً بك ${this.getUserPermissions().name}!`);
+            this.showNotification('مرحباً بك في النظام!');
             
             this.setupUserMenu();
-            this.setupNavigation();
             this.loadDashboard();
         } else {
             this.showNotification(result.error, 'error');
@@ -355,7 +349,6 @@ class AdvancedPropertySystem {
                     status: 'غير مقروء'
                 }
             ],
-            users: [], // 🔥 قسم المستخدمين الجديد
             settings: {
                 companyName: 'شركة IRSA للتجارة والمقاولات',
                 currency: 'ريال',
@@ -391,7 +384,7 @@ class AdvancedPropertySystem {
             username: username,
             fullName: fullName,
             phone: phone,
-            role: 'admin'
+            role: 'مدير النظام'
         };
         
         const result = await this.firebaseManager.createAccount(email, password, userData);
@@ -419,10 +412,8 @@ class AdvancedPropertySystem {
             document.getElementById('dashboard').style.display = 'block';
             this.loadUserData().then(db => {
                 this.propertyDB = db;
-                this.currentUserRole = localStorage.getItem('userRole') || 'admin';
                 this.loadDashboard();
                 this.setupUserMenu();
-                this.setupNavigation();
             });
         }
     }
@@ -436,10 +427,8 @@ class AdvancedPropertySystem {
         
         localStorage.removeItem('propertyUser');
         localStorage.removeItem('loginTime');
-        localStorage.removeItem('userRole');
         
         this.propertyDB = this.getDefaultUserDB();
-        this.currentUserRole = 'admin';
         
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('loginPage').style.display = 'flex';
@@ -455,81 +444,32 @@ class AdvancedPropertySystem {
         this.setupNavigation();
     }
 
-    // 🔥 نظام الصلاحيات الجديد
-    getUserPermissions() {
-        const permissions = {
-            'admin': {
-                name: 'مدير النظام',
-                permissions: ['*'],
-                modules: ['dashboard', 'properties', 'customers', 'sales', 'contracts', 'payments', 'commissions', 'maintenance', 'inventory', 'accounts', 'invoices', 'messages', 'reports', 'settings', 'users']
-            },
-            'manager': {
-                name: 'مدير',
-                permissions: ['properties', 'customers', 'contracts', 'payments', 'maintenance', 'reports'],
-                modules: ['dashboard', 'properties', 'customers', 'contracts', 'payments', 'maintenance', 'reports']
-            },
-            'sales': {
-                name: 'موظف مبيعات',
-                permissions: ['customers', 'sales', 'commissions'],
-                modules: ['dashboard', 'customers', 'sales', 'commissions']
-            },
-            'accountant': {
-                name: 'محاسب',
-                permissions: ['payments', 'accounts', 'invoices'],
-                modules: ['dashboard', 'payments', 'accounts', 'invoices']
-            },
-            'maintenance': {
-                name: 'فني صيانة',
-                permissions: ['maintenance', 'inventory'],
-                modules: ['dashboard', 'maintenance', 'inventory']
-            }
-        };
-        return permissions[this.currentUserRole] || permissions['sales'];
-    }
-
-    hasPermission(permission) {
-        const userPermissions = this.getUserPermissions().permissions;
-        return userPermissions.includes('*') || userPermissions.includes(permission);
-    }
-
-    canAccessModule(module) {
-        const userModules = this.getUserPermissions().modules;
-        return userModules.includes(module);
-    }
-
     setupNavigation() {
-        const userPermissions = this.getUserPermissions();
         const navLinks = [
-            { id: 'nav-dashboard', icon: 'fa-home', text: 'dashboard', page: 'dashboard', permission: 'dashboard' },
-            { id: 'nav-properties', icon: 'fa-building', text: 'properties', page: 'properties', permission: 'properties' },
-            { id: 'nav-customers', icon: 'fa-users', text: 'customers', page: 'customers', permission: 'customers' },
-            { id: 'nav-sales', icon: 'fa-shopping-cart', text: 'sales', page: 'sales', permission: 'sales' },
-            { id: 'nav-contracts', icon: 'fa-file-contract', text: 'contracts', page: 'contracts', permission: 'contracts' },
-            { id: 'nav-payments', icon: 'fa-money-bill', text: 'payments', page: 'payments', permission: 'payments' },
-            { id: 'nav-commissions', icon: 'fa-handshake', text: 'commissions', page: 'commissions', permission: 'commissions' },
-            { id: 'nav-maintenance', icon: 'fa-tools', text: 'maintenance', page: 'maintenance', permission: 'maintenance' },
-            { id: 'nav-inventory', icon: 'fa-boxes', text: 'inventory', page: 'inventory', permission: 'inventory' },
-            { id: 'nav-accounts', icon: 'fa-chart-line', text: 'accounts', page: 'accounts', permission: 'accounts' },
-            { id: 'nav-invoices', icon: 'fa-receipt', text: 'invoices', page: 'invoices', permission: 'invoices' },
-            { id: 'nav-messages', icon: 'fa-comments', text: 'messages', page: 'messages', permission: 'messages' },
-            { id: 'nav-reports', icon: 'fa-chart-bar', text: 'reports', page: 'reports', permission: 'reports' },
-            { id: 'nav-settings', icon: 'fa-cog', text: 'settings', page: 'settings', permission: 'settings' },
+            { id: 'nav-dashboard', icon: 'fa-home', text: 'dashboard', page: 'dashboard' },
+            { id: 'nav-properties', icon: 'fa-building', text: 'properties', page: 'properties' },
+            { id: 'nav-customers', icon: 'fa-users', text: 'customers', page: 'customers' },
+            { id: 'nav-sales', icon: 'fa-shopping-cart', text: 'sales', page: 'sales' },
+            { id: 'nav-contracts', icon: 'fa-file-contract', text: 'contracts', page: 'contracts' },
+            { id: 'nav-payments', icon: 'fa-money-bill', text: 'payments', page: 'payments' },
+            { id: 'nav-commissions', icon: 'fa-handshake', text: 'commissions', page: 'commissions' },
+            { id: 'nav-maintenance', icon: 'fa-tools', text: 'maintenance', page: 'maintenance' },
+            { id: 'nav-inventory', icon: 'fa-boxes', text: 'inventory', page: 'inventory' },
+            { id: 'nav-accounts', icon: 'fa-chart-line', text: 'accounts', page: 'accounts' },
+            { id: 'nav-invoices', icon: 'fa-receipt', text: 'invoices', page: 'invoices' },
+            { id: 'nav-messages', icon: 'fa-comments', text: 'messages', page: 'messages' },
+            { id: 'nav-reports', icon: 'fa-chart-bar', text: 'reports', page: 'reports' },
+            { id: 'nav-settings', icon: 'fa-cog', text: 'settings', page: 'settings' },
         ];
-
-        if (this.currentUserRole === 'admin') {
-            navLinks.push({ id: 'nav-users', icon: 'fa-user-shield', text: 'users', page: 'users', permission: 'users' });
-        }
 
         const navContainer = document.querySelector('.sidebar .nav-links');
         if (navContainer) {
-            navContainer.innerHTML = navLinks
-                .filter(link => this.canAccessModule(link.page))
-                .map(link => `
-                    <a href="#" class="nav-link" id="${link.id}" data-page="${link.page}">
-                        <i class="fas ${link.icon}"></i>
-                        <span data-translate="${link.text}">${this.getTranslation(link.text)}</span>
-                    </a>
-                `).join('');
+            navContainer.innerHTML = navLinks.map(link => `
+                <a href="#" class="nav-link" id="${link.id}" data-page="${link.page}">
+                    <i class="fas ${link.icon}"></i>
+                    <span data-translate="${link.text}">${this.getTranslation(link.text)}</span>
+                </a>
+            `).join('');
 
             document.querySelectorAll('.nav-link').forEach(link => {
                 link.addEventListener('click', (e) => {
@@ -542,63 +482,66 @@ class AdvancedPropertySystem {
             this.navigateTo('dashboard');
         }
     }
+    // 🔥🔥🔥 ضيف هذا الكود مباشرة بعد نهاية setupNavigation
 
-    setupMobileMenu() {
-        const mobileHeader = document.createElement('div');
-        mobileHeader.className = 'mobile-header';
-        mobileHeader.innerHTML = `
-            <div class="mobile-header-content">
-                <div class="mobile-title">
-                    <i class="fas fa-building"></i>
-                    <span>${this.propertyDB?.settings?.companyName || 'Property System'}</span>
-                </div>
-                <button class="mobile-menu-btn">
-                    <i class="fas fa-bars"></i>
-                </button>
+setupMobileMenu() {
+    // إنشاء شريط أعلى للجوال
+    const mobileHeader = document.createElement('div');
+    mobileHeader.className = 'mobile-header';
+    mobileHeader.innerHTML = `
+        <div class="mobile-header-content">
+            <div class="mobile-title">
+                <i class="fas fa-building"></i>
+                <span>${this.propertyDB?.settings?.companyName || 'Property System'}</span>
             </div>
-        `;
-        
-        document.body.appendChild(mobileHeader);
-        
-        document.querySelector('.mobile-menu-btn').addEventListener('click', () => {
-            this.toggleSidebar();
-        });
-    }
+            <button class="mobile-menu-btn">
+                <i class="fas fa-bars"></i>
+            </button>
+        </div>
+    `;
+    
+    // إضافة العناصر للصفحة
+    document.body.appendChild(mobileHeader);
+    
+    // إضافة event listener للزر
+    document.querySelector('.mobile-menu-btn').addEventListener('click', () => {
+        this.toggleSidebar();
+    });
+}
 
-    toggleSidebar() {
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-            sidebar.classList.toggle('active');
-            document.body.classList.toggle('menu-open', sidebar.classList.contains('active'));
-        }
+// 🔥 دالة تبديل الشريط الجانبي
+toggleSidebar() {
+    const sidebar = document.querySelector('.sidebar');
+    if (sidebar) {
+        sidebar.classList.toggle('active');
     }
+}
 
-    updateMobileTitle(pageName) {
-        const titleElement = document.querySelector('.mobile-title span');
-        if (titleElement) {
-            const titles = {
-                'dashboard': 'لوحة التحكم',
-                'properties': 'إدارة العقارات', 
-                'customers': 'إدارة العملاء',
-                'sales': 'المبيعات',
-                'contracts': 'العقود',
-                'payments': 'المدفوعات',
-                'maintenance': 'الصيانة',
-                'inventory': 'الجرد',
-                'accounts': 'الحسابات',
-                'invoices': 'الفواتير',
-                'messages': 'المحادثات',
-                'reports': 'التقارير',
-                'settings': 'الإعدادات',
-                'users': 'إدارة المستخدمين'
-            };
-            titleElement.textContent = titles[pageName] || pageName;
-        }
+// 🔥 تحديث عنوان الصفحة
+updateMobileTitle(pageName) {
+    const titleElement = document.querySelector('.mobile-title span');
+    if (titleElement) {
+        const titles = {
+            'dashboard': 'لوحة التحكم',
+            'properties': 'إدارة العقارات', 
+            'customers': 'إدارة العملاء',
+            'sales': 'المبيعات',
+            'contracts': 'العقود',
+            'payments': 'المدفوعات',
+            'maintenance': 'الصيانة',
+            'inventory': 'الجرد',
+            'accounts': 'الحسابات',
+            'invoices': 'الفواتير',
+            'messages': 'المحادثات',
+            'reports': 'التقارير',
+            'settings': 'الإعدادات'
+        };
+        titleElement.textContent = titles[pageName] || pageName;
     }
+}
 
     setupUserMenu() {
         const username = this.propertyDB?.currentUser || 'مستخدم';
-        const userRole = this.getUserPermissions().name;
         
         const userMenuHTML = `
             <div class="user-menu-sidebar">
@@ -612,19 +555,13 @@ class AdvancedPropertySystem {
                         <div class="user-info">
                             <i class="fas fa-user-circle profile-icon-large"></i>
                             <div class="user-name">${username}</div>
-                            <div class="user-role">${userRole}</div>
+                            <div class="user-role">مدير النظام</div>
                         </div>
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item" onclick="propertySystem.showChangePasswordModal()">
                             <i class="fas fa-key"></i>
                             <span data-translate="changePassword">تغيير كلمة المرور</span>
                         </a>
-                        ${this.currentUserRole === 'admin' ? `
-                            <a href="#" class="dropdown-item" onclick="propertySystem.navigateTo('users')">
-                                <i class="fas fa-user-shield"></i>
-                                <span data-translate="users">إدارة المستخدمين</span>
-                            </a>
-                        ` : ''}
                         <div class="dropdown-divider"></div>
                         <a href="#" class="dropdown-item logout-item" onclick="propertySystem.logout()">
                             <i class="fas fa-sign-out-alt"></i>
@@ -665,316 +602,37 @@ class AdvancedPropertySystem {
     }
 
     navigateTo(page) {
-        if (!this.canAccessModule(page)) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            return;
-        }
+    this.currentPage = page;
+    
+    // 🔥🔥🔥 أضف هالسطرين هنا:
+    this.updateMobileTitle(page); // تحديث العنوان
+    this.toggleSidebar(); // إغلاق القائمة على الجوال
+    
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    
+    const activeLink = document.getElementById(`nav-${page}`);
+    if (activeLink) activeLink.classList.add('active');
 
-        this.currentPage = page;
-        this.updateMobileTitle(page);
-        this.toggleSidebar();
-        
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.classList.remove('active');
-        });
-        
-        const activeLink = document.getElementById(`nav-${page}`);
-        if (activeLink) activeLink.classList.add('active');
-
-        switch(page) {
-            case 'dashboard': this.loadDashboard(); break;
-            case 'properties': this.loadProperties(); break;
-            case 'customers': this.loadCustomers(); break;
-            case 'sales': this.loadSales(); break;
-            case 'contracts': this.loadContracts(); break;
-            case 'payments': this.loadPayments(); break;
-            case 'commissions': this.loadCommissions(); break;
-            case 'maintenance': this.loadMaintenance(); break;
-            case 'inventory': this.loadInventory(); break;
-            case 'accounts': this.loadAccounts(); break;
-            case 'invoices': this.loadInvoices(); break;
-            case 'messages': this.loadMessages(); break;
-            case 'reports': this.loadReports(); break;
-            case 'settings': this.loadSettings(); break;
-            case 'users': this.loadUsers(); break;
-        }
+    switch(page) {
+        case 'dashboard': this.loadDashboard(); break;
+        case 'properties': this.loadProperties(); break;
+        case 'customers': this.loadCustomers(); break;
+        case 'sales': this.loadSales(); break;
+        case 'contracts': this.loadContracts(); break;
+        case 'payments': this.loadPayments(); break;
+        case 'commissions': this.loadCommissions(); break;
+        case 'maintenance': this.loadMaintenance(); break;
+        case 'inventory': this.loadInventory(); break;
+        case 'accounts': this.loadAccounts(); break;
+        case 'invoices': this.loadInvoices(); break;
+        case 'messages': this.loadMessages(); break;
+        case 'reports': this.loadReports(); break;
+        case 'settings': this.loadSettings(); break;
     }
+}
 
-    // 🔥 قسم إدارة المستخدمين الجديد
-    async loadUsers() {
-        if (!this.hasPermission('users')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
-        const content = document.querySelector('.main-content');
-        const users = this.propertyDB.users || [];
-        
-        content.innerHTML = `
-            <div class="page-header">
-                <h2><i class="fas fa-user-shield"></i> <span data-translate="users">${this.getTranslation('users')}</span></h2>
-                <div class="header-actions">
-                    <button class="btn btn-primary" onclick="propertySystem.showUserForm()">
-                        <i class="fas fa-plus"></i> ${this.currentLanguage === 'ar' ? 'إضافة مستخدم' : 'Add User'}
-                    </button>
-                </div>
-            </div>
-
-            <div class="stats-grid" style="margin-bottom: 20px;">
-                <div class="stat-card">
-                    <i class="fas fa-users"></i>
-                    <div class="stat-value">${users.length}</div>
-                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'إجمالي المستخدمين' : 'Total Users'}</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-user-shield"></i>
-                    <div class="stat-value">${users.filter(u => u.role === 'admin').length}</div>
-                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'مديرين النظام' : 'Admins'}</div>
-                </div>
-                <div class="stat-card">
-                    <i class="fas fa-user-tie"></i>
-                    <div class="stat-value">${users.filter(u => u.role !== 'admin').length}</div>
-                    <div class="stat-title">${this.currentLanguage === 'ar' ? 'مستخدمين عاديين' : 'Regular Users'}</div>
-                </div>
-            </div>
-
-            <div class="table-container">
-                <table class="data-table">
-                    <thead>
-                        <tr>
-                            <th>${this.currentLanguage === 'ar' ? 'الصورة' : 'Photo'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'الاسم' : 'Name'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'الدور' : 'Role'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'تاريخ الإنشاء' : 'Created'}</th>
-                            <th>${this.currentLanguage === 'ar' ? 'الإجراءات' : 'Actions'}</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${users.map(user => `
-                            <tr>
-                                <td>
-                                    <div class="user-avatar-small">
-                                        <i class="fas fa-user-circle"></i>
-                                    </div>
-                                </td>
-                                <td><strong>${user.fullName}</strong></td>
-                                <td>${user.email}</td>
-                                <td>
-                                    <span class="role-badge role-${user.role}">
-                                        ${this.getRoleName(user.role)}
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="status-badge status-${user.status === 'active' ? 'active' : 'inactive'}">
-                                        ${user.status === 'active' ? 'نشط' : 'غير نشط'}
-                                    </span>
-                                </td>
-                                <td>${user.createdAt}</td>
-                                <td class="actions-column">
-                                    <div class="action-buttons">
-                                        <button class="btn btn-sm btn-edit" onclick="propertySystem.editUser('${user.id}')">
-                                            <i class="fas fa-edit"></i>
-                                        </button>
-                                        <button class="btn btn-sm btn-delete" onclick="propertySystem.deleteUser('${user.id}')">
-                                            <i class="fas fa-trash"></i>
-                                        </button>
-                                        ${user.status === 'active' ? 
-                                            `<button class="btn btn-sm btn-warning" onclick="propertySystem.toggleUserStatus('${user.id}', 'inactive')">
-                                                <i class="fas fa-pause"></i>
-                                            </button>` :
-                                            `<button class="btn btn-sm btn-success" onclick="propertySystem.toggleUserStatus('${user.id}', 'active')">
-                                                <i class="fas fa-play"></i>
-                                            </button>`
-                                        }
-                                    </div>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            </div>
-        `;
-    }
-
-    getRoleName(role) {
-        const roles = {
-            'admin': 'مدير النظام',
-            'manager': 'مدير',
-            'sales': 'موظف مبيعات', 
-            'accountant': 'محاسب',
-            'maintenance': 'فني صيانة'
-        };
-        return roles[role] || role;
-    }
-
-    showUserForm(user = null) {
-        const isEdit = user !== null;
-        const formHTML = `
-            <div class="modal-overlay" id="userModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-user-plus"></i> ${isEdit ? (this.currentLanguage === 'ar' ? 'تعديل المستخدم' : 'Edit User') : (this.currentLanguage === 'ar' ? 'إضافة مستخدم جديد' : 'Add New User')}</h3>
-                        <button class="close-btn" onclick="propertySystem.closeModal('userModal')">&times;</button>
-                    </div>
-                    <form onsubmit="propertySystem.${isEdit ? 'updateUser' : 'addUser'}(event, ${isEdit ? `'${user.id}'` : ''})">
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'}:</label>
-                            <input type="text" name="fullName" value="${isEdit ? user.fullName : ''}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}:</label>
-                            <input type="email" name="email" value="${isEdit ? user.email : ''}" required ${isEdit ? 'readonly' : ''}>
-                        </div>
-                        ${!isEdit ? `
-                            <div class="form-group">
-                                <label>${this.currentLanguage === 'ar' ? 'كلمة المرور' : 'Password'}:</label>
-                                <input type="password" name="password" required minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label>${this.currentLanguage === 'ar' ? 'تأكيد كلمة المرور' : 'Confirm Password'}:</label>
-                                <input type="password" name="confirmPassword" required minlength="6">
-                            </div>
-                        ` : ''}
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'رقم الهاتف' : 'Phone'}:</label>
-                            <input type="tel" name="phone" value="${isEdit ? user.phone : ''}">
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'الدور' : 'Role'}:</label>
-                            <select name="role" required>
-                                <option value="sales" ${isEdit && user.role === 'sales' ? 'selected' : ''}>موظف مبيعات</option>
-                                <option value="manager" ${isEdit && user.role === 'manager' ? 'selected' : ''}>مدير</option>
-                                <option value="accountant" ${isEdit && user.role === 'accountant' ? 'selected' : ''}>محاسب</option>
-                                <option value="maintenance" ${isEdit && user.role === 'maintenance' ? 'selected' : ''}>فني صيانة</option>
-                                <option value="admin" ${isEdit && user.role === 'admin' ? 'selected' : ''}>مدير النظام</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>${this.currentLanguage === 'ar' ? 'الحالة' : 'Status'}:</label>
-                            <select name="status" required>
-                                <option value="active" ${isEdit && user.status === 'active' ? 'selected' : ''}>نشط</option>
-                                <option value="inactive" ${isEdit && user.status === 'inactive' ? 'selected' : ''}>غير نشط</option>
-                            </select>
-                        </div>
-                        <div class="form-actions">
-                            <button type="submit" class="btn btn-primary">
-                                ${isEdit ? (this.currentLanguage === 'ar' ? 'تحديث المستخدم' : 'Update User') : (this.currentLanguage === 'ar' ? 'إضافة المستخدم' : 'Add User')}
-                            </button>
-                            <button type="button" class="btn btn-secondary" onclick="propertySystem.closeModal('userModal')">
-                                ${this.currentLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        `;
-        this.showModal(formHTML);
-    }
-
-    async addUser(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        const email = formData.get('email');
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
-        
-        if (password !== confirmPassword) {
-            this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
-            return;
-        }
-
-        const userData = {
-            fullName: formData.get('fullName'),
-            phone: formData.get('phone'),
-            role: formData.get('role'),
-            status: formData.get('status')
-        };
-
-        const result = await this.firebaseManager.createAccount(email, password, userData);
-        
-        if (result.success) {
-            const newUser = {
-                id: result.user.uid,
-                fullName: userData.fullName,
-                email: email,
-                phone: userData.phone,
-                role: userData.role,
-                status: userData.status,
-                createdAt: new Date().toISOString().split('T')[0],
-                createdBy: this.propertyDB.currentUser
-            };
-
-            if (!this.propertyDB.users) this.propertyDB.users = [];
-            this.propertyDB.users.push(newUser);
-            
-            await this.saveUserData();
-            this.closeModal('userModal');
-            this.showNotification('تم إضافة المستخدم بنجاح!');
-            this.loadUsers();
-        } else {
-            this.showNotification(result.error, 'error');
-        }
-    }
-
-    editUser(userId) {
-        const user = (this.propertyDB.users || []).find(u => u.id === userId);
-        if (user) {
-            this.showUserForm(user);
-        }
-    }
-
-    async updateUser(event, userId) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        const userIndex = (this.propertyDB.users || []).findIndex(u => u.id === userId);
-        if (userIndex !== -1) {
-            this.propertyDB.users[userIndex] = {
-                ...this.propertyDB.users[userIndex],
-                fullName: formData.get('fullName'),
-                phone: formData.get('phone'),
-                role: formData.get('role'),
-                status: formData.get('status')
-            };
-            
-            await this.saveUserData();
-            this.closeModal('userModal');
-            this.showNotification('تم تحديث بيانات المستخدم بنجاح!');
-            this.loadUsers();
-        }
-    }
-
-    async deleteUser(userId) {
-        if (confirm(this.currentLanguage === 'ar' ? 'هل أنت متأكد من حذف هذا المستخدم؟' : 'Are you sure you want to delete this user?')) {
-            try {
-                await this.firebaseManager.deleteUser(userId);
-                
-                this.propertyDB.users = (this.propertyDB.users || []).filter(u => u.id !== userId);
-                await this.saveUserData();
-                
-                this.showNotification('تم حذف المستخدم بنجاح!');
-                this.loadUsers();
-            } catch (error) {
-                this.showNotification('فشل في حذف المستخدم', 'error');
-            }
-        }
-    }
-
-    async toggleUserStatus(userId, status) {
-        const userIndex = (this.propertyDB.users || []).findIndex(u => u.id === userId);
-        if (userIndex !== -1) {
-            this.propertyDB.users[userIndex].status = status;
-            await this.saveUserData();
-            this.showNotification(`تم ${status === 'active' ? 'تفعيل' : 'تعطيل'} المستخدم بنجاح!`);
-            this.loadUsers();
-        }
-    }
-
-    // باقي الدوال الأصلية تبقى كما هي...
     async loadDashboard() {
         const content = document.querySelector('.main-content');
         const stats = this.calculateStats();
@@ -988,6 +646,7 @@ class AdvancedPropertySystem {
                     </h1>
                 </div>
 
+                <!-- الإحصائيات الرئيسية -->
                 <div class="stats-grid-compact">
                     <div class="stat-card-compact">
                         <i class="fas fa-building"></i>
@@ -1011,37 +670,31 @@ class AdvancedPropertySystem {
                     </div>
                 </div>
 
+                <!-- الإجراءات السريعة -->
                 <div class="quick-actions">
-                    ${this.canAccessModule('properties') ? `
                     <div class="quick-action-card" onclick="propertySystem.navigateTo('properties')">
                         <i class="fas fa-building"></i>
                         <h4>${this.currentLanguage === 'ar' ? 'إدارة العقارات' : 'Properties Management'}</h4>
                         <p>${this.currentLanguage === 'ar' ? 'عرض وإدارة جميع الوحدات' : 'View and manage all units'}</p>
                     </div>
-                    ` : ''}
-                    ${this.canAccessModule('payments') ? `
                     <div class="quick-action-card" onclick="propertySystem.navigateTo('payments')">
                         <i class="fas fa-money-bill"></i>
                         <h4>${this.currentLanguage === 'ar' ? 'المدفوعات' : 'Payments'}</h4>
                         <p>${this.currentLanguage === 'ar' ? 'إدارة الدفعات والإيرادات' : 'Manage payments and revenue'}</p>
                     </div>
-                    ` : ''}
-                    ${this.canAccessModule('maintenance') ? `
                     <div class="quick-action-card" onclick="propertySystem.navigateTo('maintenance')">
                         <i class="fas fa-tools"></i>
                         <h4>${this.currentLanguage === 'ar' ? 'الصيانة' : 'Maintenance'}</h4>
                         <p>${this.currentLanguage === 'ar' ? 'متابعة طلبات الصيانة' : 'Track maintenance requests'}</p>
                     </div>
-                    ` : ''}
-                    ${this.canAccessModule('reports') ? `
                     <div class="quick-action-card" onclick="propertySystem.navigateTo('reports')">
                         <i class="fas fa-chart-bar"></i>
                         <h4>${this.currentLanguage === 'ar' ? 'التقارير' : 'Reports'}</h4>
                         <p>${this.currentLanguage === 'ar' ? 'عرض التقارير والإحصائيات' : 'View reports and statistics'}</p>
                     </div>
-                    ` : ''}
                 </div>
 
+                <!-- آخر النشاطات -->
                 <div class="activities-compact">
                     <h3><i class="fas fa-clock"></i> ${this.currentLanguage === 'ar' ? 'أحدث النشاطات' : 'Recent Activities'}</h3>
                     <div class="activity-list-compact">
@@ -1049,6 +702,7 @@ class AdvancedPropertySystem {
                     </div>
                 </div>
 
+                <!-- التقارير السريعة -->
                 <div class="charts-container-compact">
                     <div class="chart-box-compact">
                         <h3><i class="fas fa-chart-pie"></i> ${this.currentLanguage === 'ar' ? 'توزيع الوحدات' : 'Units Distribution'}</h3>
@@ -1098,6 +752,7 @@ class AdvancedPropertySystem {
     getRecentActivities() {
         const activities = [];
         
+        // آخر المدفوعات
         const recentPayments = (this.propertyDB.payments || []).slice(-3).reverse();
         recentPayments.forEach(payment => {
             activities.push({
@@ -1107,6 +762,7 @@ class AdvancedPropertySystem {
             });
         });
         
+        // آخر العقود
         const recentContracts = (this.propertyDB.contracts || []).slice(-2).reverse();
         recentContracts.forEach(contract => {
             activities.push({
@@ -1116,6 +772,7 @@ class AdvancedPropertySystem {
             });
         });
         
+        // آخر الصيانة
         const recentMaintenance = (this.propertyDB.maintenance || []).slice(-2).reverse();
         recentMaintenance.forEach(maintenance => {
             activities.push({
@@ -1148,12 +805,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم إدارة العقارات
     async loadProperties() {
-        if (!this.canAccessModule('properties')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         content.innerHTML = `
             <div class="page-header">
@@ -1355,12 +1006,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم العملاء
     async loadCustomers() {
-        if (!this.canAccessModule('customers')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         content.innerHTML = `
             <div class="page-header">
@@ -1514,14 +1159,8 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 قسم المبيعات
+    // 🔥 قسم المبيعات - تم إصلاحه
     async loadSales() {
-        if (!this.canAccessModule('sales')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const totalSales = (this.propertyDB.sales || []).reduce((sum, sale) => sum + (sale.amount || 0), 0);
         const totalCommissions = (this.propertyDB.sales || []).reduce((sum, sale) => sum + (sale.commission || 0), 0);
@@ -1735,12 +1374,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم العقود
     async loadContracts() {
-        if (!this.canAccessModule('contracts')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const activeContracts = (this.propertyDB.contracts || []).filter(c => c.status === 'نشط').length;
         const expiredContracts = (this.propertyDB.contracts || []).filter(c => c.status === 'منتهي').length;
@@ -1893,12 +1526,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم المدفوعات
     async loadPayments() {
-        if (!this.canAccessModule('payments')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const totalPaid = (this.propertyDB.payments || []).filter(p => p.status === 'مدفوع').reduce((sum, p) => sum + p.amount, 0);
         const totalPending = (this.propertyDB.payments || []).filter(p => p.status === 'معلقة').reduce((sum, p) => sum + p.amount, 0);
@@ -2050,14 +1677,8 @@ class AdvancedPropertySystem {
         this.loadPayments();
     }
 
-    // 🔥 قسم العمولات
+    // 🔥 قسم العمولات - تم إصلاحه
     async loadCommissions() {
-        if (!this.canAccessModule('commissions')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const totalCommissions = (this.propertyDB.commissions || []).reduce((sum, c) => sum + (c.amount || 0), 0);
         const paidCommissions = (this.propertyDB.commissions || []).filter(c => c.status === 'مدفوعة').reduce((sum, c) => sum + (c.amount || 0), 0);
@@ -2248,12 +1869,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم الصيانة
     async loadMaintenance() {
-        if (!this.canAccessModule('maintenance')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const completed = (this.propertyDB.maintenance || []).filter(m => m.status === 'مكتمل').length;
         const inProgress = (this.propertyDB.maintenance || []).filter(m => m.status === 'قيد التنفيذ').length;
@@ -2407,14 +2022,8 @@ class AdvancedPropertySystem {
         this.loadMaintenance();
     }
 
-    // 🔥 قسم الجرد
+    // 🔥 قسم الجرد - تم إصلاحه
     async loadInventory() {
-        if (!this.canAccessModule('inventory')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const totalItems = (this.propertyDB.inventory || []).length;
         const lowStock = (this.propertyDB.inventory || []).filter(item => item.quantity <= item.minQuantity).length;
@@ -2616,14 +2225,8 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 قسم الحسابات
+    // 🔥 قسم الحسابات - تم إصلاحه
     async loadAccounts() {
-        if (!this.canAccessModule('accounts')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const stats = this.calculateFinancialStats();
         
@@ -2808,14 +2411,8 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 قسم الفواتير
+    // 🔥 قسم الفواتير - تم إصلاحه
     async loadInvoices() {
-        if (!this.canAccessModule('invoices')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const paidInvoices = (this.propertyDB.invoices || []).filter(i => i.status === 'مدفوعة').length;
         const pendingInvoices = (this.propertyDB.invoices || []).filter(i => i.status === 'معلقة').length;
@@ -3014,14 +2611,8 @@ class AdvancedPropertySystem {
         }
     }
 
-    // 🔥 قسم المحادثات
+    // 🔥 قسم المحادثات - تم إصلاحه
     async loadMessages() {
-        if (!this.canAccessModule('messages')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const unreadMessages = (this.propertyDB.messages || []).filter(m => m.status === 'غير مقروء').length;
         
@@ -3210,12 +2801,6 @@ class AdvancedPropertySystem {
 
     // 🔥 قسم التقارير
     async loadReports() {
-        if (!this.canAccessModule('reports')) {
-            this.showNotification('ليس لديك صلاحية للوصول إلى هذا القسم', 'error');
-            this.navigateTo('dashboard');
-            return;
-        }
-
         const content = document.querySelector('.main-content');
         const stats = this.calculateStats();
         const financialStats = this.calculateFinancialStats();
@@ -3226,6 +2811,7 @@ class AdvancedPropertySystem {
             </div>
 
             <div class="reports-dashboard">
+                <!-- التقارير الرئيسية -->
                 <div class="reports-grid-main">
                     <div class="report-card-main">
                         <h3><i class="fas fa-building"></i> ${this.currentLanguage === 'ar' ? 'تقرير العقارات' : 'Properties Report'}</h3>
@@ -3272,6 +2858,7 @@ class AdvancedPropertySystem {
                     </div>
                 </div>
 
+                <!-- تقارير تفصيلية -->
                 <div class="reports-details-grid">
                     <div class="report-detail-card">
                         <h4><i class="fas fa-users"></i> ${this.currentLanguage === 'ar' ? 'تقرير العملاء' : 'Customers Report'}</h4>
@@ -3287,6 +2874,7 @@ class AdvancedPropertySystem {
                     </div>
                 </div>
 
+                <!-- مخططات التقارير -->
                 <div class="reports-charts">
                     <div class="report-chart-card">
                         <h4><i class="fas fa-chart-pie"></i> ${this.currentLanguage === 'ar' ? 'توزيع الوحدات' : 'Units Distribution'}</h4>
@@ -3450,6 +3038,7 @@ class AdvancedPropertySystem {
         this.showNotification(this.currentLanguage === 'ar' ? 'تم حفظ الإعدادات بنجاح!' : 'Settings saved successfully!');
     }
 
+    // 🔥 باقي الدوال المساعدة
     showCreateAccountModal() {
         const createAccountHTML = `
             <div class="modal-overlay" id="createAccountModal">
@@ -3608,21 +3197,22 @@ class AdvancedPropertySystem {
         
         this.updateAllTexts();
         
+        // إعادة تحميل الصفحة الحالية لتطبيق اللغة
         if (this.currentPage) {
             this.navigateTo(this.currentPage);
         }
     }
-
-    optimizeTablesForMobile() {
-        if (window.innerWidth <= 768) {
-            document.querySelectorAll('.data-table td').forEach(td => {
-                const th = td.closest('table').querySelectorAll('th')[td.cellIndex];
-                if (th) {
-                    td.setAttribute('data-label', th.textContent);
-                }
-            });
-        }
+    // 🔥🔥🔥 هنا ضيف الدالة الجديدة:
+optimizeTablesForMobile() {
+    if (window.innerWidth <= 768) {
+        document.querySelectorAll('.data-table td').forEach(td => {
+            const th = td.closest('table').querySelectorAll('th')[td.cellIndex];
+            if (th) {
+                td.setAttribute('data-label', th.textContent);
+            }
+        });
     }
+}
 
     getTranslation(key) {
         const translations = {
@@ -3634,8 +3224,7 @@ class AdvancedPropertySystem {
                 'addProperty': 'إضافة وحدة جديدة', 'addCustomer': 'إضافة عميل جديد',
                 'profile': 'الملف الشخصي', 'changePassword': 'تغيير كلمة المرور',
                 'createAccount': 'إنشاء حساب جديد', 'sales': 'المبيعات', 'commissions': 'العمولات',
-                'inventory': 'الجرد', 'accounts': 'الحسابات', 'invoices': 'الفواتير', 'messages': 'المحادثات',
-                'users': 'إدارة المستخدمين'
+                'inventory': 'الجرد', 'accounts': 'الحسابات', 'invoices': 'الفواتير', 'messages': 'المحادثات'
             },
             'en': {
                 'username': 'Username', 'password': 'Password', 'login': 'Login',
@@ -3645,8 +3234,7 @@ class AdvancedPropertySystem {
                 'addProperty': 'Add New Property', 'addCustomer': 'Add New Customer',
                 'profile': 'Profile', 'changePassword': 'Change Password',
                 'createAccount': 'Create New Account', 'sales': 'Sales', 'commissions': 'Commissions',
-                'inventory': 'Inventory', 'accounts': 'Accounts', 'invoices': 'Invoices', 'messages': 'Messages',
-                'users': 'Users Management'
+                'inventory': 'Inventory', 'accounts': 'Accounts', 'invoices': 'Invoices', 'messages': 'Messages'
             }
         };
         return translations[this.currentLanguage][key] || key;
@@ -3728,11 +3316,9 @@ class FirebaseManager {
                 fullName: userData.fullName || email.split('@')[0],
                 email: email,
                 phone: userData.phone || '',
-                role: userData.role || 'sales',
-                status: userData.status || 'active',
+                role: userData.role || 'مدير النظام',
                 joinDate: new Date().toISOString().split('T')[0],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                createdBy: this.currentUser.uid
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
             
             await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
@@ -3780,29 +3366,6 @@ class FirebaseManager {
                 await this.saveUserData(userId, defaultData);
                 return { success: true, data: defaultData };
             }
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-
-    async getUserProfile(userId) {
-        try {
-            const doc = await this.db.collection('users').doc(userId).get();
-            if (doc.exists) {
-                return doc.data();
-            }
-            return null;
-        } catch (error) {
-            console.error('Error getting user profile:', error);
-            return null;
-        }
-    }
-
-    async deleteUser(userId) {
-        try {
-            await this.auth.currentUser.delete();
-            await this.db.collection('users').doc(userId).delete();
-            return { success: true };
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -4036,7 +3599,6 @@ class FirebaseManager {
                     status: 'غير مقروء'
                 }
             ],
-            users: [],
             settings: {
                 companyName: 'شركة IRSA للتجارة والمقاولات',
                 currency: 'ريال',
@@ -4057,3 +3619,4 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
