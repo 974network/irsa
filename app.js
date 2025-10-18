@@ -3621,3 +3621,6 @@ class FirebaseManager {
 document.addEventListener('DOMContentLoaded', () => {
     window.propertySystem = new AdvancedPropertySystem();
 });
+
+
+
