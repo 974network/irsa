@@ -785,3 +785,146 @@
         gap: 0;
     }
 }
+/* أنماط جديدة للعضو والصلاحيات */
+
+/* زر تسجيل دخول العضو */
+.user-login-link {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.user-login-btn {
+    background: #28a745;
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s;
+    width: 100%;
+}
+
+.user-login-btn:hover {
+    background: #218838;
+}
+
+/* حالة المستخدم */
+.user-status {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 6px;
+    margin-top: 10px;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #28a745;
+    margin-left: 8px;
+}
+
+.status-text {
+    font-size: 12px;
+    color: #666;
+}
+
+/* رسالة منع الوصول */
+.access-denied {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+}
+
+.access-denied i {
+    font-size: 64px;
+    color: #dc3545;
+    margin-bottom: 20px;
+}
+
+.access-denied h2 {
+    color: #dc3545;
+    margin-bottom: 15px;
+}
+
+/* إدارة الصلاحيات */
+.permission-item {
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.permission-header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #eee;
+}
+
+.permission-title {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.user-email {
+    font-size: 12px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.permission-users {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+}
+
+.user-permission {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 6px;
+}
+
+.user-permission span {
+    font-size: 14px;
+    color: #333;
+}
+
+/* الملف الشخصي */
+.profile-info {
+    padding: 20px 0;
+}
+
+.profile-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-item:last-child {
+    border-bottom: none;
+}
+
+.profile-item strong {
+    color: #333;
+}
+
+/* تحسينات للعضو */
+.member-view .admin-only {
+    display: none !important;
+}
+
+/* إخفاء العناصر الممنوعة */
+.hidden-by-permission {
+    display: none !important;
+}
+
