@@ -80,10 +80,16 @@ class ContractManagementSystem {
                 this.contracts = this.userData.contracts || [];
                 this.invoices = this.userData.invoices || [];
                 this.users = this.userData.users || [];
-                this.permissions = this.userData.permissions || this.getDefaultPermissions();
+                this.permissions = this.userData.permissions || {};
                 
-                console.log(`✅ Loaded user data from: ${result.source} for user: ${this.firebaseManager.currentUser.uid}`);
+                console.log('📊 Loaded user data:', {
+                    contracts: this.contracts.length,
+                    invoices: this.invoices.length,
+                    users: this.users.length,
+                    source: result.source
+                });
                 
+                // تحديث وقت آخر دخول
                 this.userData.userProfile.lastLogin = new Date().toISOString();
                 await this.saveCurrentData();
                 
@@ -104,9 +110,10 @@ class ContractManagementSystem {
                 this.userData = this.firebaseManager.getDefaultUserData();
             }
 
+            // تحديث البيانات الحالية
             this.userData.contracts = this.contracts;
             this.userData.invoices = this.invoices;
-            this.users = this.users;
+            this.userData.users = this.users;
             this.userData.permissions = this.permissions;
             
             this.userData.userProfile = this.userData.userProfile || {};
@@ -115,6 +122,7 @@ class ContractManagementSystem {
             this.userData.userProfile.email = this.firebaseManager.currentUser.email;
             this.userData.userProfile.lastActivity = new Date().toISOString();
 
+            // تحديث البيانات الوصفية
             this.userData._metadata = this.userData._metadata || {};
             this.userData._metadata.lastUpdated = new Date().toISOString();
             this.userData._metadata.userId = this.firebaseManager.currentUser.uid;
@@ -122,7 +130,7 @@ class ContractManagementSystem {
             const result = await this.firebaseManager.saveUserData(this.userData);
             
             if (result.success) {
-                console.log('✅ Current data saved successfully for user:', this.firebaseManager.currentUser.uid);
+                console.log('💾 Data saved successfully for user:', this.firebaseManager.currentUser.uid);
                 return true;
             } else {
                 throw new Error(result.error);
@@ -189,25 +197,34 @@ class ContractManagementSystem {
         const isAdmin = !this.isUserLogin;
         const userPermissions = this.permissions[this.firebaseManager.currentUser.email] || {};
         
+        console.log('🔐 Updating permissions for:', this.firebaseManager.currentUser.email);
+        console.log('Permissions:', userPermissions);
+        console.log('Is user login:', this.isUserLogin);
+
         // إدارة المستخدمين للمدير فقط
         document.getElementById('usersNav').style.display = isAdmin ? 'flex' : 'none';
         document.getElementById('manageUsersBtn').style.display = isAdmin ? 'block' : 'none';
 
         // تطبيق الصلاحيات على المستخدم العادي
         if (this.isUserLogin) {
+            console.log('🔒 Applying restrictions for regular user');
+            
             // إخفاء الأقسام الممنوعة
             if (userPermissions.denyContracts) {
                 document.getElementById('contractsNav').style.display = 'none';
                 document.getElementById('addContractBtn').style.display = 'none';
                 document.getElementById('addContractHeaderBtn').style.display = 'none';
+                console.log('📋 Contracts access denied');
             }
             if (userPermissions.denyInvoices) {
                 document.getElementById('invoicesNav').style.display = 'none';
                 document.getElementById('addInvoiceBtn').style.display = 'none';
                 document.getElementById('addInvoiceHeaderBtn').style.display = 'none';
+                console.log('🧾 Invoices access denied');
             }
             if (userPermissions.denySettings) {
                 document.getElementById('settingsNav').style.display = 'none';
+                console.log('⚙️ Settings access denied');
             }
 
             // منع التعديل في الجداول
@@ -215,11 +232,13 @@ class ContractManagementSystem {
                 document.querySelectorAll('#contractsTable .btn-edit').forEach(btn => {
                     btn.style.display = 'none';
                 });
+                console.log('✏️ Contract editing denied');
             }
             if (userPermissions.denyEditInvoice) {
                 document.querySelectorAll('#invoicesTable .btn-edit').forEach(btn => {
                     btn.style.display = 'none';
                 });
+                console.log('✏️ Invoice editing denied');
             }
         }
     }
@@ -232,7 +251,8 @@ class ContractManagementSystem {
             if ((sectionName === 'contracts' && userPermissions.denyContracts) ||
                 (sectionName === 'invoices' && userPermissions.denyInvoices) ||
                 (sectionName === 'settings' && userPermissions.denySettings)) {
-                this.showNotification('غير مسموح لك بالوصول إلى هذه الصفحة', 'error');
+                
+                this.showAccessDeniedMessage(sectionName);
                 return;
             }
         }
@@ -266,6 +286,45 @@ class ContractManagementSystem {
         } else if (sectionName === 'settings') {
             this.displayPermissions();
         }
+    }
+
+    showAccessDeniedMessage(sectionName) {
+        const sectionNames = {
+            'contracts': 'صفحة العقود',
+            'invoices': 'صفحة الفواتير', 
+            'settings': 'صفحة الإعدادات'
+        };
+        
+        const sectionTitle = sectionNames[sectionName] || 'هذه الصفحة';
+        
+        const deniedHTML = `
+            <div class="access-denied">
+                <i class="fas fa-ban"></i>
+                <h2>غير مسموح بالوصول</h2>
+                <p>عذراً، ليس لديك صلاحية للوصول إلى ${sectionTitle}</p>
+                <p>يرجى التواصل مع المدير للحصول على الصلاحيات المناسبة</p>
+                <button class="btn-primary" onclick="contractSystem.showSection('dashboard')" style="margin-top: 20px;">
+                    <i class="fas fa-home"></i> العودة إلى الرئيسية
+                </button>
+            </div>
+        `;
+        
+        // إخفاء جميع الأقسام
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // إظهار رسالة المنع في القسم المطلوب
+        const targetSection = document.getElementById(sectionName + 'Section');
+        targetSection.innerHTML = deniedHTML;
+        targetSection.classList.add('active');
+        
+        // إخفاء جميع عناصر القائمة
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        this.showNotification('غير مسموح لك بالوصول إلى هذه الصفحة', 'error');
     }
 
     toggleUserMenu() {
@@ -357,6 +416,18 @@ class ContractManagementSystem {
     displayContracts() {
         const tableBody = document.getElementById('contractsTableBody');
         tableBody.innerHTML = '';
+
+        if (this.contracts.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-file-contract" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
+                        لا توجد عقود مضافة حتى الآن
+                    </td>
+                </tr>
+            `;
+            return;
+        }
 
         this.contracts.forEach((contract, index) => {
             const tr = document.createElement('tr');
@@ -597,6 +668,18 @@ class ContractManagementSystem {
         const tableBody = document.getElementById('invoicesTableBody');
         tableBody.innerHTML = '';
 
+        if (this.invoices.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-receipt" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
+                        لا توجد فواتير مضافة حتى الآن
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
         this.invoices.forEach((invoice, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -834,6 +917,18 @@ class ContractManagementSystem {
         const tableBody = document.getElementById('usersTableBody');
         tableBody.innerHTML = '';
 
+        if (this.users.length === 0) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
+                        <i class="fas fa-users" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
+                        لا توجد مستخدمين مضافة حتى الآن
+                    </td>
+                </tr>
+            `;
+            return;
+        }
+
         this.users.forEach((user, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
@@ -948,10 +1043,19 @@ class ContractManagementSystem {
         }
     }
 
+    editUserPermissions(userEmail) {
+        this.showSection('settings');
+    }
+
     // === إدارة الصلاحيات ===
     displayPermissions() {
         const permissionsList = document.getElementById('permissionsList');
         permissionsList.innerHTML = '';
+
+        if (this.users.length === 0) {
+            permissionsList.innerHTML = '<p style="text-align: center; color: #666;">لا يوجد مستخدمين لعرض صلاحياتهم</p>';
+            return;
+        }
 
         this.users.forEach(user => {
             if (user.role === 'user') {
@@ -1011,15 +1115,7 @@ class ContractManagementSystem {
         this.showNotification('تم تحديث الصلاحيات بنجاح');
     }
 
-    editUserPermissions(userEmail) {
-        this.showSection('settings');
-    }
-
     // === دوال مساعدة ===
-    getDefaultPermissions() {
-        return {};
-    }
-
     getDefaultUserPermissions() {
         return {
             denyContracts: false,
@@ -1290,7 +1386,7 @@ class FirebaseManager {
             // أيضًا حفظ نسخة محلية للمستخدم الحالي فقط
             localStorage.setItem(`userData_${userId}`, JSON.stringify(userData));
             
-            console.log('✅ User data saved successfully for user:', userId);
+            console.log('💾 User data saved successfully for user:', userId);
             return { success: true };
         } catch (error) {
             console.error('❌ Save user data error:', error);
