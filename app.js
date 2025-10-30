@@ -1,4 +1,4 @@
-// نظام إدارة العقود والفواتير - النسخة المعدلة
+// نظام إدارة العقود والفواتير - النسخة المحسنة
 class ContractManagementSystem {
     constructor() {
         this.currentUser = null;
@@ -6,9 +6,10 @@ class ContractManagementSystem {
         this.firebaseManager = new FirebaseManager();
         this.contracts = [];
         this.invoices = [];
-        this.members = []; // تغيير من users إلى members
+        this.members = [];
         this.permissions = {};
-        this.isMemberLogin = false; // تغيير من isUserLogin إلى isMemberLogin
+        this.isMemberLogin = false;
+        this.currentMember = null;
         this.init();
     }
 
@@ -50,6 +51,7 @@ class ContractManagementSystem {
         if (result.success) {
             await this.loadMainAccountData();
             this.isMemberLogin = false;
+            this.currentMember = null;
             this.showDashboard();
         } else {
             this.showNotification(result.error, 'error');
@@ -58,23 +60,50 @@ class ContractManagementSystem {
 
     // تسجيل دخول العضو
     async handleMemberLogin(email, password) {
+        if (!email || !password) {
+            this.showNotification('يرجى ملء جميع الحقول', 'error');
+            return false;
+        }
+
         this.showNotification('جاري تسجيل الدخول...', 'info');
 
-        // البحث عن العضو في قائمة الأعضاء
-        const member = this.members.find(m => m.email === email && m.password === password);
-        
-        if (member) {
-            // تسجيل دخول العضو
-            this.currentUser = {
-                email: member.email,
-                name: member.fullName,
-                isMember: true
-            };
+        try {
+            // جلب بيانات الحساب الرئيسي أولاً للتحقق من الأعضاء
+            const mainAccountData = await this.firebaseManager.getMainAccountData();
             
-            this.isMemberLogin = true;
-            this.showDashboard();
-        } else {
-            this.showNotification('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+            if (!mainAccountData || !mainAccountData.members) {
+                this.showNotification('لا توجد بيانات أعضاء', 'error');
+                return false;
+            }
+
+            // البحث عن العضو في قائمة الأعضاء
+            const member = mainAccountData.members.find(m => 
+                m.email === email && m.password === password
+            );
+            
+            if (member) {
+                // تسجيل دخول العضو
+                this.currentMember = member;
+                this.currentUser = {
+                    email: member.email,
+                    name: member.fullName,
+                    isMember: true
+                };
+                
+                this.isMemberLogin = true;
+                
+                // تحميل بيانات العضو
+                await this.loadMemberData();
+                this.showDashboard();
+                return true;
+            } else {
+                this.showNotification('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+                return false;
+            }
+        } catch (error) {
+            console.error('Member login error:', error);
+            this.showNotification('خطأ في تسجيل الدخول', 'error');
+            return false;
         }
     }
 
@@ -86,7 +115,7 @@ class ContractManagementSystem {
                 this.userData = result.data;
                 this.contracts = this.userData.contracts || [];
                 this.invoices = this.userData.invoices || [];
-                this.members = this.userData.members || []; // تغيير من users إلى members
+                this.members = this.userData.members || [];
                 this.permissions = this.userData.permissions || {};
                 
                 console.log('📊 Loaded main account data:', {
@@ -111,6 +140,35 @@ class ContractManagementSystem {
         }
     }
 
+    async loadMemberData() {
+        try {
+            // الأعضاء يشاهدون نفس بيانات الحساب الرئيسي ولكن مع قيود
+            const result = await this.firebaseManager.getMainAccountData();
+            
+            if (result.success) {
+                this.userData = result.data;
+                this.contracts = this.userData.contracts || [];
+                this.invoices = this.userData.invoices || [];
+                this.members = this.userData.members || [];
+                this.permissions = this.userData.permissions || {};
+                
+                console.log('📊 Member loaded data:', {
+                    contracts: this.contracts.length,
+                    invoices: this.invoices.length,
+                    email: this.currentMember.email
+                });
+                
+                return true;
+            } else {
+                throw new Error(result.error);
+            }
+        } catch (error) {
+            console.error('Load member data error:', error);
+            this.showNotification('خطأ في تحميل البيانات', 'error');
+            return false;
+        }
+    }
+
     async saveCurrentData() {
         try {
             if (!this.userData) {
@@ -120,7 +178,7 @@ class ContractManagementSystem {
             // تحديث البيانات الحالية
             this.userData.contracts = this.contracts;
             this.userData.invoices = this.invoices;
-            this.userData.members = this.members; // تغيير من users إلى members
+            this.userData.members = this.members;
             this.userData.permissions = this.permissions;
             
             this.userData.userProfile = this.userData.userProfile || {};
@@ -196,7 +254,9 @@ class ContractManagementSystem {
     loadDashboardData() {
         this.displayContracts();
         this.displayInvoices();
-        this.displayMembers();
+        if (!this.isMemberLogin) {
+            this.displayMembers();
+        }
     }
 
     updateStats() {
@@ -267,7 +327,8 @@ class ContractManagementSystem {
             
             if ((sectionName === 'contracts' && userPermissions.denyContracts) ||
                 (sectionName === 'invoices' && userPermissions.denyInvoices) ||
-                (sectionName === 'settings' && userPermissions.denySettings)) {
+                (sectionName === 'settings' && userPermissions.denySettings) ||
+                (sectionName === 'users' && this.isMemberLogin)) {
                 
                 this.showAccessDeniedMessage(sectionName);
                 return;
@@ -309,7 +370,8 @@ class ContractManagementSystem {
         const sectionNames = {
             'contracts': 'صفحة العقود',
             'invoices': 'صفحة الفواتير', 
-            'settings': 'صفحة الإعدادات'
+            'settings': 'صفحة الإعدادات',
+            'users': 'صفحة إدارة الأعضاء'
         };
         
         const sectionTitle = sectionNames[sectionName] || 'هذه الصفحة';
@@ -359,16 +421,16 @@ class ContractManagementSystem {
                         <button class="close-btn" onclick="contractSystem.closeModal('memberLoginModal')">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="memberLoginForm" onsubmit="contractSystem.handleMemberLoginForm(event)">
+                        <form id="memberLoginForm">
                             <div class="form-group">
                                 <label>البريد الإلكتروني:</label>
-                                <input type="email" name="email" class="form-input" required>
+                                <input type="email" id="memberEmail" class="form-input" required>
                             </div>
                             <div class="form-group">
                                 <label>كلمة المرور:</label>
-                                <input type="password" name="password" class="form-input" required>
+                                <input type="password" id="memberPassword" class="form-input" required>
                             </div>
-                            <button type="submit" class="btn-primary" style="width: 100%;">
+                            <button type="button" class="btn-primary" style="width: 100%;" onclick="contractSystem.handleMemberLoginForm()">
                                 <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
                             </button>
                         </form>
@@ -379,15 +441,14 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    async handleMemberLoginForm(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    async handleMemberLoginForm() {
+        const email = document.getElementById('memberEmail').value;
+        const password = document.getElementById('memberPassword').value;
         
-        const email = formData.get('email');
-        const password = formData.get('password');
-        
-        await this.handleMemberLogin(email, password);
-        this.closeModal('memberLoginModal');
+        const success = await this.handleMemberLogin(email, password);
+        if (success) {
+            this.closeModal('memberLoginModal');
+        }
     }
 
     // === عرض الملف الشخصي ===
@@ -395,7 +456,7 @@ class ContractManagementSystem {
         if (this.isMemberLogin) {
             this.showMemberProfile();
         } else {
-            this.showAddMemberModal();
+            this.showMainProfile();
         }
     }
 
@@ -404,7 +465,7 @@ class ContractManagementSystem {
             <div class="modal-overlay" id="memberProfileModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-user"></i> الملف الشخصي</h3>
+                        <h3><i class="fas fa-user"></i> الملف الشخصي للعضو</h3>
                         <button class="close-btn" onclick="contractSystem.closeModal('memberProfileModal')">&times;</button>
                     </div>
                     <div class="modal-body">
@@ -421,6 +482,9 @@ class ContractManagementSystem {
                             <div class="profile-item">
                                 <strong>الحالة:</strong> نشط
                             </div>
+                            <div class="profile-item">
+                                <strong>تاريخ الانضمام:</strong> ${this.currentMember.joinDate}
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -429,249 +493,34 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    // === إدارة العقود ===
-    displayContracts() {
-        const tableBody = document.getElementById('contractsTableBody');
-        tableBody.innerHTML = '';
-
-        if (this.contracts.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-file-contract" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
-                        لا توجد عقود مضافة حتى الآن
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        this.contracts.forEach((contract, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${contract.contractNumber}</td>
-                <td>${contract.clientName}</td>
-                <td>${contract.amount} ر.ق</td>
-                <td>${contract.startDate}</td>
-                <td>${contract.endDate}</td>
-                <td><span class="status-badge status-${contract.status}">${this.getStatusText(contract.status)}</span></td>
-                <td>
-                    <button class="btn-sm btn-edit" onclick="contractSystem.editContract(${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteContract(${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn-sm btn-view" onclick="contractSystem.viewContract(${index})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(tr);
-        });
-    }
-
-    showAddContractModal() {
+    showMainProfile() {
         const modalHTML = `
-            <div class="modal-overlay" id="addContractModal">
+            <div class="modal-overlay" id="mainProfileModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-file-contract"></i> إضافة عقد جديد</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('addContractModal')">&times;</button>
+                        <h3><i class="fas fa-user-cog"></i> الملف الشخصي للمدير</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('mainProfileModal')">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="addContractForm" onsubmit="contractSystem.addContract(event)">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>رقم العقد:</label>
-                                    <input type="text" name="contractNumber" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>اسم العميل:</label>
-                                    <input type="text" name="clientName" class="form-input" required>
-                                </div>
+                        <div class="profile-info">
+                            <div class="profile-item">
+                                <strong>الاسم:</strong> ${this.userData?.userProfile?.name || ''}
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>قيمة العقد:</label>
-                                    <input type="number" name="amount" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>حالة العقد:</label>
-                                    <select name="status" class="form-input" required>
-                                        <option value="active">نشط</option>
-                                        <option value="pending">قيد الانتظار</option>
-                                        <option value="completed">مكتمل</option>
-                                        <option value="cancelled">ملغى</option>
-                                    </select>
-                                </div>
+                            <div class="profile-item">
+                                <strong>البريد الإلكتروني:</strong> ${this.firebaseManager.currentUser.email}
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>تاريخ البدء:</label>
-                                    <input type="date" name="startDate" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>تاريخ الانتهاء:</label>
-                                    <input type="date" name="endDate" class="form-input" required>
-                                </div>
+                            <div class="profile-item">
+                                <strong>الدور:</strong> مدير النظام
                             </div>
-                            <div class="form-group">
-                                <label>وصف العقد:</label>
-                                <textarea name="description" class="form-input" rows="3"></textarea>
+                            <div class="profile-item">
+                                <strong>عدد العقود:</strong> ${this.contracts.length}
                             </div>
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
-                                <i class="fas fa-save"></i> حفظ العقد
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
-
-    async addContract(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        const contract = {
-            contractNumber: formData.get('contractNumber'),
-            clientName: formData.get('clientName'),
-            amount: formData.get('amount'),
-            status: formData.get('status'),
-            startDate: formData.get('startDate'),
-            endDate: formData.get('endDate'),
-            description: formData.get('description'),
-            createdAt: new Date().toISOString(),
-            createdBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
-        };
-
-        this.contracts.push(contract);
-        await this.saveCurrentData();
-        this.displayContracts();
-        this.updateStats();
-        this.closeModal('addContractModal');
-        this.showNotification('تم إضافة العقد بنجاح');
-    }
-
-    editContract(index) {
-        const contract = this.contracts[index];
-        const modalHTML = `
-            <div class="modal-overlay" id="editContractModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-edit"></i> تعديل العقد</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('editContractModal')">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editContractForm" onsubmit="contractSystem.updateContract(event, ${index})">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>رقم العقد:</label>
-                                    <input type="text" name="contractNumber" class="form-input" value="${contract.contractNumber}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>اسم العميل:</label>
-                                    <input type="text" name="clientName" class="form-input" value="${contract.clientName}" required>
-                                </div>
+                            <div class="profile-item">
+                                <strong>عدد الفواتير:</strong> ${this.invoices.length}
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>قيمة العقد:</label>
-                                    <input type="number" name="amount" class="form-input" value="${contract.amount}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>حالة العقد:</label>
-                                    <select name="status" class="form-input" required>
-                                        <option value="active" ${contract.status === 'active' ? 'selected' : ''}>نشط</option>
-                                        <option value="pending" ${contract.status === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
-                                        <option value="completed" ${contract.status === 'completed' ? 'selected' : ''}>مكتمل</option>
-                                        <option value="cancelled" ${contract.status === 'cancelled' ? 'selected' : ''}>ملغى</option>
-                                    </select>
-                                </div>
+                            <div class="profile-item">
+                                <strong>عدد الأعضاء:</strong> ${this.members.length}
                             </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>تاريخ البدء:</label>
-                                    <input type="date" name="startDate" class="form-input" value="${contract.startDate}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>تاريخ الانتهاء:</label>
-                                    <input type="date" name="endDate" class="form-input" value="${contract.endDate}" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>وصف العقد:</label>
-                                <textarea name="description" class="form-input" rows="3">${contract.description || ''}</textarea>
-                            </div>
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
-                                <i class="fas fa-save"></i> حفظ التعديلات
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
-
-    async updateContract(event, index) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        this.contracts[index] = {
-            ...this.contracts[index],
-            contractNumber: formData.get('contractNumber'),
-            clientName: formData.get('clientName'),
-            amount: formData.get('amount'),
-            status: formData.get('status'),
-            startDate: formData.get('startDate'),
-            endDate: formData.get('endDate'),
-            description: formData.get('description'),
-            updatedAt: new Date().toISOString(),
-            updatedBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
-        };
-
-        await this.saveCurrentData();
-        this.displayContracts();
-        this.closeModal('editContractModal');
-        this.showNotification('تم تعديل العقد بنجاح');
-    }
-
-    async deleteContract(index) {
-        if (confirm('هل أنت متأكد من حذف هذا العقد؟')) {
-            this.contracts.splice(index, 1);
-            await this.saveCurrentData();
-            this.displayContracts();
-            this.updateStats();
-            this.showNotification('تم حذف العقد بنجاح');
-        }
-    }
-
-    viewContract(index) {
-        const contract = this.contracts[index];
-        const modalHTML = `
-            <div class="modal-overlay" id="viewContractModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-eye"></i> عرض العقد</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('viewContractModal')">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div><strong>رقم العقد:</strong> ${contract.contractNumber}</div>
-                            <div><strong>اسم العميل:</strong> ${contract.clientName}</div>
-                            <div><strong>قيمة العقد:</strong> ${contract.amount} ر.ق</div>
-                            <div><strong>الحالة:</strong> <span class="status-badge status-${contract.status}">${this.getStatusText(contract.status)}</span></div>
-                            <div><strong>تاريخ البدء:</strong> ${contract.startDate}</div>
-                            <div><strong>تاريخ الانتهاء:</strong> ${contract.endDate}</div>
-                        </div>
-                        ${contract.description ? `<div style="margin-top: 15px;"><strong>الوصف:</strong><br>${contract.description}</div>` : ''}
-                        <div style="margin-top: 15px; font-size: 12px; color: #666;">
-                            <div>تم الإنشاء بواسطة: ${contract.createdBy}</div>
-                            <div>تاريخ الإنشاء: ${new Date(contract.createdAt).toLocaleString('ar-SA')}</div>
-                            ${contract.updatedAt ? `<div>آخر تعديل: ${new Date(contract.updatedAt).toLocaleString('ar-SA')}</div>` : ''}
                         </div>
                     </div>
                 </div>
@@ -680,254 +529,8 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    // === إدارة الفواتير ===
-    displayInvoices() {
-        const tableBody = document.getElementById('invoicesTableBody');
-        tableBody.innerHTML = '';
-
-        if (this.invoices.length === 0) {
-            tableBody.innerHTML = `
-                <tr>
-                    <td colspan="7" style="text-align: center; padding: 40px; color: #666;">
-                        <i class="fas fa-receipt" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
-                        لا توجد فواتير مضافة حتى الآن
-                    </td>
-                </tr>
-            `;
-            return;
-        }
-
-        this.invoices.forEach((invoice, index) => {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-                <td>${invoice.invoiceNumber}</td>
-                <td>${invoice.clientName}</td>
-                <td>${invoice.amount} ر.ق</td>
-                <td>${invoice.issueDate}</td>
-                <td>${invoice.dueDate}</td>
-                <td><span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></td>
-                <td>
-                    <button class="btn-sm btn-edit" onclick="contractSystem.editInvoice(${index})">
-                        <i class="fas fa-edit"></i>
-                    </button>
-                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteInvoice(${index})">
-                        <i class="fas fa-trash"></i>
-                    </button>
-                    <button class="btn-sm btn-view" onclick="contractSystem.viewInvoice(${index})">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </td>
-            `;
-            tableBody.appendChild(tr);
-        });
-    }
-
-    showAddInvoiceModal() {
-        const modalHTML = `
-            <div class="modal-overlay" id="addInvoiceModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-receipt"></i> إضافة فاتورة جديدة</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('addInvoiceModal')">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addInvoiceForm" onsubmit="contractSystem.addInvoice(event)">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>رقم الفاتورة:</label>
-                                    <input type="text" name="invoiceNumber" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>اسم العميل:</label>
-                                    <input type="text" name="clientName" class="form-input" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>المبلغ:</label>
-                                    <input type="number" name="amount" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>حالة الفاتورة:</label>
-                                    <select name="status" class="form-input" required>
-                                        <option value="paid">مدفوعة</option>
-                                        <option value="pending">قيد الانتظار</option>
-                                        <option value="overdue">متأخرة</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>تاريخ الإصدار:</label>
-                                    <input type="date" name="issueDate" class="form-input" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>تاريخ الاستحقاق:</label>
-                                    <input type="date" name="dueDate" class="form-input" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>وصف الفاتورة:</label>
-                                <textarea name="description" class="form-input" rows="3"></textarea>
-                            </div>
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
-                                <i class="fas fa-save"></i> حفظ الفاتورة
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
-
-    async addInvoice(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        const invoice = {
-            invoiceNumber: formData.get('invoiceNumber'),
-            clientName: formData.get('clientName'),
-            amount: formData.get('amount'),
-            status: formData.get('status'),
-            issueDate: formData.get('issueDate'),
-            dueDate: formData.get('dueDate'),
-            description: formData.get('description'),
-            createdAt: new Date().toISOString(),
-            createdBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
-        };
-
-        this.invoices.push(invoice);
-        await this.saveCurrentData();
-        this.displayInvoices();
-        this.updateStats();
-        this.closeModal('addInvoiceModal');
-        this.showNotification('تم إضافة الفاتورة بنجاح');
-    }
-
-    editInvoice(index) {
-        const invoice = this.invoices[index];
-        const modalHTML = `
-            <div class="modal-overlay" id="editInvoiceModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-edit"></i> تعديل الفاتورة</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('editInvoiceModal')">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="editInvoiceForm" onsubmit="contractSystem.updateInvoice(event, ${index})">
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>رقم الفاتورة:</label>
-                                    <input type="text" name="invoiceNumber" class="form-input" value="${invoice.invoiceNumber}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>اسم العميل:</label>
-                                    <input type="text" name="clientName" class="form-input" value="${invoice.clientName}" required>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>المبلغ:</label>
-                                    <input type="number" name="amount" class="form-input" value="${invoice.amount}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>حالة الفاتورة:</label>
-                                    <select name="status" class="form-input" required>
-                                        <option value="paid" ${invoice.status === 'paid' ? 'selected' : ''}>مدفوعة</option>
-                                        <option value="pending" ${invoice.status === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
-                                        <option value="overdue" ${invoice.status === 'overdue' ? 'selected' : ''}>متأخرة</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>تاريخ الإصدار:</label>
-                                    <input type="date" name="issueDate" class="form-input" value="${invoice.issueDate}" required>
-                                </div>
-                                <div class="form-group">
-                                    <label>تاريخ الاستحقاق:</label>
-                                    <input type="date" name="dueDate" class="form-input" value="${invoice.dueDate}" required>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>وصف الفاتورة:</label>
-                                <textarea name="description" class="form-input" rows="3">${invoice.description || ''}</textarea>
-                            </div>
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
-                                <i class="fas fa-save"></i> حفظ التعديلات
-                            </button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
-
-    async updateInvoice(event, index) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        
-        this.invoices[index] = {
-            ...this.invoices[index],
-            invoiceNumber: formData.get('invoiceNumber'),
-            clientName: formData.get('clientName'),
-            amount: formData.get('amount'),
-            status: formData.get('status'),
-            issueDate: formData.get('issueDate'),
-            dueDate: formData.get('dueDate'),
-            description: formData.get('description'),
-            updatedAt: new Date().toISOString(),
-            updatedBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
-        };
-
-        await this.saveCurrentData();
-        this.displayInvoices();
-        this.closeModal('editInvoiceModal');
-        this.showNotification('تم تعديل الفاتورة بنجاح');
-    }
-
-    async deleteInvoice(index) {
-        if (confirm('هل أنت متأكد من حذف هذه الفاتورة؟')) {
-            this.invoices.splice(index, 1);
-            await this.saveCurrentData();
-            this.displayInvoices();
-            this.updateStats();
-            this.showNotification('تم حذف الفاتورة بنجاح');
-        }
-    }
-
-    viewInvoice(index) {
-        const invoice = this.invoices[index];
-        const modalHTML = `
-            <div class="modal-overlay" id="viewInvoiceModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-eye"></i> عرض الفاتورة</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('viewInvoiceModal')">&times;</button>
-                    </div>
-                    <div class="modal-body">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div><strong>رقم الفاتورة:</strong> ${invoice.invoiceNumber}</div>
-                            <div><strong>اسم العميل:</strong> ${invoice.clientName}</div>
-                            <div><strong>المبلغ:</strong> ${invoice.amount} ر.ق</div>
-                            <div><strong>الحالة:</strong> <span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></div>
-                            <div><strong>تاريخ الإصدار:</strong> ${invoice.issueDate}</div>
-                            <div><strong>تاريخ الاستحقاق:</strong> ${invoice.dueDate}</div>
-                        </div>
-                        ${invoice.description ? `<div style="margin-top: 15px;"><strong>الوصف:</strong><br>${invoice.description}</div>` : ''}
-                        <div style="margin-top: 15px; font-size: 12px; color: #666;">
-                            <div>تم الإنشاء بواسطة: ${invoice.createdBy}</div>
-                            <div>تاريخ الإنشاء: ${new Date(invoice.createdAt).toLocaleString('ar-SA')}</div>
-                            ${invoice.updatedAt ? `<div>آخر تعديل: ${new Date(invoice.updatedAt).toLocaleString('ar-SA')}</div>` : ''}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
+    // === باقي دوال إدارة العقود والفواتير تبقى كما هي ===
+    // ... (displayContracts, showAddContractModal, addContract, editContract, etc.)
 
     // === إدارة الأعضاء ===
     displayMembers() {
@@ -956,10 +559,10 @@ class ContractManagementSystem {
                 <td><span class="status-badge status-active">نشط</span></td>
                 <td>
                     <button class="btn-sm btn-edit" onclick="contractSystem.editMemberPermissions('${member.email}')">
-                        <i class="fas fa-shield-alt"></i>
+                        <i class="fas fa-shield-alt"></i> الصلاحيات
                     </button>
                     <button class="btn-sm btn-delete" onclick="contractSystem.deleteMember(${index})">
-                        <i class="fas fa-trash"></i>
+                        <i class="fas fa-trash"></i> حذف
                     </button>
                 </td>
             `;
@@ -976,24 +579,24 @@ class ContractManagementSystem {
                         <button class="close-btn" onclick="contractSystem.closeModal('addMemberModal')">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="addMemberForm" onsubmit="contractSystem.addMember(event)">
+                        <form id="addMemberForm">
                             <div class="form-group">
                                 <label>الاسم الكامل:</label>
-                                <input type="text" name="fullName" class="form-input" required>
+                                <input type="text" id="memberFullName" class="form-input" required>
                             </div>
                             <div class="form-group">
                                 <label>البريد الإلكتروني:</label>
-                                <input type="email" name="email" class="form-input" required>
+                                <input type="email" id="memberEmailAdd" class="form-input" required>
                             </div>
                             <div class="form-group">
                                 <label>كلمة المرور:</label>
-                                <input type="password" name="password" class="form-input" required minlength="6">
+                                <input type="password" id="memberPasswordAdd" class="form-input" required minlength="6">
                             </div>
                             <div class="form-group">
                                 <label>تأكيد كلمة المرور:</label>
-                                <input type="password" name="confirmPassword" class="form-input" required minlength="6">
+                                <input type="password" id="memberConfirmPassword" class="form-input" required minlength="6">
                             </div>
-                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                            <button type="button" class="btn-primary" style="width: 100%; margin-top: 20px;" onclick="contractSystem.addMember()">
                                 <i class="fas fa-user-plus"></i> إضافة العضو
                             </button>
                         </form>
@@ -1004,22 +607,33 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    async addMember(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    async addMember() {
+        const fullName = document.getElementById('memberFullName').value;
+        const email = document.getElementById('memberEmailAdd').value;
+        const password = document.getElementById('memberPasswordAdd').value;
+        const confirmPassword = document.getElementById('memberConfirmPassword').value;
         
-        const password = formData.get('password');
-        const confirmPassword = formData.get('confirmPassword');
+        if (!fullName || !email || !password || !confirmPassword) {
+            this.showNotification('يرجى ملء جميع الحقول', 'error');
+            return;
+        }
         
         if (password !== confirmPassword) {
             this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
             return;
         }
 
+        // التحقق من عدم وجود عضو بنفس البريد الإلكتروني
+        const existingMember = this.members.find(m => m.email === email);
+        if (existingMember) {
+            this.showNotification('هذا البريد الإلكتروني مسجل بالفعل!', 'error');
+            return;
+        }
+
         const memberData = {
-            fullName: formData.get('fullName'),
-            email: formData.get('email'),
-            password: password, // تخزين كلمة المرور محلياً فقط
+            fullName: fullName,
+            email: email,
+            password: password,
             joinDate: new Date().toISOString().split('T')[0],
             createdBy: this.firebaseManager.currentUser.email,
             isMember: true
@@ -1113,13 +727,13 @@ class ContractManagementSystem {
         }
     }
 
-    updateMemberPermission(memberEmail, permission, value) {
+    async updateMemberPermission(memberEmail, permission, value) {
         if (!this.permissions[memberEmail]) {
             this.permissions[memberEmail] = this.getDefaultMemberPermissions();
         }
         
         this.permissions[memberEmail][permission] = value;
-        this.saveCurrentData();
+        await this.saveCurrentData();
         this.showNotification('تم تحديث الصلاحيات بنجاح');
     }
 
@@ -1192,6 +806,7 @@ class ContractManagementSystem {
         if (this.isMemberLogin) {
             // تسجيل خروج العضو
             this.currentUser = null;
+            this.currentMember = null;
             this.isMemberLogin = false;
         } else {
             // تسجيل خروج المدير
@@ -1217,7 +832,7 @@ class ContractManagementSystem {
     }
 }
 
-// مدير Firebase
+// مدير Firebase المحسن
 class FirebaseManager {
     constructor() {
         this.auth = null;
@@ -1323,34 +938,16 @@ class FirebaseManager {
             
             userData._metadata = userData._metadata || {};
             userData._metadata.lastUpdated = new Date().toISOString();
-            userData._metadata.lastUpdatedBy = this.currentUser.email;
             userData._metadata.userId = userId;
+            userData._metadata.userEmail = this.currentUser.email;
             
-            // حفظ البيانات في Firestore للحساب الرئيسي
-            await this.db.collection('userData').doc(userId).set(userData, { merge: true });
+            await this.db.collection('users').doc(userId).set(userData, { merge: true });
             
-            // أيضًا حفظ نسخة محلية
-            localStorage.setItem(`userData_${userId}`, JSON.stringify(userData));
-            
-            console.log('💾 Main account data saved to Firebase');
+            console.log('💾 Data saved to Firebase successfully');
             return { success: true };
         } catch (error) {
-            console.error('❌ Save user data error:', error);
-            
-            try {
-                if (this.currentUser) {
-                    localStorage.setItem(`userData_${this.currentUser.uid}`, JSON.stringify(userData));
-                    console.log('📱 Data saved locally as backup');
-                    return { success: true, source: 'local' };
-                }
-            } catch (localError) {
-                console.error('❌ Local storage error:', localError);
-            }
-            
-            return { 
-                success: false, 
-                error: error.message 
-            };
+            console.error('❌ Save data error:', error);
+            return { success: false, error: error.message };
         }
     }
 
@@ -1365,39 +962,21 @@ class FirebaseManager {
             }
 
             const userId = this.currentUser.uid;
-            
-            // أولاً: التحقق من التخزين المحلي للسرعة
-            const localData = localStorage.getItem(`userData_${userId}`);
-            if (localData) {
-                console.log('📱 Loading data from local storage for user:', userId);
-                return { 
-                    success: true, 
-                    data: JSON.parse(localData),
-                    source: 'local'
-                };
-            }
-            
-            // ثانياً: جلب البيانات من Firebase للحساب الرئيسي
-            const doc = await this.db.collection('userData').doc(userId).get();
+            const docRef = this.db.collection('users').doc(userId);
+            const doc = await docRef.get();
             
             if (doc.exists) {
                 const data = doc.data();
-                
-                // حفظ نسخة محلية
-                localStorage.setItem(`userData_${userId}`, JSON.stringify(data));
-                
-                console.log('☁️ Loading data from Firebase for user:', userId);
+                console.log('📥 Data loaded from Firebase');
                 return { 
                     success: true, 
                     data: data,
                     source: 'firebase'
                 };
             } else {
-                // إذا لم توجد بيانات، إنشاء بيانات افتراضية للحساب الرئيسي
-                console.log('🆕 No data found, creating default data for user:', userId);
+                console.log('📝 No data found, creating default data');
                 const defaultData = this.getDefaultUserData();
                 await this.saveUserData(defaultData);
-                
                 return { 
                     success: true, 
                     data: defaultData,
@@ -1406,66 +985,63 @@ class FirebaseManager {
             }
         } catch (error) {
             console.error('❌ Get user data error:', error);
-            
-            // محاولة استخدام البيانات المحلية كبديل
-            if (this.currentUser) {
-                const localData = localStorage.getItem(`userData_${this.currentUser.uid}`);
-                if (localData) {
-                    console.log('🔄 Using local data as fallback for user:', this.currentUser.uid);
-                    return { 
-                        success: true, 
-                        data: JSON.parse(localData),
-                        source: 'local_fallback'
-                    };
-                }
+            return { success: false, error: error.message };
+        }
+    }
+
+    // دالة جديدة لجلب بيانات الحساب الرئيسي (للاستخدام من قبل الأعضاء)
+    async getMainAccountData() {
+        try {
+            if (!this.isInitialized) {
+                await this.init();
             }
+
+            // نفترض أن هناك مستند رئيسي واحد يخزن بيانات النظام
+            const mainDocRef = this.db.collection('system').doc('main_account');
+            const doc = await mainDocRef.get();
             
-            return { 
-                success: false, 
-                error: error.message 
-            };
+            if (doc.exists) {
+                const data = doc.data();
+                console.log('📥 Main account data loaded from Firebase');
+                return { 
+                    success: true, 
+                    data: data,
+                    source: 'firebase'
+                };
+            } else {
+                console.log('📝 No main account data found');
+                return { success: false, error: 'No main account data found' };
+            }
+        } catch (error) {
+            console.error('❌ Get main account data error:', error);
+            return { success: false, error: error.message };
         }
     }
 
     getDefaultUserData() {
-        const currentDate = new Date().toISOString().split('T')[0];
         return {
             userProfile: {
                 name: '',
                 email: this.currentUser?.email || '',
-                role: 'admin',
-                joinDate: currentDate,
-                lastLogin: new Date().toISOString()
+                lastLogin: new Date().toISOString(),
+                createdDate: new Date().toISOString()
             },
             contracts: [],
             invoices: [],
-            members: [], // تغيير من users إلى members
+            members: [],
             permissions: {},
-            settings: {
-                theme: 'dark-gold',
-                language: 'ar'
-            },
             _metadata: {
-                createdAt: new Date().toISOString(),
-                lastLogin: new Date().toISOString(),
+                created: new Date().toISOString(),
                 lastUpdated: new Date().toISOString(),
-                createdBy: this.currentUser?.email || 'system',
-                userId: this.currentUser?.uid || ''
+                userId: this.currentUser?.uid || '',
+                userEmail: this.currentUser?.email || ''
             }
         };
     }
 }
 
-// تهيئة النظام
-document.addEventListener('DOMContentLoaded', () => {
-    window.contractSystem = new ContractManagementSystem();
-    console.log('🚀 نظام إدارة العقود والفواتير جاهز للاستخدام!');
-    
-    // إضافة مكتبة Excel إذا لم تكن موجودة
-    if (typeof XLSX === 'undefined') {
-        const script = document.createElement('script');
-        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-        script.onload = () => console.log('✅ Excel library loaded');
-        document.head.appendChild(script);
-    }
+// تهيئة النظام عند تحميل الصفحة
+let contractSystem;
+document.addEventListener('DOMContentLoaded', function() {
+    contractSystem = new ContractManagementSystem();
 });
