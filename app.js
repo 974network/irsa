@@ -297,7 +297,7 @@ class DataManagementSystem {
     }
 exportRealExcel() {
     const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-    const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+    const EXCEL_URL = `https://docs.google.com/spreadsheets/d/1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww/export?format=xlsx`;
     window.open(EXCEL_URL, "_blank");
     this.showNotification('جاري تحميل الملف الأصلي من Google Sheets...');
 }
@@ -1335,6 +1335,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
