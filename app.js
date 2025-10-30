@@ -840,22 +840,42 @@ class DataManagementSystem {
 
 // ===== نظام التكامل مع Excel & Google Sheets =====
 class ExcelIntegration {
-    static async fetchLiveGoogleSheetData(sheetId, sheetName = "Sheet1") {
+    static async exportToXLSX(data) {
     try {
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+        // -------- إعداد Google Sheet --------
+        const sheetId = "1dtxlQthn2b2prfXOxdEn28r5hHfGZB"; // ID الجدول
+        const sheetName = "New Rents"; // اسم الورقة بالضبط مثل ما يظهر أسفل الجدول في Google Sheets
+
+        // -------- جلب البيانات الفعلية من Google Sheet --------
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
         const response = await fetch(url);
-        const csvText = await response.text();
-        const rows = csvText
-            .split('\n')
-            .map(row => row.split(',').map(cell => cell.trim()))
-            .filter(r => r.some(c => c !== '')); // تجاهل الصفوف الفارغة
-        console.log(`✅ تم جلب ${rows.length} صف من Google Sheets`);
-        return rows;
+        const csv = await response.text();
+
+        // تحويل CSV إلى صفوف Excel
+        const rows = csv.split("\n").map(row => row.split(","));
+
+        if (rows.length <= 1) {
+            alert("⚠️ لم يتم العثور على بيانات فعلية داخل Google Sheet المحدد.");
+            return { success: false, error: "No data found" };
+        }
+
+        // -------- إنشاء ملف Excel فعلي من Google Sheet --------
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
+
+        const fileName = `البيانات_${new Date().toISOString().split("T")[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+
+        console.log(`✅ تم تصدير ${rows.length - 1} صف من Google Sheets`);
+        return { success: true, fileName };
     } catch (error) {
-        console.error("❌ خطأ في قراءة Google Sheet:", error);
-        return [["خطأ", error.message]];
+        console.error("❌ خطأ أثناء تصدير Google Sheet:", error);
+        alert("حدث خطأ أثناء جلب البيانات من Google Sheets: " + error.message);
+        return { success: false, error: error.message };
     }
 }
+
 
 
     static async connectToMicrosoftExcel(data) {
@@ -1368,6 +1388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
