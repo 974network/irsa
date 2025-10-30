@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة البيانات - IRSA</title>
+    <title>IRSA - نظام إدارة العقود والفواتير</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Firebase -->
@@ -14,490 +14,318 @@
     <!-- مكتبة Excel -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
-        :root {
-            --primary-color: #667eea;
-            --secondary-color: #764ba2;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --warning-color: #ffc107;
-            --info-color: #17a2b8;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-        }
-
-        /* تصميم تسجيل الدخول الجديد */
-        .new-login-container {
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-        }
-
-        .new-login-box {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-        }
-
-        .new-logo {
-            width: 120px;
-            height: 120px;
-            margin: 0 auto 20px;
-            background: #f8f9fa;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            color: var(--primary-color);
-        }
-
-        .new-login-title {
-            color: #333;
-            margin-bottom: 30px;
-            font-size: 24px;
-            font-weight: 600;
-        }
-
-        .new-form-group {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-
-        .new-form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 500;
-        }
-
-        .new-form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #e1e5e9;
-            border-radius: 10px;
-            font-size: 16px;
-            transition: all 0.3s ease;
-        }
-
-        .new-form-input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .new-login-btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .new-login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
-        }
-
-        .new-signup-link {
-            margin-top: 20px;
-            color: #666;
-        }
-
-        .new-signup-link a {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        /* تصميم اللوحة الجديدة */
-        .new-dashboard {
-            background: #f8f9fa;
-            min-height: 100vh;
-        }
-
-        .new-header {
-            background: white;
-            padding: 15px 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .new-header-logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 20px;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .new-user-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-
-        .new-user-info {
-            text-align: right;
-        }
-
-        .new-user-name {
-            font-weight: 600;
-            color: #333;
-        }
-
-        .new-user-email {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .new-logout-btn {
-            background: var(--danger-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .new-main-content {
-            padding: 40px;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .new-welcome-card {
-            background: white;
-            padding: 40px;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .new-welcome-card h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .new-welcome-card p {
-            color: #666;
-            font-size: 18px;
-        }
-
-        .new-features-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-top: 30px;
-        }
-
-        .new-feature-card {
-            background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s ease;
-        }
-
-        .new-feature-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .new-feature-icon {
-            font-size: 40px;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        .new-feature-card h3 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-
-        .new-feature-card p {
-            color: #666;
-            margin-bottom: 20px;
-        }
-
-        /* تصميم المودال */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 20px;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 15px;
-            width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
-        }
-
-        .modal-header {
-            padding: 20px;
-            border-bottom: 1px solid #eee;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-header h3 {
-            color: #333;
-            font-size: 20px;
-        }
-
-        .close-btn {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #666;
-        }
-
-        /* الإشعارات */
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 15px 20px;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1001;
-            max-width: 400px;
-        }
-
-        .notification-success {
-            border-right: 4px solid var(--success-color);
-        }
-
-        .notification-error {
-            border-right: 4px solid var(--danger-color);
-        }
-
-        .notification-info {
-            border-right: 4px solid var(--info-color);
-        }
-
-        .notification-content {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-        }
-
-        .notification-close {
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #666;
-        }
-
-        /* تصميم الجداول */
-        .data-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: white;
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
-
-        .data-table th,
-        .data-table td {
-            padding: 12px 15px;
-            text-align: right;
-            border-bottom: 1px solid #eee;
-        }
-
-        .data-table th {
-            background: #f8f9fa;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .data-table tr:hover {
-            background: #f8f9fa;
-        }
-
-        /* تصميم الاستجابة للجوال */
-        @media (max-width: 768px) {
-            .new-login-box {
-                padding: 30px 20px;
-            }
-            
-            .new-main-content {
-                padding: 20px;
-            }
-            
-            .new-features-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .new-header {
-                padding: 15px 20px;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .new-user-menu {
-                width: 100%;
-                justify-content: space-between;
-            }
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- شاشة تسجيل الدخول الجديدة -->
-    <div id="loginPage" class="new-login-container">
-        <div class="new-login-box">
-            <div class="new-logo">
-                <i class="fas fa-file-excel"></i>
+    <!-- شاشة تسجيل الدخول -->
+    <div id="loginPage" class="login-container">
+        <div class="login-box">
+            <div class="company-logo">
+                <i class="fas fa-file-contract"></i>
+                <div class="company-name">IRSA<br><span>Trading & Contracting</span></div>
             </div>
-            <h1 class="new-login-title">نظام إدارة البيانات</h1>
+            
+            <h1 class="login-title">تسجيل الدخول</h1>
             
             <form id="loginForm">
-                <div class="new-form-group">
-                    <label for="email"><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-                    <input type="email" id="email" class="new-form-input" placeholder="أدخل بريدك الإلكتروني" required>
+                <div class="form-group">
+                    <label for="email"><i class="fas fa-envelope"></i> بريد الكتروني</label>
+                    <input type="email" id="email" class="form-input" placeholder="أدخل بريدك الإلكتروني" required>
                 </div>
                 
-                <div class="new-form-group">
-                    <label for="password"><i class="fas fa-lock"></i> كلمة المرور</label>
-                    <input type="password" id="password" class="new-form-input" placeholder="أدخل كلمة المرور" required>
+                <div class="form-group">
+                    <label for="password"><i class="fas fa-lock"></i> كلمة السر</label>
+                    <input type="password" id="password" class="form-input" placeholder="أدخل كلمة السر" required>
                 </div>
                 
-                <button type="submit" class="new-login-btn">
-                    <i class="fas fa-sign-in-alt"></i> تسجيل الدخول
+                <button type="submit" class="login-btn">
+                    <i class="fas fa-sign-in-alt"></i> تسجيل دخول مستخدم
                 </button>
             </form>
             
-            <div class="new-signup-link">
-                ليس لديك حساب؟ <a href="#" onclick="dataSystem.showSignupModal()">إنشاء حساب جديد</a>
+            <div class="signup-link">
+                ليس لديك حساب؟ <a href="#" onclick="contractSystem.showSignupModal()">إنشاء حساب جديد</a>
             </div>
         </div>
     </div>
 
-    <!-- لوحة التحكم الجديدة -->
-    <div id="dashboard" class="new-dashboard" style="display: none;">
-        <div class="new-header">
-            <div class="new-header-logo">
-                <i class="fas fa-file-excel"></i>
-                <span>نظام إدارة البيانات</span>
-            </div>
-            <div class="new-user-menu">
-                <div class="new-user-info">
-                    <div class="new-user-name" id="userDisplayName">مستخدم</div>
-                    <div class="new-user-email" id="userDisplayEmail">user@example.com</div>
+    <!-- لوحة التحكم -->
+    <div id="dashboard" class="dashboard" style="display: none;">
+        <!-- الشريط الجانبي -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="company-logo">
+                    <i class="fas fa-file-contract"></i>
+                    <div class="company-name">IRSA</div>
                 </div>
-                <button class="new-logout-btn" onclick="dataSystem.logout()">
-                    <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-                </button>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" onclick="contractSystem.showSection('dashboard')">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </a>
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('contracts')">
+                    <i class="fas fa-file-contract"></i>
+                    <span>العقود</span>
+                </a>
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('invoices')">
+                    <i class="fas fa-receipt"></i>
+                    <span>الفواتير</span>
+                </a>
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('users')" id="usersNav" style="display: none;">
+                    <i class="fas fa-users"></i>
+                    <span>إدارة المستخدمين</span>
+                </a>
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('settings')">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="user-menu">
+                    <div class="user-avatar" onclick="contractSystem.toggleUserMenu()">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <div class="user-name" id="userDisplayName">مستخدم</div>
+                        <div class="user-email" id="userDisplayEmail">user@example.com</div>
+                    </div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <a href="#" onclick="contractSystem.showSection('profile')"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
+                        <a href="#" onclick="contractSystem.logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <div class="new-main-content">
-            <div class="new-welcome-card">
-                <h1>مرحباً بك في نظام إدارة البيانات</h1>
-                <p>من هنا يمكنك سحب البيانات وتصديرها بصيغة Excel</p>
+        <!-- المحتوى الرئيسي -->
+        <div class="main-content">
+            <!-- شاشة الرئيسية -->
+            <div id="dashboardSection" class="content-section active">
+                <div class="content-header">
+                    <h1>مرحباً بك في نظام إدارة العقود والفواتير</h1>
+                    <p>من هنا يمكنك إدارة العقود والفواتير بسهولة</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-file-contract"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="contractsCount">0</h3>
+                            <p>إجمالي العقود</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="invoicesCount">0</h3>
+                            <p>إجمالي الفواتير</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3 id="usersCount">0</h3>
+                            <p>المستخدمين</p>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-info">
+                            <h3>نشط</h3>
+                            <p>حالة النظام</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quick-actions">
+                    <h2>الإجراءات السريعة</h2>
+                    <div class="actions-grid">
+                        <button class="action-btn" onclick="contractSystem.showSection('contracts')">
+                            <i class="fas fa-plus"></i>
+                            <span>إضافة عقد جديد</span>
+                        </button>
+                        <button class="action-btn" onclick="contractSystem.showSection('invoices')">
+                            <i class="fas fa-plus"></i>
+                            <span>إضافة فاتورة جديدة</span>
+                        </button>
+                        <button class="action-btn" onclick="contractSystem.exportData()">
+                            <i class="fas fa-download"></i>
+                            <span>تصدير البيانات</span>
+                        </button>
+                        <button class="action-btn" onclick="contractSystem.showSection('users')" id="manageUsersBtn" style="display: none;">
+                            <i class="fas fa-user-plus"></i>
+                            <span>إدارة المستخدمين</span>
+                        </button>
+                    </div>
+                </div>
             </div>
 
-            <div class="new-features-grid">
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-download"></i>
+            <!-- شاشة العقود -->
+            <div id="contractsSection" class="content-section">
+                <div class="content-header">
+                    <h1>إدارة العقود</h1>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="contractSystem.showAddContractModal()">
+                            <i class="fas fa-plus"></i> إضافة عقد جديد
+                        </button>
                     </div>
-                    <h3>سحب البيانات</h3>
-                    <p>استخرج بياناتك وحفظها بصيغة Excel</p>
-                    <button class="new-login-btn" onclick="dataSystem.exportRealExcel()" style="margin-top: 15px;">
-                        تصدير إلى Excel
-                    </button>
                 </div>
 
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-upload"></i>
-                    </div>
-                    <h3>رفع البيانات</h3>
-                    <p>رفع ملفات Excel لمعالجتها</p>
-                    <button class="new-login-btn" onclick="dataSystem.importFromExcel()" style="margin-top: 15px;">
-                        استيراد من Excel
-                    </button>
+                <div class="filters">
+                    <input type="text" id="contractSearch" class="search-input" placeholder="بحث في العقود...">
+                    <select id="contractStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="active">نشط</option>
+                        <option value="pending">قيد الانتظار</option>
+                        <option value="completed">مكتمل</option>
+                        <option value="cancelled">ملغى</option>
+                    </select>
                 </div>
 
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-cogs"></i>
-                    </div>
-                    <h3>إعدادات الحساب</h3>
-                    <p>إدارة حسابك وتفضيلاتك</p>
-                    <button class="new-login-btn" onclick="dataSystem.showSettings()" style="margin-top: 15px;">
-                        الإعدادات
-                    </button>
+                <div class="table-container">
+                    <table class="data-table" id="contractsTable">
+                        <thead>
+                            <tr>
+                                <th>رقم العقد</th>
+                                <th>العميل</th>
+                                <th>القيمة</th>
+                                <th>تاريخ البدء</th>
+                                <th>تاريخ الانتهاء</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contractsTableBody">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
-            <!-- قسم عرض البيانات -->
-            <div id="dataSection" style="display: none; margin-top: 40px;">
-                <div class="new-welcome-card">
-                    <h2>البيانات المستوردة</h2>
-                    <div class="table-container">
-                        <table class="data-table" id="importedDataTable">
-                            <thead>
-                                <tr>
-                                    <th>#</th>
-                                    <th>البيانات</th>
-                                </tr>
-                            </thead>
-                            <tbody id="dataTableBody">
-                                <!-- سيتم ملؤها ديناميكياً -->
-                            </tbody>
-                        </table>
+            <!-- شاشة الفواتير -->
+            <div id="invoicesSection" class="content-section">
+                <div class="content-header">
+                    <h1>إدارة الفواتير</h1>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="contractSystem.showAddInvoiceModal()">
+                            <i class="fas fa-plus"></i> إضافة فاتورة جديدة
+                        </button>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <input type="text" id="invoiceSearch" class="search-input" placeholder="بحث في الفواتير...">
+                    <select id="invoiceStatusFilter" class="filter-select">
+                        <option value="">جميع الحالات</option>
+                        <option value="paid">مدفوعة</option>
+                        <option value="pending">قيد الانتظار</option>
+                        <option value="overdue">متأخرة</option>
+                    </select>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="invoicesTable">
+                        <thead>
+                            <tr>
+                                <th>رقم الفاتورة</th>
+                                <th>العميل</th>
+                                <th>المبلغ</th>
+                                <th>تاريخ الاصدار</th>
+                                <th>تاريخ الاستحقاق</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="invoicesTableBody">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- شاشة إدارة المستخدمين -->
+            <div id="usersSection" class="content-section">
+                <div class="content-header">
+                    <h1>إدارة المستخدمين</h1>
+                    <div class="header-actions">
+                        <button class="btn-primary" onclick="contractSystem.showAddUserModal()">
+                            <i class="fas fa-user-plus"></i> إضافة مستخدم جديد
+                        </button>
+                    </div>
+                </div>
+
+                <div class="table-container">
+                    <table class="data-table" id="usersTable">
+                        <thead>
+                            <tr>
+                                <th>الاسم</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الدور</th>
+                                <th>تاريخ الإنشاء</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- شاشة الإعدادات -->
+            <div id="settingsSection" class="content-section">
+                <div class="content-header">
+                    <h1>الإعدادات</h1>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3><i class="fas fa-user-shield"></i> إدارة الصلاحيات</h3>
+                        <div class="permissions-list" id="permissionsList">
+                            <!-- سيتم ملؤها ديناميكياً -->
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3><i class="fas fa-bell"></i> الإشعارات</h3>
+                        <div class="setting-option">
+                            <label>
+                                <input type="checkbox" id="emailNotifications" checked>
+                                إشعارات البريد الإلكتروني
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3><i class="fas fa-palette"></i> المظهر</h3>
+                        <div class="theme-options">
+                            <button class="theme-btn active" data-theme="dark-gold">أسود وذهبي</button>
+                            <button class="theme-btn" data-theme="light">فاتح</button>
+                            <button class="theme-btn" data-theme="dark">داكن</button>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- المودالات -->
+    <div id="modalContainer"></div>
+
+    <!-- الإشعارات -->
+    <div id="notificationContainer"></div>
 
     <!-- رابط ملف JavaScript -->
     <script src="app.js"></script>
