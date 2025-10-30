@@ -10,9 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
-    
-    <!-- مكتبة Excel -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -39,12 +36,15 @@
                 </div>
                 
                 <button type="submit" class="login-btn">
-                    <i class="fas fa-sign-in-alt"></i> تسجيل دخول مستخدم
+                    <i class="fas fa-sign-in-alt"></i> تسجيل دخول
                 </button>
             </form>
             
-            <div class="signup-link">
-                ليس لديك حساب؟ <a href="#" onclick="contractSystem.showSignupModal()">إنشاء حساب جديد</a>
+            <!-- زر تسجيل دخول مستخدم -->
+            <div class="user-login-link">
+                <button type="button" class="user-login-btn" onclick="contractSystem.showUserLoginModal()">
+                    <i class="fas fa-user"></i> تسجيل دخول مستخدم
+                </button>
             </div>
         </div>
     </div>
@@ -65,11 +65,11 @@
                     <i class="fas fa-home"></i>
                     <span>الرئيسية</span>
                 </a>
-                <a href="#" class="nav-item" onclick="contractSystem.showSection('contracts')">
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('contracts')" id="contractsNav">
                     <i class="fas fa-file-contract"></i>
                     <span>العقود</span>
                 </a>
-                <a href="#" class="nav-item" onclick="contractSystem.showSection('invoices')">
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('invoices')" id="invoicesNav">
                     <i class="fas fa-receipt"></i>
                     <span>الفواتير</span>
                 </a>
@@ -77,7 +77,7 @@
                     <i class="fas fa-users"></i>
                     <span>إدارة المستخدمين</span>
                 </a>
-                <a href="#" class="nav-item" onclick="contractSystem.showSection('settings')">
+                <a href="#" class="nav-item" onclick="contractSystem.showSection('settings')" id="settingsNav">
                     <i class="fas fa-cog"></i>
                     <span>الإعدادات</span>
                 </a>
@@ -93,7 +93,7 @@
                         <div class="user-email" id="userDisplayEmail">user@example.com</div>
                     </div>
                     <div class="user-dropdown" id="userDropdown">
-                        <a href="#" onclick="contractSystem.showSection('profile')"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
+                        <a href="#" onclick="contractSystem.showProfileSection()"><i class="fas fa-user-cog"></i> الملف الشخصي</a>
                         <a href="#" onclick="contractSystem.logout()"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</a>
                     </div>
                 </div>
@@ -151,11 +151,11 @@
                 <div class="quick-actions">
                     <h2>الإجراءات السريعة</h2>
                     <div class="actions-grid">
-                        <button class="action-btn" onclick="contractSystem.showSection('contracts')">
+                        <button class="action-btn" onclick="contractSystem.showSection('contracts')" id="addContractBtn">
                             <i class="fas fa-plus"></i>
                             <span>إضافة عقد جديد</span>
                         </button>
-                        <button class="action-btn" onclick="contractSystem.showSection('invoices')">
+                        <button class="action-btn" onclick="contractSystem.showSection('invoices')" id="addInvoiceBtn">
                             <i class="fas fa-plus"></i>
                             <span>إضافة فاتورة جديدة</span>
                         </button>
@@ -176,21 +176,10 @@
                 <div class="content-header">
                     <h1>إدارة العقود</h1>
                     <div class="header-actions">
-                        <button class="btn-primary" onclick="contractSystem.showAddContractModal()">
+                        <button class="btn-primary" onclick="contractSystem.showAddContractModal()" id="addContractHeaderBtn">
                             <i class="fas fa-plus"></i> إضافة عقد جديد
                         </button>
                     </div>
-                </div>
-
-                <div class="filters">
-                    <input type="text" id="contractSearch" class="search-input" placeholder="بحث في العقود...">
-                    <select id="contractStatusFilter" class="filter-select">
-                        <option value="">جميع الحالات</option>
-                        <option value="active">نشط</option>
-                        <option value="pending">قيد الانتظار</option>
-                        <option value="completed">مكتمل</option>
-                        <option value="cancelled">ملغى</option>
-                    </select>
                 </div>
 
                 <div class="table-container">
@@ -218,20 +207,10 @@
                 <div class="content-header">
                     <h1>إدارة الفواتير</h1>
                     <div class="header-actions">
-                        <button class="btn-primary" onclick="contractSystem.showAddInvoiceModal()">
+                        <button class="btn-primary" onclick="contractSystem.showAddInvoiceModal()" id="addInvoiceHeaderBtn">
                             <i class="fas fa-plus"></i> إضافة فاتورة جديدة
                         </button>
                     </div>
-                </div>
-
-                <div class="filters">
-                    <input type="text" id="invoiceSearch" class="search-input" placeholder="بحث في الفواتير...">
-                    <select id="invoiceStatusFilter" class="filter-select">
-                        <option value="">جميع الحالات</option>
-                        <option value="paid">مدفوعة</option>
-                        <option value="pending">قيد الانتظار</option>
-                        <option value="overdue">متأخرة</option>
-                    </select>
                 </div>
 
                 <div class="table-container">
@@ -295,25 +274,6 @@
                         <h3><i class="fas fa-user-shield"></i> إدارة الصلاحيات</h3>
                         <div class="permissions-list" id="permissionsList">
                             <!-- سيتم ملؤها ديناميكياً -->
-                        </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <h3><i class="fas fa-bell"></i> الإشعارات</h3>
-                        <div class="setting-option">
-                            <label>
-                                <input type="checkbox" id="emailNotifications" checked>
-                                إشعارات البريد الإلكتروني
-                            </label>
-                        </div>
-                    </div>
-                    
-                    <div class="setting-card">
-                        <h3><i class="fas fa-palette"></i> المظهر</h3>
-                        <div class="theme-options">
-                            <button class="theme-btn active" data-theme="dark-gold">أسود وذهبي</button>
-                            <button class="theme-btn" data-theme="light">فاتح</button>
-                            <button class="theme-btn" data-theme="dark">داكن</button>
                         </div>
                     </div>
                 </div>
