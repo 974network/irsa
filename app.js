@@ -839,122 +839,74 @@ class DataManagementSystem {
 // ===== نظام التكامل مع Excel =====
 
 // ===== نظام التكامل مع Excel & Google Sheets =====
+// ===== نظام التكامل الجديد مع Google Sheets & Excel Online =====
 class ExcelIntegration {
-    static async exportToXLSX(data) {
-    try {
-        // -------- إعداد Google Sheet --------
-        const sheetId = "1dtxlQthn2b2prfXOxdEn28r5hHfGZB"; // ID الجدول
-        const sheetName = "New Rents"; // اسم الورقة بالضبط مثل ما يظهر أسفل الجدول في Google Sheets
+    // === إعداد: ضع هنا معرف Google Sheet الخاص بك ===
+    static SHEET_ID = "1dtXLQhtnb2h2prRXOxdEn28r5hFIFGZB"; // مثال: "1a2b3c4d5e6f7g8h9i0j"
+    static SHEET_NAME = "VILLA 11.xlsx"; // اسم الورقة بالضبط كما يظهر في Google Sheets
+    static SCRIPT_URL = "https://script.google.com/macros/s/PUT_YOUR_DEPLOYMENT_ID/exec"; // رابط Web App المنشور من Google Apps Script
 
-        // -------- جلب البيانات الفعلية من Google Sheet --------
-        const url = `https://script.google.com/macros/s/AKfycbxM9uh0czTbOq06i1jYuuC0jnsZVgb7FX8_Zri3cG2jXF4wvQVxAlKkfsKlYomKGzioQg/exec`;
-        const response = await fetch(url);
-        const csv = await response.text();
-
-        // تحويل CSV إلى صفوف Excel
-        const rows = csv.split("\n").map(row => row.split(","));
-
-        if (rows.length <= 1) {
-            alert("⚠️ لم يتم العثور على بيانات فعلية داخل Google Sheet المحدد.");
-            return { success: false, error: "No data found" };
-        }
-
-        // -------- إنشاء ملف Excel فعلي من Google Sheet --------
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.aoa_to_sheet(rows);
-        XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
-
-        const fileName = `البيانات_${new Date().toISOString().split("T")[0]}.xlsx`;
-        XLSX.writeFile(workbook, fileName);
-
-        console.log(`✅ تم تصدير ${rows.length - 1} صف من Google Sheets`);
-        return { success: true, fileName };
-    } catch (error) {
-        console.error("❌ خطأ أثناء تصدير Google Sheet:", error);
-        alert("حدث خطأ أثناء جلب البيانات من Google Sheets: " + error.message);
-        return { success: false, error: error.message };
-    }
-}
-
-
-
-    static async connectToMicrosoftExcel(data) {
-        // محاكاة الاتصال مع Microsoft Excel Online
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    success: true,
-                    message: 'تم الربط مع Microsoft Excel Online بنجاح',
-                    url: 'https://excel.office.com'
-                });
-            }, 1500);
-        });
-    }
-
-    static async connectToGoogleSheets(data) {
-        // محاكاة بسيطة (يمكن حذفها إذا استخدمت syncWithGoogleSheet مباشرة)
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    success: true,
-                    message: 'تم الربط مع Google Sheets بنجاح',
-                    url: 'https://sheets.google.com'
-                });
-            }, 1000);
-        });
-    }
-
-    // ===== دالة المزامنة مع Google Sheets =====
-    static async syncWithGoogleSheet(sheetId, sheetName = "Sheet1", data = []) {
+    // === جلب آخر نسخة من Google Sheets وتحويلها إلى Excel ===
+    static async exportToXLSX() {
         try {
-            // تحويل البيانات إلى CSV
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
-            const csv = XLSX.utils.sheet_to_csv(worksheet);
+            const response = await fetch(this.SCRIPT_URL);
+            const csv = await response.text();
+            const rows = csv.split("\n").map(row => row.split(","));
 
-            // عنوان تطبيق Apps Script (تضعه من النشر)
-            const url = "https://script.google.com/macros/s/AKfycbwNlFvEMbK-vf0IXAEoX8ITtuVs6tYweRZvW0RyO1ddus41XpjIVyxmgoCowmbWiU6yCA/exec";
+            if (rows.length <= 1) {
+                alert("⚠️ لم يتم العثور على بيانات في Google Sheet.");
+                return { success: false, error: "No data found" };
+            }
 
-            const response = await fetch(url, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ sheetId, sheetName, csv })
-            });
-
-            const result = await response.json();
-
-            if (result.error) throw new Error(result.error);
-            return { success: true, message: result.message || "تم تحديث Google Sheet بنجاح" };
-        } catch (error) {
-            console.error("❌ خطأ في مزامنة Google Sheet:", error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    // ===== تصدير إلى صيغ متعددة =====
-    static async exportToVariousFormats(data, format = 'xlsx') {
-        const formats = {
-            'xlsx': () => this.exportToXLSX(data),
-            'csv': () => this.exportToCSV(data),
-            'json': () => this.exportToJSON(data)
-        };
-        return formats[format] ? formats[format]() : this.exportToXLSX(data);
-    }
-
-    static exportToXLSX(data) {
-        try {
+            // إنشاء ملف Excel من البيانات المحدثة
             const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
+            const worksheet = XLSX.utils.aoa_to_sheet(rows);
             XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
 
-            const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.xlsx`;
+            const fileName = `البيانات_${new Date().toISOString().split("T")[0]}.xlsx`;
             XLSX.writeFile(workbook, fileName);
 
+            console.log(`✅ تم تصدير ${rows.length - 1} صف من Google Sheets`);
             return { success: true, fileName };
         } catch (error) {
+            console.error("❌ خطأ أثناء تصدير Google Sheet:", error);
+            alert("حدث خطأ أثناء جلب البيانات: " + error.message);
             return { success: false, error: error.message };
         }
     }
 
+    // === جلب البيانات فقط بدون تنزيل الملف (للعرض المباشر في الموقع) ===
+    static async fetchLiveData() {
+        try {
+            const response = await fetch(this.SCRIPT_URL);
+            const csv = await response.text();
+            const rows = csv.split("\n").map(row => row.split(","));
+            return rows;
+        } catch (error) {
+            console.error("❌ خطأ أثناء جلب البيانات المباشرة:", error);
+            return [];
+        }
+    }
+
+    // === تحديث تلقائي كل فترة زمنية (اختياري) ===
+    static startAutoRefresh(intervalMinutes = 5) {
+        this.fetchAndUpdate();
+        setInterval(() => this.fetchAndUpdate(), intervalMinutes * 60 * 1000);
+    }
+
+    static async fetchAndUpdate() {
+        const rows = await this.fetchLiveData();
+        if (rows.length > 1) {
+            console.log(`🔄 تم تحديث البيانات من Google Sheets (${rows.length - 1} صف)`);
+            const dataSystem = window.dataSystem;
+            if (dataSystem) {
+                dataSystem.importedData = rows;
+                dataSystem.displayImportedData(rows);
+            }
+        }
+    }
+
+    // === تصدير إلى صيغ أخرى (CSV / JSON) إن احتجت ===
     static exportToCSV(data) {
         try {
             const worksheet = XLSX.utils.aoa_to_sheet(data);
@@ -987,6 +939,7 @@ class ExcelIntegration {
         }
     }
 
+    // === أداة تنزيل الملفات ===
     static downloadFile(content, fileName, contentType) {
         const blob = new Blob([content], { type: contentType });
         const url = URL.createObjectURL(blob);
@@ -998,6 +951,8 @@ class ExcelIntegration {
         document.body.removeChild(link);
         URL.revokeObjectURL(url);
     }
+}
+
 
     // ===== بيانات نموذجية =====
     static generateSampleData(type = 'customers', count = 10) {
@@ -1388,6 +1343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
