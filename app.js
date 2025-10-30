@@ -661,8 +661,8 @@ class DataManagementSystem {
     async connectToExternalExcel(service = 'microsoft') {
         try {
             const dataToExport = await ExcelIntegration.fetchLiveGoogleSheetData(
-    "1dtxlQthn2b2prfXOxdEn28r5hHfGZB", // ID الجدول
-    "VILLA 11.xlsx" // اسم الورقة عندك
+    "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww", // ID الجدول
+    "VILLA 11" // اسم الورقة عندك
 );
             
             const result = await ExcelIntegration.connectToExcelOnline(dataToExport, service);
@@ -842,9 +842,9 @@ class DataManagementSystem {
 // ===== نظام التكامل الجديد مع Google Sheets & Excel Online =====
 class ExcelIntegration {
     // === إعداد: ضع هنا معرف Google Sheet الخاص بك ===
-    static SHEET_ID = "1dtXLQhtnb2h2prRXOxdEn28r5hFIFGZB"; // مثال: "1a2b3c4d5e6f7g8h9i0j"
-    static SHEET_NAME = "VILLA 11.xlsx"; // اسم الورقة بالضبط كما يظهر في Google Sheets
-    static SCRIPT_URL = "https://script.google.com/macros/s/PUT_YOUR_DEPLOYMENT_ID/exec"; // رابط Web App المنشور من Google Apps Script
+    static SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww"; // مثال: "1a2b3c4d5e6f7g8h9i0j"
+    static SHEET_NAME = "VILLA 11"; // اسم الورقة بالضبط كما يظهر في Google Sheets
+    static SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAcTU57DZm4-fbNsJ7Z1138Y7NXZQVoeGJUr5FWVSUZ6MLhW5tM2cUGuUifKf1l4EDMw/exec"; // رابط Web App المنشور من Google Apps Script
 
     // === جلب آخر نسخة من Google Sheets وتحويلها إلى Excel ===
     static async exportToXLSX() {
@@ -1343,6 +1343,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
