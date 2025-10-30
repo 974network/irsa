@@ -295,89 +295,13 @@ class DataManagementSystem {
             this.showNotification(result.error, 'error');
         }
     }
+    exportToExcel() {
+    const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
+    const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+    window.open(EXCEL_URL, "_blank");
+    this.showNotification('جاري تحميل الملف الأصلي من Google Sheets...');
+}   
 
-    // دالة تصدير إلى Excel - محسنة
-    async exportToExcel() {
-        try {
-            this.showNotification('جاري تصدير البيانات من Google Sheets...', 'info');
-            
-            // محاولة التصدير المباشر من Google Sheets
-            const result = await this.exportDirectFromGoogleSheets();
-            
-            if (result.success) {
-                this.showNotification('تم تصدير البيانات بنجاح!', 'success');
-                
-                // حفظ في سجل التصدير
-                await this.saveExportHistory({
-                    type: 'google_sheets_direct',
-                    fileName: result.fileName,
-                    recordCount: result.recordCount,
-                    date: new Date().toISOString()
-                });
-                
-                return result;
-            } else {
-                // إذا فشل التصدير المباشر، نستخدم البيانات المحلية
-                throw new Error('فشل التصدير المباشر');
-            }
-            
-        } catch (error) {
-            console.error('Direct export failed, trying alternative:', error);
-            
-            // المحاولة الثانية: استخدام البيانات المحلية
-            if (this.importedData && this.importedData.length > 0) {
-                this.exportDataToExcel(this.importedData);
-                this.showNotification('تم تصدير البيانات المحلية بنجاح!', 'success');
-            } else {
-                // المحاولة الثالثة: جلب بيانات جديدة من Google Sheets
-                this.showNotification('جاري جلب البيانات من Google Sheets...', 'info');
-                const data = await ExcelIntegration.fetchLiveData();
-                
-                if (data && data.length > 1) {
-                    this.importedData = data;
-                    this.exportDataToExcel(data);
-                    this.showNotification(`تم تصدير ${data.length - 1} سجل بنجاح!`, 'success');
-                } else {
-                    this.showNotification('❌ لا توجد بيانات متاحة للتصدير', 'error');
-                }
-            }
-        }
-    }
-
-    // التصدير المباشر من Google Sheets
-exportToExcel() {
-  const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-  const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
-  window.open(EXCEL_URL, "_blank");
-  this.showNotification('جاري تحميل الملف...');
-}
-                
-                // فتح الرابط في نافذة جديدة
-                const newWindow = window.open(EXCEL_URL, '_blank');
-                
-                if (newWindow) {
-                    // التحقق من أن النافذة فتحت بنجاح
-                    setTimeout(() => {
-                        if (newWindow.closed || newWindow.document.URL === 'about:blank') {
-                            reject(new Error('فشل في فتح ملف Excel'));
-                        } else {
-                            resolve({
-                                success: true,
-                                fileName: `البيانات_${new Date().toISOString().split('T')[0]}.xlsx`,
-                                recordCount: 'غير معروف',
-                                source: 'google_sheets_direct'
-                            });
-                        }
-                    }, 2000);
-                } else {
-                    reject(new Error('تم منع فتح النافذة المنبثقة. يرجى السماح بالنوافذ المنبثقة لهذا الموقع.'));
-                }
-                
-            } catch (error) {
-                reject(error);
-            }
-        });
-    }
 
     async saveExportHistory(exportInfo) {
         if (!this.userData.exportHistory) {
@@ -1436,3 +1360,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
