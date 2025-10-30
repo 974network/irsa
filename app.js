@@ -345,11 +345,12 @@ class DataManagementSystem {
     }
 
     // التصدير المباشر من Google Sheets
-    async exportDirectFromGoogleSheets() {
-        return new Promise((resolve, reject) => {
-            try {
-                const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-                const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+exportToExcel() {
+  const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
+  const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+  window.open(EXCEL_URL, "_blank");
+  this.showNotification('جاري تحميل الملف...');
+}
                 
                 // فتح الرابط في نافذة جديدة
                 const newWindow = window.open(EXCEL_URL, '_blank');
