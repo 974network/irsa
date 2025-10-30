@@ -120,14 +120,51 @@
     transform: translateY(-2px);
 }
 
-.signup-link {
-    margin-top: 20px;
-    color: #666;
+/* زر تسجيل دخول مستخدم */
+.user-login-link {
+    margin-top: 15px;
 }
 
-.signup-link a {
+.user-login-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
     color: var(--secondary-color);
-    text-decoration: none;
+    border: 2px solid var(--secondary-color);
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.user-login-btn:hover {
+    background: var(--secondary-color);
+    color: var(--primary-color);
+}
+
+/* مؤشر المستخدم المتصل */
+.user-status {
+    display: flex;
+    align-items: center;
+    margin-top: 10px;
+    padding: 8px;
+    background: rgba(255, 215, 0, 0.1);
+    border-radius: 6px;
+    border-right: 3px solid var(--secondary-color);
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    background: var(--success-color);
+    border-radius: 50%;
+    margin-left: 8px;
+}
+
+.status-text {
+    font-size: 12px;
+    color: var(--success-color);
     font-weight: 500;
 }
 
@@ -405,34 +442,6 @@
     font-weight: 500;
 }
 
-/* الفلاتر */
-.filters {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-.search-input {
-    flex: 1;
-    padding: 10px 15px;
-    border: 2px solid #e1e5e9;
-    border-radius: 6px;
-    font-size: 14px;
-}
-
-.filter-select {
-    padding: 10px 15px;
-    border: 2px solid #e1e5e9;
-    border-radius: 6px;
-    background: white;
-    font-size: 14px;
-    min-width: 150px;
-}
-
 /* الجداول */
 .table-container {
     background: white;
@@ -509,47 +518,47 @@
     padding-bottom: 10px;
 }
 
-.setting-option {
-    margin-bottom: 10px;
-}
-
-.setting-option label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-}
-
-.setting-option input {
-    margin-left: 8px;
+/* إدارة الصلاحيات */
+.permissions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+    margin-top: 15px;
 }
 
 .permission-item {
+    background: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.permission-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid #f0f0f0;
+    margin-bottom: 10px;
 }
 
-.theme-options {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.theme-btn {
-    padding: 8px 15px;
-    border: 2px solid #e1e5e9;
-    border-radius: 6px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.theme-btn.active {
-    border-color: var(--secondary-color);
-    background: var(--secondary-color);
+.permission-title {
+    font-weight: 600;
     color: var(--primary-color);
+}
+
+.permission-users {
+    margin-top: 10px;
+}
+
+.user-permission {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.user-permission:last-child {
+    border-bottom: none;
 }
 
 /* المودالات */
@@ -699,6 +708,24 @@
 .status-overdue {
     background: #f8d7da;
     color: #721c24;
+}
+
+/* معلومات الملف الشخصي */
+.profile-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.profile-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid #eee;
+}
+
+.profile-item:last-child {
+    border-bottom: none;
 }
 
 /* التجاوب مع الشاشات الصغيرة */
