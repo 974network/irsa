@@ -660,8 +660,10 @@ class DataManagementSystem {
 
     async connectToExternalExcel(service = 'microsoft') {
         try {
-            const dataToExport = this.importedData.length > 0 ? this.importedData : 
-                ExcelIntegration.generateSampleData('customers', 5);
+            const dataToExport = await ExcelIntegration.fetchLiveGoogleSheetData(
+    "1dtxlQthn2b2prfXOxdEn28r5hHfGZB", // ID الجدول
+    "VILLA 11.xlsx" // اسم الورقة عندك
+);
             
             const result = await ExcelIntegration.connectToExcelOnline(dataToExport, service);
             this.showNotification(result.message);
@@ -838,31 +840,23 @@ class DataManagementSystem {
 
 // ===== نظام التكامل مع Excel & Google Sheets =====
 class ExcelIntegration {
-    static async exportToXLSX(data) {
+    static async fetchLiveGoogleSheetData(sheetId, sheetName = "Sheet1") {
     try {
-        // قبل إنشاء الملف، نجلب أحدث نسخة من Google Sheet
-        const sheetId = "1dtxlQthn2b2prfXOxdEn28r5hHfGZB"; // معرّف الجدول الصحيح
-        const sheetName = "Sheet1";
         const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
-        
         const response = await fetch(url);
         const csvText = await response.text();
-        const rows = csvText.split('\n').map(r => r.split(','));
-
-        const workbook = XLSX.utils.book_new();
-        const worksheet = XLSX.utils.aoa_to_sheet(rows);
-        XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
-
-        const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.xlsx`;
-        XLSX.writeFile(workbook, fileName);
-
-        return { success: true, fileName };
+        const rows = csvText
+            .split('\n')
+            .map(row => row.split(',').map(cell => cell.trim()))
+            .filter(r => r.some(c => c !== '')); // تجاهل الصفوف الفارغة
+        console.log(`✅ تم جلب ${rows.length} صف من Google Sheets`);
+        return rows;
     } catch (error) {
-        console.error("❌ خطأ في التصدير من Google Sheet:", error);
-        return { success: false, error: error.message };
+        console.error("❌ خطأ في قراءة Google Sheet:", error);
+        return [["خطأ", error.message]];
     }
 }
-}
+
 
     static async connectToMicrosoftExcel(data) {
         // محاكاة الاتصال مع Microsoft Excel Online
@@ -1374,6 +1368,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
