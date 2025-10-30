@@ -295,13 +295,24 @@ class DataManagementSystem {
             this.showNotification(result.error, 'error');
         }
     }
-exportRealExcel() {
-    const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-    const EXCEL_URL = `https://docs.google.com/spreadsheets/d/1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww/export?format=xlsx`;
-    window.open(EXCEL_URL, "_blank");
-    this.showNotification('جاري تحميل الملف الأصلي من Google Sheets...');
-}
 
+    // دالة التصدير المباشر من Google Sheets
+    exportRealExcel() {
+        const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
+        const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+        
+        // فتح الرابط في نافذة جديدة لتحميل الملف
+        window.open(EXCEL_URL, "_blank");
+        this.showNotification('جاري تحميل الملف الأصلي من Google Sheets...', 'info');
+        
+        // حفظ في سجل التصدير
+        this.saveExportHistory({
+            type: 'Google Sheets',
+            fileName: 'ملف_Google_Sheets_الأصلي.xlsx',
+            recordCount: 'غير معروف',
+            date: new Date().toISOString()
+        });
+    }
 
     async saveExportHistory(exportInfo) {
         if (!this.userData.exportHistory) {
@@ -1335,7 +1346,3 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
-
-
-
-
