@@ -728,6 +728,32 @@
     border-bottom: none;
 }
 
+/* رسالة المنع */
+.access-denied {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 10px;
+    margin: 20px 0;
+    border: 2px solid var(--danger-color);
+}
+
+.access-denied i {
+    font-size: 64px;
+    color: var(--danger-color);
+    margin-bottom: 20px;
+}
+
+.access-denied h2 {
+    color: var(--danger-color);
+    margin-bottom: 10px;
+}
+
+.access-denied p {
+    color: var(--accent-color);
+    font-size: 16px;
+}
+
 /* التجاوب مع الشاشات الصغيرة */
 @media (max-width: 768px) {
     .sidebar {
