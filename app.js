@@ -297,24 +297,11 @@ class DataManagementSystem {
     }
 
     // دالة تصدير إلى Excel - معدلة للحفظ التلقائي
-    async exportToExcel() {
-        // بيانات مثاليه للتصدير
-        const sampleData = [
-            ['الاسم', 'البريد الإلكتروني', 'الهاتف', 'الدولة', 'التاريخ'],
-            ['أحمد محمد', 'ahmed@example.com', '0512345678', 'السعودية', new Date().toLocaleDateString('ar-SA')],
-            ['فاطمة علي', 'fatima@example.com', '0554321098', 'السعودية', new Date().toLocaleDateString('ar-SA')],
-            ['خالد عبدالله', 'khaled@example.com', '0501234567', 'السعودية', new Date().toLocaleDateString('ar-SA')],
-            ['سارة أحمد', 'sara@example.com', '0543210987', 'السعودية', new Date().toLocaleDateString('ar-SA')]
-        ];
-
-        // إذا كان هناك بيانات مستوردة، نستخدمها
-        const dataToExport = this.importedData.length > 0 ? this.importedData : sampleData;
-        
-        this.exportDataToExcel(dataToExport);
-        
-        // حفظ سجل التصدير
-        await this.saveExportHistory(dataToExport);
-    }
+    exportToExcel() {
+  const SHEET_ID = "1QqqzGL6Axto1p4cvHjtb1Yr0rQRPjWy0SpCtv-ww";
+  const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
+  window.open(EXCEL_URL, "_blank");
+}
 
     async saveExportHistory(data) {
         if (!this.userData.exportHistory) {
@@ -1343,6 +1330,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
