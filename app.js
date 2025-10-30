@@ -846,7 +846,7 @@ class ExcelIntegration {
                 return await this.connectToMicrosoftExcel(data);
             } else if (service === 'google') {
                 // الاتصال مع Google Sheets
-                const sheetId = "ضع_هنا_ID_الجدول"; // مثل: 1aBcD_EfgHijKlmNOPqrStUvWxYZ12345
+                const sheetId = "1dtXLQhtnb2h2prRXOxdEn28r5hFIFGZB"
                 const sheetName = "Sheet1";
                 const result = await this.syncWithGoogleSheet(sheetId, sheetName, data);
                 return result;
@@ -893,7 +893,7 @@ class ExcelIntegration {
             const csv = XLSX.utils.sheet_to_csv(worksheet);
 
             // عنوان تطبيق Apps Script (تضعه من النشر)
-            const url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+            const url = "https://script.google.com/macros/s/AKfycbwNlFvEMbK-vf0IXAEoX8ITtuVs6tYweRZvW0RyO1ddus41XpjIVyxmgoCowmbWiU6yCA/exec";
 
             const response = await fetch(url, {
                 method: "POST",
@@ -1369,4 +1369,5 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
