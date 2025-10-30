@@ -1,12 +1,13 @@
-// النظام الجديد - نظام إدارة البيانات مع Excel (الإصدار النهائي)
-class DataManagementSystem {
+// نظام إدارة العقود والفواتير
+class ContractManagementSystem {
     constructor() {
         this.currentUser = null;
         this.userData = null;
         this.firebaseManager = new FirebaseManager();
-        this.importedData = [];
-        this.autoSaveInterval = null;
-        this.isOnline = true;
+        this.contracts = [];
+        this.invoices = [];
+        this.users = [];
+        this.permissions = {};
         this.init();
     }
 
@@ -14,8 +15,6 @@ class DataManagementSystem {
         try {
             await this.firebaseManager.init();
             this.setupLogin();
-            this.setupAutoSave();
-            this.setupOnlineStatus();
             this.checkAuthStatus();
         } catch (error) {
             console.error('Initialization error:', error);
@@ -30,47 +29,6 @@ class DataManagementSystem {
                 e.preventDefault();
                 await this.handleLogin();
             });
-        }
-    }
-
-    setupAutoSave() {
-        // حفظ تلقائي كل 30 ثانية
-        this.autoSaveInterval = setInterval(() => {
-            if (this.userData && this.firebaseManager.currentUser) {
-                this.autoSave();
-            }
-        }, 30000);
-
-        // حفظ عند إغلاق الصفحة
-        window.addEventListener('beforeunload', () => {
-            if (this.userData && this.firebaseManager.currentUser) {
-                this.saveCurrentData();
-            }
-        });
-    }
-
-    setupOnlineStatus() {
-        // مراقبة حالة الاتصال بالإنترنت
-        window.addEventListener('online', () => {
-            this.isOnline = true;
-            this.showNotification('تم استعادة الاتصال بالإنترنت', 'info');
-            this.syncData(); // مزامنة البيانات عند العودة للاتصال
-        });
-
-        window.addEventListener('offline', () => {
-            this.isOnline = false;
-            this.showNotification('فقدان الاتصال بالإنترنت - العمل في الوضع المحلي', 'warning');
-        });
-    }
-
-    async autoSave() {
-        try {
-            if (this.userData && this.isOnline) {
-                await this.firebaseManager.saveUserData(this.userData);
-                console.log('💾 Auto-saved user data to cloud');
-            }
-        } catch (error) {
-            console.error('Auto-save error:', error);
         }
     }
 
@@ -101,20 +59,16 @@ class DataManagementSystem {
             
             if (result.success) {
                 this.userData = result.data;
-                this.importedData = this.userData.importedData || [];
+                this.contracts = this.userData.contracts || [];
+                this.invoices = this.userData.invoices || [];
+                this.users = this.userData.users || [];
+                this.permissions = this.userData.permissions || {};
                 
                 console.log(`✅ Loaded user data from: ${result.source}`);
                 
                 // تحديث وقت آخر دخول
                 this.userData.userProfile.lastLogin = new Date().toISOString();
                 await this.saveCurrentData();
-                
-                // إذا كانت هناك بيانات مستوردة محفوظة، عرضها
-                if (this.importedData.length > 0) {
-                    setTimeout(() => {
-                        this.displayImportedData(this.importedData);
-                    }, 500);
-                }
                 
                 return true;
             } else {
@@ -134,7 +88,11 @@ class DataManagementSystem {
             }
 
             // تحديث البيانات الحالية
-            this.userData.importedData = this.importedData;
+            this.userData.contracts = this.contracts;
+            this.userData.invoices = this.invoices;
+            this.userData.users = this.users;
+            this.userData.permissions = this.permissions;
+            
             this.userData.userProfile = this.userData.userProfile || {};
             this.userData.userProfile.name = this.userData.userProfile.name || 
                 this.firebaseManager.currentUser.email.split('@')[0];
@@ -144,7 +102,6 @@ class DataManagementSystem {
             // تحديث البيانات الوصفية
             this.userData._metadata = this.userData._metadata || {};
             this.userData._metadata.lastUpdated = new Date().toISOString();
-            this.userData._metadata.device = navigator.userAgent;
 
             const result = await this.firebaseManager.saveUserData(this.userData);
             
@@ -156,14 +113,13 @@ class DataManagementSystem {
             }
         } catch (error) {
             console.error('Save current data error:', error);
-            // لا نعرض إشعار خطأ هنا لتجنب الإزعاج أثناء الحفظ التلقائي
             return false;
         }
     }
 
     showDashboard() {
         document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
+        document.getElementById('dashboard').style.display = 'flex';
         
         // تحديث معلومات المستخدم
         if (this.firebaseManager.currentUser) {
@@ -175,48 +131,598 @@ class DataManagementSystem {
                 this.firebaseManager.currentUser.email;
         }
         
-        this.showNotification('مرحباً بك في نظام إدارة البيانات!');
+        this.showNotification('مرحباً بك في نظام إدارة العقود والفواتير!');
         
-        // إضافة الميزات المتقدمة
-        setTimeout(() => {
-            this.addAdvancedFeatures();
-            this.showDataStats();
-        }, 100);
+        // تحميل البيانات وعرضها
+        this.loadDashboardData();
+        this.updateStats();
+        
+        // إظهار/إخفاء أقسام حسب الصلاحيات
+        this.updatePermissionsUI();
     }
 
-    showDataStats() {
-        const stats = document.createElement('div');
-        stats.className = 'data-stats';
-        stats.innerHTML = `
-            <div style="background: white; padding: 15px; border-radius: 10px; margin: 10px 0; text-align: center;">
-                <h4 style="margin-bottom: 10px;">📊 إحصائيات البيانات</h4>
-                <div style="display: flex; justify-content: space-around; flex-wrap: wrap;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: var(--primary-color);">
-                            ${this.importedData.length > 0 ? this.importedData.length - 1 : 0}
-                        </div>
-                        <div style="font-size: 12px; color: #666;">السجلات</div>
+    loadDashboardData() {
+        this.displayContracts();
+        this.displayInvoices();
+        this.displayUsers();
+    }
+
+    updateStats() {
+        document.getElementById('contractsCount').textContent = this.contracts.length;
+        document.getElementById('invoicesCount').textContent = this.invoices.length;
+        document.getElementById('usersCount').textContent = this.users.length;
+    }
+
+    updatePermissionsUI() {
+        const isAdmin = this.userData?.userProfile?.role === 'admin';
+        
+        // إظهار/إخفاء أقسام إدارة المستخدمين
+        document.getElementById('usersNav').style.display = isAdmin ? 'flex' : 'none';
+        document.getElementById('manageUsersBtn').style.display = isAdmin ? 'block' : 'none';
+    }
+
+    // إدارة الأقسام
+    showSection(sectionName) {
+        // إخفاء جميع الأقسام
+        document.querySelectorAll('.content-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // إخفاء جميع عناصر القائمة
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // إظهار القسم المطلوب
+        document.getElementById(sectionName + 'Section').classList.add('active');
+        
+        // تفعيل عنصر القائمة المناسب
+        document.querySelector(`.nav-item[onclick="contractSystem.showSection('${sectionName}')"]`).classList.add('active');
+        
+        // تحديث البيانات عند عرض القسم
+        if (sectionName === 'contracts') {
+            this.displayContracts();
+        } else if (sectionName === 'invoices') {
+            this.displayInvoices();
+        } else if (sectionName === 'users') {
+            this.displayUsers();
+        }
+    }
+
+    // إدارة القائمة الجانبية للمستخدم
+    toggleUserMenu() {
+        const dropdown = document.getElementById('userDropdown');
+        dropdown.classList.toggle('show');
+    }
+
+    // === إدارة العقود ===
+    displayContracts() {
+        const tableBody = document.getElementById('contractsTableBody');
+        tableBody.innerHTML = '';
+
+        this.contracts.forEach((contract, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${contract.contractNumber}</td>
+                <td>${contract.clientName}</td>
+                <td>${contract.amount} ر.ق</td>
+                <td>${contract.startDate}</td>
+                <td>${contract.endDate}</td>
+                <td><span class="status-badge status-${contract.status}">${this.getStatusText(contract.status)}</span></td>
+                <td>
+                    <button class="btn-sm btn-edit" onclick="contractSystem.editContract(${index})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteContract(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-sm btn-view" onclick="contractSystem.viewContract(${index})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    showAddContractModal() {
+        const modalHTML = `
+            <div class="modal-overlay" id="addContractModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-file-contract"></i> إضافة عقد جديد</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('addContractModal')">&times;</button>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: var(--success-color);">
-                            ${this.userData?.exportHistory?.length || 0}
-                        </div>
-                        <div style="font-size: 12px; color: #666;">عمليات التصدير</div>
-                    </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 24px; font-weight: bold; color: ${this.isOnline ? 'var(--success-color)' : 'var(--danger-color)'};">
-                            ${this.isOnline ? '🟢' : '🔴'}
-                        </div>
-                        <div style="font-size: 12px; color: #666;">الحالة</div>
+                    <div class="modal-body">
+                        <form id="addContractForm" onsubmit="contractSystem.addContract(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>رقم العقد:</label>
+                                    <input type="text" name="contractNumber" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>اسم العميل:</label>
+                                    <input type="text" name="clientName" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>قيمة العقد:</label>
+                                    <input type="number" name="amount" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>حالة العقد:</label>
+                                    <select name="status" class="form-input" required>
+                                        <option value="active">نشط</option>
+                                        <option value="pending">قيد الانتظار</option>
+                                        <option value="completed">مكتمل</option>
+                                        <option value="cancelled">ملغى</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>تاريخ البدء:</label>
+                                    <input type="date" name="startDate" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>تاريخ الانتهاء:</label>
+                                    <input type="date" name="endDate" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>وصف العقد:</label>
+                                <textarea name="description" class="form-input" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                                <i class="fas fa-save"></i> حفظ العقد
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
         `;
+        this.showModal(modalHTML);
+    }
+
+    async addContract(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
         
-        const welcomeCard = document.querySelector('.new-welcome-card');
-        if (welcomeCard) {
-            welcomeCard.parentNode.insertBefore(stats, welcomeCard.nextSibling);
+        const contract = {
+            contractNumber: formData.get('contractNumber'),
+            clientName: formData.get('clientName'),
+            amount: formData.get('amount'),
+            status: formData.get('status'),
+            startDate: formData.get('startDate'),
+            endDate: formData.get('endDate'),
+            description: formData.get('description'),
+            createdAt: new Date().toISOString(),
+            createdBy: this.userData.userProfile.email
+        };
+
+        this.contracts.push(contract);
+        await this.saveCurrentData();
+        this.displayContracts();
+        this.updateStats();
+        this.closeModal('addContractModal');
+        this.showNotification('تم إضافة العقد بنجاح');
+    }
+
+    editContract(index) {
+        const contract = this.contracts[index];
+        const modalHTML = `
+            <div class="modal-overlay" id="editContractModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-edit"></i> تعديل العقد</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('editContractModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="editContractForm" onsubmit="contractSystem.updateContract(event, ${index})">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>رقم العقد:</label>
+                                    <input type="text" name="contractNumber" class="form-input" value="${contract.contractNumber}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>اسم العميل:</label>
+                                    <input type="text" name="clientName" class="form-input" value="${contract.clientName}" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>قيمة العقد:</label>
+                                    <input type="number" name="amount" class="form-input" value="${contract.amount}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>حالة العقد:</label>
+                                    <select name="status" class="form-input" required>
+                                        <option value="active" ${contract.status === 'active' ? 'selected' : ''}>نشط</option>
+                                        <option value="pending" ${contract.status === 'pending' ? 'selected' : ''}>قيد الانتظار</option>
+                                        <option value="completed" ${contract.status === 'completed' ? 'selected' : ''}>مكتمل</option>
+                                        <option value="cancelled" ${contract.status === 'cancelled' ? 'selected' : ''}>ملغى</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>تاريخ البدء:</label>
+                                    <input type="date" name="startDate" class="form-input" value="${contract.startDate}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>تاريخ الانتهاء:</label>
+                                    <input type="date" name="endDate" class="form-input" value="${contract.endDate}" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>وصف العقد:</label>
+                                <textarea name="description" class="form-input" rows="3">${contract.description || ''}</textarea>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                                <i class="fas fa-save"></i> حفظ التعديلات
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        this.showModal(modalHTML);
+    }
+
+    async updateContract(event, index) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        this.contracts[index] = {
+            ...this.contracts[index],
+            contractNumber: formData.get('contractNumber'),
+            clientName: formData.get('clientName'),
+            amount: formData.get('amount'),
+            status: formData.get('status'),
+            startDate: formData.get('startDate'),
+            endDate: formData.get('endDate'),
+            description: formData.get('description'),
+            updatedAt: new Date().toISOString(),
+            updatedBy: this.userData.userProfile.email
+        };
+
+        await this.saveCurrentData();
+        this.displayContracts();
+        this.closeModal('editContractModal');
+        this.showNotification('تم تعديل العقد بنجاح');
+    }
+
+    async deleteContract(index) {
+        if (confirm('هل أنت متأكد من حذف هذا العقد؟')) {
+            this.contracts.splice(index, 1);
+            await this.saveCurrentData();
+            this.displayContracts();
+            this.updateStats();
+            this.showNotification('تم حذف العقد بنجاح');
         }
+    }
+
+    viewContract(index) {
+        const contract = this.contracts[index];
+        const modalHTML = `
+            <div class="modal-overlay" id="viewContractModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-eye"></i> عرض العقد</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('viewContractModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <div><strong>رقم العقد:</strong> ${contract.contractNumber}</div>
+                            <div><strong>اسم العميل:</strong> ${contract.clientName}</div>
+                            <div><strong>قيمة العقد:</strong> ${contract.amount} ر.ق</div>
+                            <div><strong>الحالة:</strong> <span class="status-badge status-${contract.status}">${this.getStatusText(contract.status)}</span></div>
+                            <div><strong>تاريخ البدء:</strong> ${contract.startDate}</div>
+                            <div><strong>تاريخ الانتهاء:</strong> ${contract.endDate}</div>
+                        </div>
+                        ${contract.description ? `<div style="margin-top: 15px;"><strong>الوصف:</strong><br>${contract.description}</div>` : ''}
+                        <div style="margin-top: 15px; font-size: 12px; color: #666;">
+                            <div>تم الإنشاء بواسطة: ${contract.createdBy}</div>
+                            <div>تاريخ الإنشاء: ${new Date(contract.createdAt).toLocaleString('ar-SA')}</div>
+                            ${contract.updatedAt ? `<div>آخر تعديل: ${new Date(contract.updatedAt).toLocaleString('ar-SA')}</div>` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        this.showModal(modalHTML);
+    }
+
+    // === إدارة الفواتير (بنفس طريقة العقود) ===
+    displayInvoices() {
+        const tableBody = document.getElementById('invoicesTableBody');
+        tableBody.innerHTML = '';
+
+        this.invoices.forEach((invoice, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${invoice.invoiceNumber}</td>
+                <td>${invoice.clientName}</td>
+                <td>${invoice.amount} ر.ق</td>
+                <td>${invoice.issueDate}</td>
+                <td>${invoice.dueDate}</td>
+                <td><span class="status-badge status-${invoice.status}">${this.getStatusText(invoice.status)}</span></td>
+                <td>
+                    <button class="btn-sm btn-edit" onclick="contractSystem.editInvoice(${index})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteInvoice(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                    <button class="btn-sm btn-view" onclick="contractSystem.viewInvoice(${index})">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    showAddInvoiceModal() {
+        const modalHTML = `
+            <div class="modal-overlay" id="addInvoiceModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-receipt"></i> إضافة فاتورة جديدة</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('addInvoiceModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addInvoiceForm" onsubmit="contractSystem.addInvoice(event)">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>رقم الفاتورة:</label>
+                                    <input type="text" name="invoiceNumber" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>اسم العميل:</label>
+                                    <input type="text" name="clientName" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>المبلغ:</label>
+                                    <input type="number" name="amount" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>حالة الفاتورة:</label>
+                                    <select name="status" class="form-input" required>
+                                        <option value="paid">مدفوعة</option>
+                                        <option value="pending">قيد الانتظار</option>
+                                        <option value="overdue">متأخرة</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>تاريخ الإصدار:</label>
+                                    <input type="date" name="issueDate" class="form-input" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>تاريخ الاستحقاق:</label>
+                                    <input type="date" name="dueDate" class="form-input" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>وصف الفاتورة:</label>
+                                <textarea name="description" class="form-input" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                                <i class="fas fa-save"></i> حفظ الفاتورة
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        this.showModal(modalHTML);
+    }
+
+    async addInvoice(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const invoice = {
+            invoiceNumber: formData.get('invoiceNumber'),
+            clientName: formData.get('clientName'),
+            amount: formData.get('amount'),
+            status: formData.get('status'),
+            issueDate: formData.get('issueDate'),
+            dueDate: formData.get('dueDate'),
+            description: formData.get('description'),
+            createdAt: new Date().toISOString(),
+            createdBy: this.userData.userProfile.email
+        };
+
+        this.invoices.push(invoice);
+        await this.saveCurrentData();
+        this.displayInvoices();
+        this.updateStats();
+        this.closeModal('addInvoiceModal');
+        this.showNotification('تم إضافة الفاتورة بنجاح');
+    }
+
+    // ... (الدوال المتبقية لإدارة الفواتير مشابهة للعقود)
+
+    // === إدارة المستخدمين ===
+    displayUsers() {
+        const tableBody = document.getElementById('usersTableBody');
+        tableBody.innerHTML = '';
+
+        this.users.forEach((user, index) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${user.fullName}</td>
+                <td>${user.email}</td>
+                <td>${user.role === 'admin' ? 'مدير' : 'مستخدم'}</td>
+                <td>${user.joinDate}</td>
+                <td><span class="status-badge status-active">نشط</span></td>
+                <td>
+                    <button class="btn-sm btn-edit" onclick="contractSystem.editUser(${index})">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteUser(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(tr);
+        });
+    }
+
+    showAddUserModal() {
+        const modalHTML = `
+            <div class="modal-overlay" id="addUserModal">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('addUserModal')">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addUserForm" onsubmit="contractSystem.addUser(event)">
+                            <div class="form-group">
+                                <label>الاسم الكامل:</label>
+                                <input type="text" name="fullName" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>البريد الإلكتروني:</label>
+                                <input type="email" name="email" class="form-input" required>
+                            </div>
+                            <div class="form-group">
+                                <label>كلمة المرور:</label>
+                                <input type="password" name="password" class="form-input" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label>تأكيد كلمة المرور:</label>
+                                <input type="password" name="confirmPassword" class="form-input" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label>الدور:</label>
+                                <select name="role" class="form-input" required>
+                                    <option value="user">مستخدم</option>
+                                    <option value="admin">مدير</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
+                                <i class="fas fa-user-plus"></i> إنشاء المستخدم
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+        this.showModal(modalHTML);
+    }
+
+    async addUser(event) {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        
+        const password = formData.get('password');
+        const confirmPassword = formData.get('confirmPassword');
+        
+        if (password !== confirmPassword) {
+            this.showNotification('كلمتا المرور غير متطابقتين!', 'error');
+            return;
+        }
+
+        const userData = {
+            fullName: formData.get('fullName'),
+            email: formData.get('email'),
+            role: formData.get('role'),
+            joinDate: new Date().toISOString().split('T')[0],
+            createdBy: this.userData.userProfile.email
+        };
+
+        this.showNotification('جاري إنشاء الحساب...', 'info');
+
+        const result = await this.firebaseManager.createAccount(userData.email, password, userData);
+        
+        if (result.success) {
+            // إضافة المستخدم إلى القائمة
+            this.users.push(userData);
+            await this.saveCurrentData();
+            this.displayUsers();
+            this.updateStats();
+            this.closeModal('addUserModal');
+            this.showNotification('تم إنشاء المستخدم بنجاح');
+        } else {
+            this.showNotification(result.error, 'error');
+        }
+    }
+
+    // === دوال مساعدة ===
+    getStatusText(status) {
+        const statusMap = {
+            'active': 'نشط',
+            'pending': 'قيد الانتظار',
+            'completed': 'مكتمل',
+            'cancelled': 'ملغى',
+            'paid': 'مدفوعة',
+            'overdue': 'متأخرة'
+        };
+        return statusMap[status] || status;
+    }
+
+    showModal(html) {
+        this.closeAllModals();
+        document.getElementById('modalContainer').innerHTML = html;
+    }
+
+    closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) modal.remove();
+    }
+
+    closeAllModals() {
+        document.getElementById('modalContainer').innerHTML = '';
+    }
+
+    showNotification(message, type = 'success') {
+        // إزالة الإشعارات القديمة
+        document.querySelectorAll('.notification').forEach(notification => notification.remove());
+        
+        const notification = document.createElement('div');
+        notification.className = `notification notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i>
+                <span>${message}</span>
+            </div>
+            <button class="notification-close" onclick="this.parentElement.remove()">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        document.getElementById('notificationContainer').appendChild(notification);
+        
+        // إزالة الإشعار تلقائياً بعد 5 ثواني
+        setTimeout(() => {
+            if (notification.parentElement) {
+                notification.remove();
+            }
+        }, 5000);
+    }
+
+    async logout() {
+        await this.firebaseManager.logout();
+        document.getElementById('dashboard').style.display = 'none';
+        document.getElementById('loginPage').style.display = 'flex';
+        
+        // مسح الحقول
+        document.getElementById('email').value = '';
+        document.getElementById('password').value = '';
+        
+        this.showNotification('تم تسجيل الخروج بنجاح');
+    }
+
+    checkAuthStatus() {
+        console.log('🔍 Checking auth status...');
     }
 
     async showSignupModal() {
@@ -225,31 +731,31 @@ class DataManagementSystem {
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3><i class="fas fa-user-plus"></i> إنشاء حساب جديد</h3>
-                        <button class="close-btn" onclick="dataSystem.closeModal('signupModal')">&times;</button>
+                        <button class="close-btn" onclick="contractSystem.closeModal('signupModal')">&times;</button>
                     </div>
-                    <form onsubmit="dataSystem.handleSignup(event)">
-                        <div style="padding: 20px;">
-                            <div class="new-form-group">
+                    <div class="modal-body">
+                        <form onsubmit="contractSystem.handleSignup(event)">
+                            <div class="form-group">
                                 <label>الاسم الكامل:</label>
-                                <input type="text" name="fullName" class="new-form-input" required>
+                                <input type="text" name="fullName" class="form-input" required>
                             </div>
-                            <div class="new-form-group">
+                            <div class="form-group">
                                 <label>البريد الإلكتروني:</label>
-                                <input type="email" name="email" class="new-form-input" required>
+                                <input type="email" name="email" class="form-input" required>
                             </div>
-                            <div class="new-form-group">
+                            <div class="form-group">
                                 <label>كلمة المرور:</label>
-                                <input type="password" name="password" class="new-form-input" required minlength="6">
+                                <input type="password" name="password" class="form-input" required minlength="6">
                             </div>
-                            <div class="new-form-group">
+                            <div class="form-group">
                                 <label>تأكيد كلمة المرور:</label>
-                                <input type="password" name="confirmPassword" class="new-form-input" required minlength="6">
+                                <input type="password" name="confirmPassword" class="form-input" required minlength="6">
                             </div>
-                            <button type="submit" class="new-login-btn">
+                            <button type="submit" class="btn-primary" style="width: 100%;">
                                 <i class="fas fa-user-plus"></i> إنشاء الحساب
                             </button>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         `;
@@ -273,7 +779,7 @@ class DataManagementSystem {
         const userData = {
             username: email.split('@')[0],
             fullName: fullName,
-            role: 'مستخدم'
+            role: 'user'
         };
 
         this.showNotification('جاري إنشاء الحساب...', 'info');
@@ -296,689 +802,14 @@ class DataManagementSystem {
         }
     }
 
-    // دالة التصدير المباشر من Google Sheets
-    exportRealExcel() {
-        const SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-        const EXCEL_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=xlsx`;
-        
-        // فتح الرابط في نافذة جديدة لتحميل الملف
-        window.open(EXCEL_URL, "_blank");
-        this.showNotification('جاري تحميل الملف الأصلي من Google Sheets...', 'info');
-        
-        // حفظ في سجل التصدير
-        this.saveExportHistory({
-            type: 'Google Sheets',
-            fileName: 'ملف_Google_Sheets_الأصلي.xlsx',
-            recordCount: 'غير معروف',
-            date: new Date().toISOString()
-        });
-    }
-
-    async saveExportHistory(exportInfo) {
-        if (!this.userData.exportHistory) {
-            this.userData.exportHistory = [];
-        }
-        
-        this.userData.exportHistory.push(exportInfo);
-        
-        // حفظ فقط آخر 50 عملية تصدير
-        if (this.userData.exportHistory.length > 50) {
-            this.userData.exportHistory = this.userData.exportHistory.slice(-50);
-        }
-        
-        await this.saveCurrentData();
-    }
-
-    // دالة استيراد من Excel - معدلة للحفظ التلقائي
-    async importFromExcel() {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.xlsx, .xls, .csv';
-        
-        input.onchange = (e) => {
-            const file = e.target.files[0];
-            if (file) {
-                this.processExcelFile(file);
-            }
-        };
-        
-        input.click();
-    }
-
-    async processExcelFile(file) {
-        const reader = new FileReader();
-        
-        reader.onload = async (e) => {
-            try {
-                const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, { type: 'array' });
-                
-                // معالجة البيانات
-                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
-                
-                this.importedData = jsonData;
-                this.displayImportedData(jsonData);
-                
-                // حفظ البيانات المستوردة تلقائياً
-                await this.saveCurrentData();
-                
-                this.showNotification(`تم استيراد ${jsonData.length - 1} سجل بنجاح وتم الحفظ!`);
-                
-                // تحديث الإحصائيات
-                this.showDataStats();
-            } catch (error) {
-                this.showNotification('خطأ في معالجة الملف', 'error');
-                console.error('File processing error:', error);
-            }
-        };
-        
-        reader.onerror = () => {
-            this.showNotification('خطأ في قراءة الملف', 'error');
-        };
-        
-        reader.readAsArrayBuffer(file);
-    }
-
-    displayImportedData(data) {
-        const tableBody = document.getElementById('dataTableBody');
-        const dataSection = document.getElementById('dataSection');
-        
-        // إظهار قسم البيانات
-        dataSection.style.display = 'block';
-        
-        // مسح الجدول القديم
-        tableBody.innerHTML = '';
-        
-        // إضافة البيانات الجديدة
-        data.forEach((row, index) => {
-            const tr = document.createElement('tr');
-            
-            const tdIndex = document.createElement('td');
-            tdIndex.textContent = index + 1;
-            tr.appendChild(tdIndex);
-            
-            const tdData = document.createElement('td');
-            if (Array.isArray(row)) {
-                // إنشاء خلايا منفصلة لكل عمود
-                row.forEach((cell, cellIndex) => {
-                    if (cellIndex === 0) {
-                        tdData.textContent = cell;
-                    } else {
-                        tdData.textContent += ` - ${cell}`;
-                    }
-                });
-            } else {
-                tdData.textContent = JSON.stringify(row);
-            }
-            tr.appendChild(tdData);
-            
-            tableBody.appendChild(tr);
-        });
-    }
-
-    async showSettings() {
-        const lastUpdate = await this.firebaseManager.getLastUpdate();
-        const lastUpdateText = lastUpdate ? new Date(lastUpdate).toLocaleString('ar-SA') : 'غير متوفر';
-        
-        const modalHTML = `
-            <div class="modal-overlay" id="settingsModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-cogs"></i> إعدادات الحساب والبيانات</h3>
-                        <button class="close-btn" onclick="dataSystem.closeModal('settingsModal')">&times;</button>
-                    </div>
-                    <div style="padding: 20px;">
-                        <div class="new-form-group">
-                            <label>الاسم:</label>
-                            <input type="text" id="userNameInput" class="new-form-input" value="${this.userData?.userProfile?.name || ''}">
-                        </div>
-                        <div class="new-form-group">
-                            <label>البريد الإلكتروني:</label>
-                            <input type="email" class="new-form-input" value="${this.userData?.userProfile?.email || ''}" readonly>
-                        </div>
-                        <div class="new-form-group">
-                            <label>تاريخ الانضمام:</label>
-                            <input type="text" class="new-form-input" value="${this.userData?.userProfile?.joinDate || ''}" readonly>
-                        </div>
-                        <div class="new-form-group">
-                            <label>آخر تحديث للبيانات:</label>
-                            <input type="text" class="new-form-input" value="${lastUpdateText}" readonly>
-                        </div>
-                        
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 15px 0;">
-                            <h4 style="margin-bottom: 10px;">📈 إحصائيات البيانات</h4>
-                            <p>عدد السجلات المستوردة: <strong>${this.importedData.length > 0 ? this.importedData.length - 1 : 0}</strong></p>
-                            <p>عدد عمليات التصدير: <strong>${this.userData?.exportHistory?.length || 0}</strong></p>
-                            <p>حالة الاتصال: <strong style="color: ${this.isOnline ? 'var(--success-color)' : 'var(--danger-color)'}">${this.isOnline ? 'متصل' : 'غير متصل'}</strong></p>
-                        </div>
-                        
-                        <button class="new-login-btn" onclick="dataSystem.saveSettings()">
-                            <i class="fas fa-save"></i> حفظ الإعدادات
-                        </button>
-                        <button class="new-login-btn" onclick="dataSystem.syncData()" style="background: var(--info-color); margin-top: 10px;">
-                            <i class="fas fa-sync"></i> مزامنة البيانات مع السحابة
-                        </button>
-                        <button class="new-login-btn" onclick="dataSystem.showExportHistory()" style="background: var(--warning-color); margin-top: 10px; color: #000;">
-                            <i class="fas fa-history"></i> سجل التصدير
-                        </button>
-                        <button class="new-login-btn" onclick="dataSystem.testGoogleSheetsConnection()" style="background: var(--primary-color); margin-top: 10px;">
-                            <i class="fas fa-test"></i> اختبار اتصال Google Sheets
-                        </button>
-                        <button class="new-login-btn" onclick="dataSystem.logout()" style="background: var(--danger-color); margin-top: 10px;">
-                            <i class="fas fa-sign-out-alt"></i> تسجيل الخروج
-                        </button>
-                    </div>
-                </div>
-            </div>
-        `;
-        this.showModal(modalHTML);
-    }
-
-    async saveSettings() {
-        const userName = document.getElementById('userNameInput').value;
-        
-        if (this.userData && this.firebaseManager.currentUser) {
-            this.userData.userProfile.name = userName;
-            
-            const result = await this.saveCurrentData();
-            if (result) {
-                this.closeModal('settingsModal');
-                this.showNotification('تم حفظ الإعدادات بنجاح!');
-                
-                // تحديث الاسم المعروض
-                document.getElementById('userDisplayName').textContent = userName || 
-                    this.firebaseManager.currentUser.email.split('@')[0];
-            }
-        }
-    }
-
-    async syncData() {
-        this.showNotification('جاري مزامنة البيانات مع السحابة...', 'info');
-        
-        const result = await this.firebaseManager.syncUserData();
-        if (result.success) {
-            this.showNotification('تم مزامنة البيانات بنجاح!', 'success');
-        } else {
-            this.showNotification('فشل في المزامنة: ' + result.error, 'error');
-        }
-    }
-
-    showExportHistory() {
-        const exportHistory = this.userData?.exportHistory || [];
-        
-        let historyHTML = '';
-        if (exportHistory.length > 0) {
-            historyHTML = exportHistory.slice(-10).reverse().map(exportItem => `
-                <div style="border-bottom: 1px solid #eee; padding: 10px 0;">
-                    <div><strong>${new Date(exportItem.date).toLocaleString('ar-SA')}</strong></div>
-                    <div>الملف: ${exportItem.fileName}</div>
-                    <div>عدد السجلات: ${exportItem.recordCount}</div>
-                    <div>النوع: ${exportItem.type}</div>
-                </div>
-            `).join('');
-        } else {
-            historyHTML = '<p style="text-align: center; color: #666;">لا توجد عمليات تصدير سابقة</p>';
-        }
-        
-        const modalHTML = `
-            <div class="modal-overlay" id="exportHistoryModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-history"></i> سجل عمليات التصدير</h3>
-                        <button class="close-btn" onclick="dataSystem.closeModal('exportHistoryModal')">&times;</button>
-                    </div>
-                    <div style="padding: 20px; max-height: 400px; overflow-y: auto;">
-                        ${historyHTML}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        this.showModal(modalHTML);
-    }
-
-    // دالة اختبار اتصال Google Sheets
-    async testGoogleSheetsConnection() {
-        try {
-            this.showNotification('جاري اختبار الاتصال بـ Google Sheets...', 'info');
-            
-            // اختبار التصدير المباشر
-            const result = await this.exportDirectFromGoogleSheets();
-            
-            if (result.success) {
-                this.showNotification('✅ الاتصال بـ Google Sheets ناجح!', 'success');
-            } else {
-                this.showNotification('❌ فشل الاتصال المباشر', 'error');
-            }
-            
-        } catch (error) {
-            this.showNotification(`❌ فشل الاتصال: ${error.message}`, 'error');
-        }
-    }
-
-    async logout() {
-        // حفظ البيانات النهائية قبل الخروج
-        await this.saveCurrentData();
-        
-        await this.firebaseManager.logout();
-        document.getElementById('dashboard').style.display = 'none';
-        document.getElementById('loginPage').style.display = 'flex';
-        document.getElementById('dataSection').style.display = 'none';
-        
-        // إيقاف الحفظ التلقائي
-        if (this.autoSaveInterval) {
-            clearInterval(this.autoSaveInterval);
-        }
-        
-        // مسح الحقول
-        document.getElementById('email').value = '';
-        document.getElementById('password').value = '';
-        
-        this.showNotification('تم تسجيل الخروج بنجاح');
-    }
-
-    checkAuthStatus() {
-        // هذه الوظيفة تعمل تلقائياً من خلال مستمع حالة Firebase
-        console.log('🔍 Checking auth status...');
-    }
-
-    // ===== الميزات المتقدمة =====
-    
-    addAdvancedFeatures() {
-        const featuresGrid = document.querySelector('.new-features-grid');
-        
-        if (featuresGrid) {
-            const advancedFeaturesHTML = `
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-cloud-upload-alt"></i>
-                    </div>
-                    <h3>ربط مع Excel Online</h3>
-                    <p>الربط مع خدمات Excel السحابية</p>
-                    <button class="new-login-btn" onclick="dataSystem.connectToExternalExcel('microsoft')" style="margin-top: 15px; margin-bottom: 5px;">
-                        <i class="fab fa-microsoft"></i> Excel Online
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.connectToExternalExcel('google')" style="background: #34A853; margin-bottom: 5px;">
-                        <i class="fab fa-google"></i> Google Sheets
-                    </button>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-file-export"></i>
-                    </div>
-                    <h3>تصدير متعدد</h3>
-                    <p>تصدير البيانات بصيغ متعددة</p>
-                    <button class="new-login-btn" onclick="dataSystem.exportToMultipleFormats('xlsx')" style="margin-top: 15px; margin-bottom: 5px;">
-                        <i class="fas fa-file-excel"></i> Excel
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.exportToMultipleFormats('csv')" style="background: #FF6B35; margin-bottom: 5px;">
-                        <i class="fas fa-file-csv"></i> CSV
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.exportToMultipleFormats('json')" style="background: #F7DF1E; color: #000; margin-bottom: 5px;">
-                        <i class="fas fa-file-code"></i> JSON
-                    </button>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>بيانات نموذجية</h3>
-                    <p>إنشاء بيانات تجريبية للاختبار</p>
-                    <button class="new-login-btn" onclick="dataSystem.generateSampleData('customers', 10)" style="margin-top: 15px; margin-bottom: 5px;">
-                        <i class="fas fa-users"></i> عملاء
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.generateSampleData('products', 8)" style="background: #28a745; margin-bottom: 5px;">
-                        <i class="fas fa-box"></i> منتجات
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.generateSampleData('sales', 12)" style="background: #ffc107; color: #000;">
-                        <i class="fas fa-shopping-cart"></i> مبيعات
-                    </button>
-                </div>
-
-                <div class="new-feature-card">
-                    <div class="new-feature-icon">
-                        <i class="fas fa-shield-alt"></i>
-                    </div>
-                    <h3>إدارة البيانات</h3>
-                    <p>أدوات متقدمة لإدارة البيانات</p>
-                    <button class="new-login-btn" onclick="dataSystem.backupData()" style="margin-top: 15px; margin-bottom: 5px; background: #17a2b8;">
-                        <i class="fas fa-download"></i> نسخ احتياطي
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.clearData()" style="background: #6c757d; margin-bottom: 5px;">
-                        <i class="fas fa-trash"></i> مسح البيانات
-                    </button>
-                    <button class="new-login-btn" onclick="dataSystem.showDataInfo()" style="background: #6f42c1;">
-                        <i class="fas fa-info-circle"></i> معلومات النظام
-                    </button>
-                </div>
-            `;
-            
-            featuresGrid.innerHTML += advancedFeaturesHTML;
-        }
-    }
-
-    // ===== الدوال المتقدمة =====
-
-    async connectToExternalExcel(service = 'microsoft') {
-        try {
-            const dataToExport = this.importedData.length > 0 ? this.importedData : 
-                ExcelIntegration.generateSampleData('customers', 5);
-            
-            const result = await ExcelIntegration.connectToExcelOnline(dataToExport, service);
-            this.showNotification(result.message);
-            
-            return result;
-        } catch (error) {
-            this.showNotification('فشل في الربط مع الخدمة الخارجية', 'error');
-            console.error('Connection error:', error);
-        }
-    }
-
-    async exportToMultipleFormats(format = 'xlsx') {
-        try {
-            const dataToExport = this.importedData.length > 0 ? this.importedData : 
-                ExcelIntegration.generateSampleData('customers', 5);
-            
-            const result = await ExcelIntegration.exportToVariousFormats(dataToExport, format);
-            
-            if (result.success) {
-                this.showNotification(`تم التصدير بصيغة ${format} بنجاح`);
-                
-                // حفظ في السجل
-                await this.saveExportHistory({
-                    type: format,
-                    fileName: result.fileName,
-                    recordCount: dataToExport.length - 1,
-                    date: new Date().toISOString()
-                });
-            } else {
-                this.showNotification('فشل في التصدير', 'error');
-            }
-            
-            return result;
-        } catch (error) {
-            this.showNotification('خطأ في التصدير', 'error');
-            console.error('Export error:', error);
-        }
-    }
-
-    async generateSampleData(type = 'customers', count = 10) {
-        const sampleData = ExcelIntegration.generateSampleData(type, count);
-        this.importedData = sampleData;
-        this.displayImportedData(sampleData);
-        
-        // حفظ البيانات تلقائياً
-        await this.saveCurrentData();
-        
-        this.showNotification(`تم إنشاء ${count} سجل نموذجي بنجاح وتم الحفظ`);
-        this.showDataStats();
-    }
-
-    async backupData() {
-        try {
-            const backup = {
-                userData: this.userData,
-                importedData: this.importedData,
-                timestamp: new Date().toISOString(),
-                version: '1.0'
-            };
-            
-            const backupStr = JSON.stringify(backup, null, 2);
-            const blob = new Blob([backupStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `data_backup_${new Date().toISOString().split('T')[0]}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            
-            this.showNotification('تم إنشاء نسخة احتياطية بنجاح');
-        } catch (error) {
-            this.showNotification('خطأ في إنشاء النسخة الاحتياطية', 'error');
-        }
-    }
-
-    async clearData() {
-        if (confirm('هل أنت متأكد من مسح جميع البيانات؟ لا يمكن التراجع عن هذا الإجراء.')) {
-            this.importedData = [];
-            this.userData.importedData = [];
-            this.userData.exportHistory = [];
-            
-            await this.saveCurrentData();
-            
-            const tableBody = document.getElementById('dataTableBody');
-            if (tableBody) {
-                tableBody.innerHTML = '';
-            }
-            
-            const dataSection = document.getElementById('dataSection');
-            if (dataSection) {
-                dataSection.style.display = 'none';
-            }
-            
-            this.showNotification('تم مسح جميع البيانات بنجاح');
-            this.showDataStats();
-        }
-    }
-
-    showDataInfo() {
-        const info = {
-            'المستخدم': this.userData?.userProfile?.name || 'غير محدد',
-            'البريد الإلكتروني': this.userData?.userProfile?.email || 'غير محدد',
-            'تاريخ الانضمام': this.userData?.userProfile?.joinDate || 'غير محدد',
-            'آخر نشاط': this.userData?.userProfile?.lastActivity || 'غير محدد',
-            'عدد السجلات': this.importedData.length > 0 ? this.importedData.length - 1 : 0,
-            'عمليات التصدير': this.userData?.exportHistory?.length || 0,
-            'حالة الاتصال': this.isOnline ? 'متصل' : 'غير متصل',
-            'آخر تحديث': this.userData?._metadata?.lastUpdated || 'غير محدد'
-        };
-        
-        const infoHTML = Object.entries(info).map(([key, value]) => `
-            <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
-                <span style="font-weight: bold;">${key}:</span>
-                <span>${value}</span>
-            </div>
-        `).join('');
-        
-        const modalHTML = `
-            <div class="modal-overlay" id="dataInfoModal">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3><i class="fas fa-info-circle"></i> معلومات النظام والبيانات</h3>
-                        <button class="close-btn" onclick="dataSystem.closeModal('dataInfoModal')">&times;</button>
-                    </div>
-                    <div style="padding: 20px;">
-                        ${infoHTML}
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        this.showModal(modalHTML);
-    }
-
-    // ===== الدوال المساعدة =====
-
-    showModal(html) {
-        this.closeAllModals();
-        document.body.insertAdjacentHTML('beforeend', html);
-    }
-
-    closeModal(modalId) {
-        const modal = document.getElementById(modalId);
-        if (modal) modal.remove();
-    }
-
-    closeAllModals() {
-        document.querySelectorAll('.modal-overlay').forEach(modal => modal.remove());
-    }
-
-    showNotification(message, type = 'success') {
-        // إزالة الإشعارات القديمة
-        document.querySelectorAll('.notification').forEach(notification => notification.remove());
-        
-        const notification = document.createElement('div');
-        notification.className = `notification notification-${type}`;
-        notification.innerHTML = `
-            <div class="notification-content">
-                <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation' : 'info'}-circle"></i>
-                <span>${message}</span>
-            </div>
-            <button class="notification-close" onclick="this.parentElement.remove()">
-                <i class="fas fa-times"></i>
-            </button>
-        `;
-        
-        document.body.appendChild(notification);
-        
-        // إزالة الإشعار تلقائياً بعد 5 ثواني
-        setTimeout(() => {
-            if (notification.parentElement) {
-                notification.remove();
-            }
-        }, 5000);
+    exportData() {
+        // دالة تصدير البيانات
+        this.showNotification('جاري تصدير البيانات...', 'info');
+        // يمكن إضافة منطق التصدير هنا
     }
 }
 
-// ===== نظام التكامل مع Excel & Google Sheets =====
-class ExcelIntegration {
-    // === إعداد: ضع هنا معرف Google Sheet الخاص بك ===
-    static SHEET_ID = "1Qq9zGL0tAxotIp4cvpHKjttbHYorQRPjWYoSpCtv-ww";
-    static SHEET_NAME = "VILLA 11";
-    static SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyAcTU57DZm4-fbNsJ7Z1138Y7NXZQVoeGJUr5FWVSUZ6MLhW5tM2cUGuUifKf1l4EDMw/exec";
-
-    // === جلب آخر نسخة من Google Sheets وتحويلها إلى Excel ===
-    static async exportToXLSX() {
-        try {
-            const response = await fetch(this.SCRIPT_URL);
-            const csv = await response.text();
-            const rows = csv.split("\n").map(row => row.split(","));
-
-            if (rows.length <= 1) {
-                alert("⚠️ لم يتم العثور على بيانات في Google Sheet.");
-                return { success: false, error: "No data found" };
-            }
-
-            // إنشاء ملف Excel من البيانات المحدثة
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(rows);
-            XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
-
-            const fileName = `البيانات_${new Date().toISOString().split("T")[0]}.xlsx`;
-            XLSX.writeFile(workbook, fileName);
-
-            console.log(`✅ تم تصدير ${rows.length - 1} صف من Google Sheets`);
-            return { success: true, fileName };
-        } catch (error) {
-            console.error("❌ خطأ أثناء تصدير Google Sheet:", error);
-            alert("حدث خطأ أثناء جلب البيانات: " + error.message);
-            return { success: false, error: error.message };
-        }
-    }
-
-    // === جلب البيانات فقط بدون تنزيل الملف (للعرض المباشر في الموقع) ===
-    static async fetchLiveData() {
-        try {
-            const response = await fetch(this.SCRIPT_URL);
-            const csv = await response.text();
-            const rows = csv.split("\n").map(row => row.split(","));
-            return rows;
-        } catch (error) {
-            console.error("❌ خطأ أثناء جلب البيانات المباشرة:", error);
-            return [];
-        }
-    }
-
-    // === تصدير إلى صيغ أخرى (CSV / JSON) ===
-    static exportToCSV(data) {
-        try {
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
-            const csv = XLSX.utils.sheet_to_csv(worksheet);
-            const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.csv`;
-            this.downloadFile(csv, fileName, 'text/csv');
-            return { success: true, fileName };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-
-    static exportToJSON(data) {
-        try {
-            const headers = data[0];
-            const jsonData = [];
-            for (let i = 1; i < data.length; i++) {
-                const obj = {};
-                headers.forEach((header, index) => {
-                    obj[header] = data[i][index] || '';
-                });
-                jsonData.push(obj);
-            }
-            const jsonString = JSON.stringify(jsonData, null, 2);
-            const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.json`;
-            this.downloadFile(jsonString, fileName, 'application/json');
-            return { success: true, fileName };
-        } catch (error) {
-            return { success: false, error: error.message };
-        }
-    }
-
-    // === أداة تنزيل الملفات ===
-    static downloadFile(content, fileName, contentType) {
-        const blob = new Blob([content], { type: contentType });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-    }
-
-    // === بيانات نموذجية ===
-    static generateSampleData(type = 'customers', count = 10) {
-        const headers = ['ID', 'الاسم', 'البريد الإلكتروني', 'الهاتف', 'العنوان', 'التاريخ'];
-        const data = [headers];
-        for (let i = 1; i <= count; i++) {
-            data.push([
-                i,
-                `عميل ${i}`,
-                `customer${i}@example.com`,
-                `05${Math.floor(10000000 + Math.random() * 90000000)}`,
-                `الدوحة - قطر`,
-                new Date().toLocaleDateString('ar-QA')
-            ]);
-        }
-        return data;
-    }
-
-    // === دوال التكامل مع الخدمات السحابية ===
-    static async connectToExcelOnline(data, service = 'microsoft') {
-        // هذه دالة تجريبية للتكامل مع الخدمات السحابية
-        return { 
-            success: true, 
-            message: `تم الربط مع ${service === 'microsoft' ? 'Excel Online' : 'Google Sheets'} بنجاح` 
-        };
-    }
-
-    static async exportToVariousFormats(data, format = 'xlsx') {
-        switch (format) {
-            case 'xlsx':
-                return this.exportToXLSX(data);
-            case 'csv':
-                return this.exportToCSV(data);
-            case 'json':
-                return this.exportToJSON(data);
-            default:
-                return { success: false, error: 'صيغة غير مدعومة' };
-        }
-    }
-}
-
-// ===== مدير Firebase - الإصدار النهائي =====
+// مدير Firebase (نفس الكود السابق مع تعديلات بسيطة)
 class FirebaseManager {
     constructor() {
         this.auth = null;
@@ -1005,7 +836,6 @@ class FirebaseManager {
             this.auth = firebase.auth();
             this.db = firebase.firestore();
             
-            // الانتظار حتى يتم تهيئة Firebase بالكامل
             await new Promise((resolve, reject) => {
                 const unsubscribe = this.auth.onAuthStateChanged((user) => {
                     this.currentUser = user;
@@ -1066,17 +896,14 @@ class FirebaseManager {
                 username: userData.username || email.split('@')[0],
                 fullName: userData.fullName || email.split('@')[0],
                 email: email,
-                phone: userData.phone || '',
-                role: userData.role || 'مستخدم',
+                role: userData.role || 'user',
                 joinDate: new Date().toISOString().split('T')[0],
                 createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                 lastLogin: firebase.firestore.FieldValue.serverTimestamp()
             };
             
-            // حفظ بيانات الملف الشخصي
             await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
             
-            // إنشاء بيانات المستخدم الافتراضية
             const defaultUserData = this.getDefaultUserData();
             defaultUserData.userProfile = userProfile;
             
@@ -1091,7 +918,6 @@ class FirebaseManager {
         } catch (error) {
             console.error('❌ Account creation error:', error);
             
-            // إذا كان البريد مستخدم مسبقاً، نحاول تسجيل الدخول
             if (error.code === 'auth/email-already-in-use') {
                 try {
                     console.log('🔄 Email already in use, trying to login...');
@@ -1129,7 +955,6 @@ class FirebaseManager {
             this.currentUser = null;
             this.isInitialized = false;
             
-            // مسح التخزين المحلي
             localStorage.removeItem('propertyUser');
             localStorage.removeItem('userData');
             
@@ -1153,15 +978,12 @@ class FirebaseManager {
 
             const userId = this.currentUser.uid;
             
-            // تحديث وقت التعديل الأخير
             userData._metadata = userData._metadata || {};
             userData._metadata.lastUpdated = new Date().toISOString();
             userData._metadata.lastUpdatedBy = this.currentUser.email;
             
-            // حفظ البيانات في Firestore
             await this.db.collection('userData').doc(userId).set(userData, { merge: true });
             
-            // أيضًا حفظ نسخة محلية للسرعة
             localStorage.setItem(`userData_${userId}`, JSON.stringify(userData));
             
             console.log('✅ User data saved successfully for user:', userId);
@@ -1169,7 +991,6 @@ class FirebaseManager {
         } catch (error) {
             console.error('❌ Save user data error:', error);
             
-            // محاولة حفظ محلي كبديل
             try {
                 if (this.currentUser) {
                     localStorage.setItem(`userData_${this.currentUser.uid}`, JSON.stringify(userData));
@@ -1199,7 +1020,6 @@ class FirebaseManager {
 
             const userId = this.currentUser.uid;
             
-            // أولاً: التحقق من التخزين المحلي للسرعة
             const localData = localStorage.getItem(`userData_${userId}`);
             if (localData) {
                 console.log('📱 Loading data from local storage');
@@ -1210,13 +1030,11 @@ class FirebaseManager {
                 };
             }
             
-            // ثانياً: جلب البيانات من Firebase
             const doc = await this.db.collection('userData').doc(userId).get();
             
             if (doc.exists) {
                 const data = doc.data();
                 
-                // حفظ نسخة محلية
                 localStorage.setItem(`userData_${userId}`, JSON.stringify(data));
                 
                 console.log('☁️ Loading data from Firebase');
@@ -1226,7 +1044,6 @@ class FirebaseManager {
                     source: 'firebase'
                 };
             } else {
-                // إذا لم توجد بيانات، إنشاء بيانات افتراضية
                 console.log('🆕 No data found, creating default data');
                 const defaultData = this.getDefaultUserData();
                 await this.saveUserData(defaultData);
@@ -1240,7 +1057,6 @@ class FirebaseManager {
         } catch (error) {
             console.error('❌ Get user data error:', error);
             
-            // محاولة استخدام البيانات المحلية كبديل
             if (this.currentUser) {
                 const localData = localStorage.getItem(`userData_${this.currentUser.uid}`);
                 if (localData) {
@@ -1266,16 +1082,16 @@ class FirebaseManager {
             userProfile: {
                 name: '',
                 email: this.currentUser?.email || '',
+                role: 'user',
                 joinDate: currentDate,
                 lastLogin: new Date().toISOString()
             },
-            excelFiles: [],
-            importedData: [],
-            exportHistory: [],
+            contracts: [],
+            invoices: [],
+            users: [],
+            permissions: {},
             settings: {
-                defaultFormat: 'xlsx',
-                autoSave: true,
-                theme: 'light',
+                theme: 'dark-gold',
                 language: 'ar'
             },
             _metadata: {
@@ -1286,57 +1102,12 @@ class FirebaseManager {
             }
         };
     }
-
-    // دالة جديدة لمزامنة البيانات بين الأجهزة
-    async syncUserData() {
-        try {
-            if (!this.currentUser) return { success: false, error: 'No user' };
-            
-            const userId = this.currentUser.uid;
-            const localData = localStorage.getItem(`userData_${userId}`);
-            
-            if (localData) {
-                const parsedData = JSON.parse(localData);
-                
-                // تحديث وقت المزامنة
-                parsedData._metadata.lastSync = new Date().toISOString();
-                
-                // رفع البيانات المحلية إلى Firebase
-                await this.db.collection('userData').doc(userId).set(parsedData, { merge: true });
-                
-                console.log('✅ Data synced to Firebase');
-                return { success: true, message: 'تم مزامنة البيانات' };
-            }
-            
-            return { success: false, error: 'No local data to sync' };
-        } catch (error) {
-            console.error('❌ Sync error:', error);
-            return { success: false, error: error.message };
-        }
-    }
-
-    // دالة لجلب تاريخ آخر تحديث
-    async getLastUpdate() {
-        try {
-            if (!this.currentUser) return null;
-            
-            const doc = await this.db.collection('userData').doc(this.currentUser.uid).get();
-            if (doc.exists) {
-                const data = doc.data();
-                return data._metadata?.lastUpdated || data._metadata?.createdAt;
-            }
-            return null;
-        } catch (error) {
-            console.error('❌ Get last update error:', error);
-            return null;
-        }
-    }
 }
 
-// ===== تهيئة النظام =====
+// تهيئة النظام
 document.addEventListener('DOMContentLoaded', () => {
-    window.dataSystem = new DataManagementSystem();
-    console.log('🚀 نظام إدارة البيانات مع Firebase جاهز للاستخدام!');
+    window.contractSystem = new ContractManagementSystem();
+    console.log('🚀 نظام إدارة العقود والفواتير جاهز للاستخدام!');
     
     // إضافة مكتبة Excel إذا لم تكن موجودة
     if (typeof XLSX === 'undefined') {
