@@ -1,4 +1,4 @@
-// نظام إدارة العقود والفواتير
+// نظام إدارة العقود والفواتير - النسخة المعدلة
 class ContractManagementSystem {
     constructor() {
         this.currentUser = null;
@@ -6,9 +6,9 @@ class ContractManagementSystem {
         this.firebaseManager = new FirebaseManager();
         this.contracts = [];
         this.invoices = [];
-        this.users = [];
+        this.members = []; // تغيير من users إلى members
         this.permissions = {};
-        this.isUserLogin = false;
+        this.isMemberLogin = false; // تغيير من isUserLogin إلى isMemberLogin
         this.init();
     }
 
@@ -28,13 +28,13 @@ class ContractManagementSystem {
         if (loginForm) {
             loginForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
-                await this.handleAdminLogin();
+                await this.handleMainAccountLogin();
             });
         }
     }
 
-    // تسجيل دخول المدير
-    async handleAdminLogin() {
+    // تسجيل دخول الحساب الرئيسي (المدير)
+    async handleMainAccountLogin() {
         const email = document.getElementById('email').value;
         const password = document.getElementById('password').value;
         
@@ -48,30 +48,37 @@ class ContractManagementSystem {
         const result = await this.firebaseManager.login(email, password);
         
         if (result.success) {
-            await this.loadUserData();
-            this.isUserLogin = false;
+            await this.loadMainAccountData();
+            this.isMemberLogin = false;
             this.showDashboard();
         } else {
             this.showNotification(result.error, 'error');
         }
     }
 
-    // تسجيل دخول المستخدم العادي
-    async handleUserLogin(email, password) {
+    // تسجيل دخول العضو
+    async handleMemberLogin(email, password) {
         this.showNotification('جاري تسجيل الدخول...', 'info');
 
-        const result = await this.firebaseManager.login(email, password);
+        // البحث عن العضو في قائمة الأعضاء
+        const member = this.members.find(m => m.email === email && m.password === password);
         
-        if (result.success) {
-            await this.loadUserData();
-            this.isUserLogin = true;
+        if (member) {
+            // تسجيل دخول العضو
+            this.currentUser = {
+                email: member.email,
+                name: member.fullName,
+                isMember: true
+            };
+            
+            this.isMemberLogin = true;
             this.showDashboard();
         } else {
-            this.showNotification(result.error, 'error');
+            this.showNotification('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
         }
     }
 
-    async loadUserData() {
+    async loadMainAccountData() {
         try {
             const result = await this.firebaseManager.getUserData();
             
@@ -79,13 +86,13 @@ class ContractManagementSystem {
                 this.userData = result.data;
                 this.contracts = this.userData.contracts || [];
                 this.invoices = this.userData.invoices || [];
-                this.users = this.userData.users || [];
+                this.members = this.userData.members || []; // تغيير من users إلى members
                 this.permissions = this.userData.permissions || {};
                 
-                console.log('📊 Loaded user data:', {
+                console.log('📊 Loaded main account data:', {
                     contracts: this.contracts.length,
                     invoices: this.invoices.length,
-                    users: this.users.length,
+                    members: this.members.length,
                     source: result.source
                 });
                 
@@ -98,7 +105,7 @@ class ContractManagementSystem {
                 throw new Error(result.error);
             }
         } catch (error) {
-            console.error('Load user data error:', error);
+            console.error('Load main account data error:', error);
             this.userData = this.firebaseManager.getDefaultUserData();
             return false;
         }
@@ -113,7 +120,7 @@ class ContractManagementSystem {
             // تحديث البيانات الحالية
             this.userData.contracts = this.contracts;
             this.userData.invoices = this.invoices;
-            this.userData.users = this.users;
+            this.userData.members = this.members; // تغيير من users إلى members
             this.userData.permissions = this.permissions;
             
             this.userData.userProfile = this.userData.userProfile || {};
@@ -130,7 +137,7 @@ class ContractManagementSystem {
             const result = await this.firebaseManager.saveUserData(this.userData);
             
             if (result.success) {
-                console.log('💾 Data saved successfully for user:', this.firebaseManager.currentUser.uid);
+                console.log('💾 Main account data saved successfully');
                 return true;
             } else {
                 throw new Error(result.error);
@@ -145,7 +152,12 @@ class ContractManagementSystem {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('dashboard').style.display = 'flex';
         
-        if (this.firebaseManager.currentUser) {
+        if (this.isMemberLogin) {
+            // إذا كان دخول عضو
+            document.getElementById('userDisplayName').textContent = this.currentUser.name;
+            document.getElementById('userDisplayEmail').textContent = this.currentUser.email;
+        } else {
+            // إذا كان دخول مدير
             const userName = this.userData?.userProfile?.name || 
                 this.firebaseManager.currentUser.email.split('@')[0];
             
@@ -170,11 +182,11 @@ class ContractManagementSystem {
             existingStatus.remove();
         }
         
-        if (this.isUserLogin) {
+        if (this.isMemberLogin) {
             const statusHTML = `
                 <div class="user-status">
                     <div class="status-indicator"></div>
-                    <div class="status-text">مستخدم متصل</div>
+                    <div class="status-text">عضو متصل</div>
                 </div>
             `;
             userMenu.insertAdjacentHTML('beforeend', statusHTML);
@@ -184,30 +196,35 @@ class ContractManagementSystem {
     loadDashboardData() {
         this.displayContracts();
         this.displayInvoices();
-        this.displayUsers();
+        this.displayMembers();
     }
 
     updateStats() {
         document.getElementById('contractsCount').textContent = this.contracts.length;
         document.getElementById('invoicesCount').textContent = this.invoices.length;
-        document.getElementById('usersCount').textContent = this.users.length;
+        document.getElementById('usersCount').textContent = this.members.length;
     }
 
     updatePermissionsUI() {
-        const isAdmin = !this.isUserLogin;
-        const userPermissions = this.permissions[this.firebaseManager.currentUser.email] || {};
+        const isMainAccount = !this.isMemberLogin;
+        const userPermissions = this.isMemberLogin ? 
+            (this.permissions[this.currentUser.email] || this.getDefaultMemberPermissions()) : 
+            {};
         
-        console.log('🔐 Updating permissions for:', this.firebaseManager.currentUser.email);
-        console.log('Permissions:', userPermissions);
-        console.log('Is user login:', this.isUserLogin);
+        console.log('🔐 Updating permissions:', {
+            isMainAccount: isMainAccount,
+            isMemberLogin: this.isMemberLogin,
+            userEmail: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email,
+            permissions: userPermissions
+        });
 
-        // إدارة المستخدمين للمدير فقط
-        document.getElementById('usersNav').style.display = isAdmin ? 'flex' : 'none';
-        document.getElementById('manageUsersBtn').style.display = isAdmin ? 'block' : 'none';
+        // إدارة الأعضاء للحساب الرئيسي فقط
+        document.getElementById('usersNav').style.display = isMainAccount ? 'flex' : 'none';
+        document.getElementById('manageUsersBtn').style.display = isMainAccount ? 'block' : 'none';
 
-        // تطبيق الصلاحيات على المستخدم العادي
-        if (this.isUserLogin) {
-            console.log('🔒 Applying restrictions for regular user');
+        // تطبيق الصلاحيات على العضو
+        if (this.isMemberLogin) {
+            console.log('🔒 Applying restrictions for member');
             
             // إخفاء الأقسام الممنوعة
             if (userPermissions.denyContracts) {
@@ -245,8 +262,8 @@ class ContractManagementSystem {
 
     showSection(sectionName) {
         // التحقق من الصلاحيات أولاً
-        if (this.isUserLogin) {
-            const userPermissions = this.permissions[this.firebaseManager.currentUser.email] || {};
+        if (this.isMemberLogin) {
+            const userPermissions = this.permissions[this.currentUser.email] || this.getDefaultMemberPermissions();
             
             if ((sectionName === 'contracts' && userPermissions.denyContracts) ||
                 (sectionName === 'invoices' && userPermissions.denyInvoices) ||
@@ -282,7 +299,7 @@ class ContractManagementSystem {
         } else if (sectionName === 'invoices') {
             this.displayInvoices();
         } else if (sectionName === 'users') {
-            this.displayUsers();
+            this.displayMembers();
         } else if (sectionName === 'settings') {
             this.displayPermissions();
         }
@@ -332,17 +349,17 @@ class ContractManagementSystem {
         dropdown.classList.toggle('show');
     }
 
-    // === نافذة تسجيل دخول المستخدم ===
-    showUserLoginModal() {
+    // === نافذة تسجيل دخول العضو ===
+    showMemberLoginModal() {
         const modalHTML = `
-            <div class="modal-overlay" id="userLoginModal">
+            <div class="modal-overlay" id="memberLoginModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-user"></i> تسجيل دخول مستخدم</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('userLoginModal')">&times;</button>
+                        <h3><i class="fas fa-user"></i> تسجيل دخول عضو</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('memberLoginModal')">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="userLoginForm" onsubmit="contractSystem.handleUserLoginForm(event)">
+                        <form id="memberLoginForm" onsubmit="contractSystem.handleMemberLoginForm(event)">
                             <div class="form-group">
                                 <label>البريد الإلكتروني:</label>
                                 <input type="email" name="email" class="form-input" required>
@@ -362,47 +379,47 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    async handleUserLoginForm(event) {
+    async handleMemberLoginForm(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
         const email = formData.get('email');
         const password = formData.get('password');
         
-        await this.handleUserLogin(email, password);
-        this.closeModal('userLoginModal');
+        await this.handleMemberLogin(email, password);
+        this.closeModal('memberLoginModal');
     }
 
     // === عرض الملف الشخصي ===
     showProfileSection() {
-        if (this.isUserLogin) {
-            this.showUserProfile();
+        if (this.isMemberLogin) {
+            this.showMemberProfile();
         } else {
-            this.showAddUserModal();
+            this.showAddMemberModal();
         }
     }
 
-    showUserProfile() {
+    showMemberProfile() {
         const modalHTML = `
-            <div class="modal-overlay" id="userProfileModal">
+            <div class="modal-overlay" id="memberProfileModal">
                 <div class="modal-content">
                     <div class="modal-header">
                         <h3><i class="fas fa-user"></i> الملف الشخصي</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('userProfileModal')">&times;</button>
+                        <button class="close-btn" onclick="contractSystem.closeModal('memberProfileModal')">&times;</button>
                     </div>
                     <div class="modal-body">
                         <div class="profile-info">
                             <div class="profile-item">
-                                <strong>الاسم:</strong> ${this.userData.userProfile.name}
+                                <strong>الاسم:</strong> ${this.currentUser.name}
                             </div>
                             <div class="profile-item">
-                                <strong>البريد الإلكتروني:</strong> ${this.userData.userProfile.email}
+                                <strong>البريد الإلكتروني:</strong> ${this.currentUser.email}
                             </div>
                             <div class="profile-item">
-                                <strong>آخر نشاط:</strong> ${new Date(this.userData.userProfile.lastActivity).toLocaleString('ar-SA')}
+                                <strong>الدور:</strong> عضو
                             </div>
                             <div class="profile-item">
-                                <strong>الدور:</strong> مستخدم
+                                <strong>الحالة:</strong> نشط
                             </div>
                         </div>
                     </div>
@@ -527,7 +544,7 @@ class ContractManagementSystem {
             endDate: formData.get('endDate'),
             description: formData.get('description'),
             createdAt: new Date().toISOString(),
-            createdBy: this.userData.userProfile.email
+            createdBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
         };
 
         this.contracts.push(contract);
@@ -613,7 +630,7 @@ class ContractManagementSystem {
             endDate: formData.get('endDate'),
             description: formData.get('description'),
             updatedAt: new Date().toISOString(),
-            updatedBy: this.userData.userProfile.email
+            updatedBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
         };
 
         await this.saveCurrentData();
@@ -777,7 +794,7 @@ class ContractManagementSystem {
             dueDate: formData.get('dueDate'),
             description: formData.get('description'),
             createdAt: new Date().toISOString(),
-            createdBy: this.userData.userProfile.email
+            createdBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
         };
 
         this.invoices.push(invoice);
@@ -862,7 +879,7 @@ class ContractManagementSystem {
             dueDate: formData.get('dueDate'),
             description: formData.get('description'),
             updatedAt: new Date().toISOString(),
-            updatedBy: this.userData.userProfile.email
+            updatedBy: this.isMemberLogin ? this.currentUser.email : this.firebaseManager.currentUser.email
         };
 
         await this.saveCurrentData();
@@ -912,36 +929,36 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    // === إدارة المستخدمين ===
-    displayUsers() {
+    // === إدارة الأعضاء ===
+    displayMembers() {
         const tableBody = document.getElementById('usersTableBody');
         tableBody.innerHTML = '';
 
-        if (this.users.length === 0) {
+        if (this.members.length === 0) {
             tableBody.innerHTML = `
                 <tr>
                     <td colspan="6" style="text-align: center; padding: 40px; color: #666;">
                         <i class="fas fa-users" style="font-size: 48px; margin-bottom: 15px; display: block; color: #ccc;"></i>
-                        لا توجد مستخدمين مضافة حتى الآن
+                        لا توجد أعضاء مضافة حتى الآن
                     </td>
                 </tr>
             `;
             return;
         }
 
-        this.users.forEach((user, index) => {
+        this.members.forEach((member, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${user.fullName}</td>
-                <td>${user.email}</td>
-                <td>${user.role === 'admin' ? 'مدير' : 'مستخدم'}</td>
-                <td>${user.joinDate}</td>
+                <td>${member.fullName}</td>
+                <td>${member.email}</td>
+                <td>عضو</td>
+                <td>${member.joinDate}</td>
                 <td><span class="status-badge status-active">نشط</span></td>
                 <td>
-                    <button class="btn-sm btn-edit" onclick="contractSystem.editUserPermissions('${user.email}')">
+                    <button class="btn-sm btn-edit" onclick="contractSystem.editMemberPermissions('${member.email}')">
                         <i class="fas fa-shield-alt"></i>
                     </button>
-                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteUser(${index})">
+                    <button class="btn-sm btn-delete" onclick="contractSystem.deleteMember(${index})">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -950,16 +967,16 @@ class ContractManagementSystem {
         });
     }
 
-    showAddUserModal() {
+    showAddMemberModal() {
         const modalHTML = `
-            <div class="modal-overlay" id="addUserModal">
+            <div class="modal-overlay" id="addMemberModal">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h3><i class="fas fa-user-plus"></i> إضافة مستخدم جديد</h3>
-                        <button class="close-btn" onclick="contractSystem.closeModal('addUserModal')">&times;</button>
+                        <h3><i class="fas fa-user-plus"></i> إضافة عضو جديد</h3>
+                        <button class="close-btn" onclick="contractSystem.closeModal('addMemberModal')">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <form id="addUserForm" onsubmit="contractSystem.addUser(event)">
+                        <form id="addMemberForm" onsubmit="contractSystem.addMember(event)">
                             <div class="form-group">
                                 <label>الاسم الكامل:</label>
                                 <input type="text" name="fullName" class="form-input" required>
@@ -977,7 +994,7 @@ class ContractManagementSystem {
                                 <input type="password" name="confirmPassword" class="form-input" required minlength="6">
                             </div>
                             <button type="submit" class="btn-primary" style="width: 100%; margin-top: 20px;">
-                                <i class="fas fa-user-plus"></i> إنشاء المستخدم
+                                <i class="fas fa-user-plus"></i> إضافة العضو
                             </button>
                         </form>
                     </div>
@@ -987,7 +1004,7 @@ class ContractManagementSystem {
         this.showModal(modalHTML);
     }
 
-    async addUser(event) {
+    async addMember(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
@@ -999,51 +1016,44 @@ class ContractManagementSystem {
             return;
         }
 
-        const userData = {
+        const memberData = {
             fullName: formData.get('fullName'),
             email: formData.get('email'),
-            role: 'user',
+            password: password, // تخزين كلمة المرور محلياً فقط
             joinDate: new Date().toISOString().split('T')[0],
-            createdBy: this.userData.userProfile.email
+            createdBy: this.firebaseManager.currentUser.email,
+            isMember: true
         };
 
-        this.showNotification('جاري إنشاء الحساب...', 'info');
-
-        const result = await this.firebaseManager.createAccount(userData.email, password, userData);
+        // إضافة العضو إلى القائمة
+        this.members.push(memberData);
         
-        if (result.success) {
-            // إضافة المستخدم إلى القائمة
-            this.users.push(userData);
+        // إنشاء صلاحيات افتراضية للعضو الجديد
+        this.permissions[memberData.email] = this.getDefaultMemberPermissions();
+        
+        await this.saveCurrentData();
+        this.displayMembers();
+        this.updateStats();
+        this.closeModal('addMemberModal');
+        this.showNotification('تم إضافة العضو بنجاح');
+    }
+
+    async deleteMember(index) {
+        if (confirm('هل أنت متأكد من حذف هذا العضو؟')) {
+            const memberEmail = this.members[index].email;
             
-            // إنشاء صلاحيات افتراضية للمستخدم الجديد
-            this.permissions[userData.email] = this.getDefaultUserPermissions();
+            // حذف الصلاحيات المرتبطة بالعضو
+            delete this.permissions[memberEmail];
             
+            this.members.splice(index, 1);
             await this.saveCurrentData();
-            this.displayUsers();
+            this.displayMembers();
             this.updateStats();
-            this.closeModal('addUserModal');
-            this.showNotification('تم إنشاء المستخدم بنجاح');
-        } else {
-            this.showNotification(result.error, 'error');
+            this.showNotification('تم حذف العضو بنجاح');
         }
     }
 
-    async deleteUser(index) {
-        if (confirm('هل أنت متأكد من حذف هذا المستخدم؟')) {
-            const userEmail = this.users[index].email;
-            
-            // حذف الصلاحيات المرتبطة بالمستخدم
-            delete this.permissions[userEmail];
-            
-            this.users.splice(index, 1);
-            await this.saveCurrentData();
-            this.displayUsers();
-            this.updateStats();
-            this.showNotification('تم حذف المستخدم بنجاح');
-        }
-    }
-
-    editUserPermissions(userEmail) {
+    editMemberPermissions(memberEmail) {
         this.showSection('settings');
     }
 
@@ -1052,71 +1062,69 @@ class ContractManagementSystem {
         const permissionsList = document.getElementById('permissionsList');
         permissionsList.innerHTML = '';
 
-        if (this.users.length === 0) {
-            permissionsList.innerHTML = '<p style="text-align: center; color: #666;">لا يوجد مستخدمين لعرض صلاحياتهم</p>';
+        if (this.members.length === 0) {
+            permissionsList.innerHTML = '<p style="text-align: center; color: #666;">لا يوجد أعضاء لعرض صلاحياتهم</p>';
             return;
         }
 
-        this.users.forEach(user => {
-            if (user.role === 'user') {
-                const userPermissions = this.permissions[user.email] || this.getDefaultUserPermissions();
-                
-                const permissionHTML = `
-                    <div class="permission-item">
-                        <div class="permission-header">
-                            <div class="permission-title">${user.fullName}</div>
-                            <div class="user-email">${user.email}</div>
+        this.members.forEach(member => {
+            const memberPermissions = this.permissions[member.email] || this.getDefaultMemberPermissions();
+            
+            const permissionHTML = `
+                <div class="permission-item">
+                    <div class="permission-header">
+                        <div class="permission-title">${member.fullName}</div>
+                        <div class="user-email">${member.email}</div>
+                    </div>
+                    <div class="permission-users">
+                        <div class="user-permission">
+                            <span>منع دخول صفحة العقود</span>
+                            <input type="checkbox" ${memberPermissions.denyContracts ? 'checked' : ''} 
+                                onchange="contractSystem.updateMemberPermission('${member.email}', 'denyContracts', this.checked)">
                         </div>
-                        <div class="permission-users">
-                            <div class="user-permission">
-                                <span>منع دخول صفحة العقود</span>
-                                <input type="checkbox" ${userPermissions.denyContracts ? 'checked' : ''} 
-                                    onchange="contractSystem.updateUserPermission('${user.email}', 'denyContracts', this.checked)">
-                            </div>
-                            <div class="user-permission">
-                                <span>منع دخول صفحة الفواتير</span>
-                                <input type="checkbox" ${userPermissions.denyInvoices ? 'checked' : ''} 
-                                    onchange="contractSystem.updateUserPermission('${user.email}', 'denyInvoices', this.checked)">
-                            </div>
-                            <div class="user-permission">
-                                <span>منع تعديل العقود</span>
-                                <input type="checkbox" ${userPermissions.denyEditContract ? 'checked' : ''} 
-                                    onchange="contractSystem.updateUserPermission('${user.email}', 'denyEditContract', this.checked)">
-                            </div>
-                            <div class="user-permission">
-                                <span>منع تعديل الفواتير</span>
-                                <input type="checkbox" ${userPermissions.denyEditInvoice ? 'checked' : ''} 
-                                    onchange="contractSystem.updateUserPermission('${user.email}', 'denyEditInvoice', this.checked)">
-                            </div>
-                            <div class="user-permission">
-                                <span>منع دخول الإعدادات</span>
-                                <input type="checkbox" ${userPermissions.denySettings ? 'checked' : ''} 
-                                    onchange="contractSystem.updateUserPermission('${user.email}', 'denySettings', this.checked)">
-                            </div>
+                        <div class="user-permission">
+                            <span>منع دخول صفحة الفواتير</span>
+                            <input type="checkbox" ${memberPermissions.denyInvoices ? 'checked' : ''} 
+                                onchange="contractSystem.updateMemberPermission('${member.email}', 'denyInvoices', this.checked)">
+                        </div>
+                        <div class="user-permission">
+                            <span>منع تعديل العقود</span>
+                            <input type="checkbox" ${memberPermissions.denyEditContract ? 'checked' : ''} 
+                                onchange="contractSystem.updateMemberPermission('${member.email}', 'denyEditContract', this.checked)">
+                        </div>
+                        <div class="user-permission">
+                            <span>منع تعديل الفواتير</span>
+                            <input type="checkbox" ${memberPermissions.denyEditInvoice ? 'checked' : ''} 
+                                onchange="contractSystem.updateMemberPermission('${member.email}', 'denyEditInvoice', this.checked)">
+                        </div>
+                        <div class="user-permission">
+                            <span>منع دخول الإعدادات</span>
+                            <input type="checkbox" ${memberPermissions.denySettings ? 'checked' : ''} 
+                                onchange="contractSystem.updateMemberPermission('${member.email}', 'denySettings', this.checked)">
                         </div>
                     </div>
-                `;
-                permissionsList.innerHTML += permissionHTML;
-            }
+                </div>
+            `;
+            permissionsList.innerHTML += permissionHTML;
         });
 
         if (permissionsList.innerHTML === '') {
-            permissionsList.innerHTML = '<p style="text-align: center; color: #666;">لا يوجد مستخدمين لعرض صلاحياتهم</p>';
+            permissionsList.innerHTML = '<p style="text-align: center; color: #666;">لا يوجد أعضاء لعرض صلاحياتهم</p>';
         }
     }
 
-    updateUserPermission(userEmail, permission, value) {
-        if (!this.permissions[userEmail]) {
-            this.permissions[userEmail] = this.getDefaultUserPermissions();
+    updateMemberPermission(memberEmail, permission, value) {
+        if (!this.permissions[memberEmail]) {
+            this.permissions[memberEmail] = this.getDefaultMemberPermissions();
         }
         
-        this.permissions[userEmail][permission] = value;
+        this.permissions[memberEmail][permission] = value;
         this.saveCurrentData();
         this.showNotification('تم تحديث الصلاحيات بنجاح');
     }
 
     // === دوال مساعدة ===
-    getDefaultUserPermissions() {
+    getDefaultMemberPermissions() {
         return {
             denyContracts: false,
             denyInvoices: false,
@@ -1181,7 +1189,15 @@ class ContractManagementSystem {
     }
 
     async logout() {
-        await this.firebaseManager.logout();
+        if (this.isMemberLogin) {
+            // تسجيل خروج العضو
+            this.currentUser = null;
+            this.isMemberLogin = false;
+        } else {
+            // تسجيل خروج المدير
+            await this.firebaseManager.logout();
+        }
+        
         document.getElementById('dashboard').style.display = 'none';
         document.getElementById('loginPage').style.display = 'flex';
         
@@ -1275,76 +1291,6 @@ class FirebaseManager {
         }
     }
 
-    async createAccount(email, password, userData = {}) {
-        try {
-            if (!this.isInitialized) {
-                await this.init();
-            }
-
-            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
-            this.currentUser = userCredential.user;
-            
-            const userProfile = {
-                username: userData.username || email.split('@')[0],
-                fullName: userData.fullName || email.split('@')[0],
-                email: email,
-                role: userData.role || 'user',
-                joinDate: new Date().toISOString().split('T')[0],
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
-                userId: this.currentUser.uid
-            };
-            
-            // حفظ بيانات الملف الشخصي للمستخدم الجديد
-            await this.db.collection('users').doc(this.currentUser.uid).set(userProfile);
-            
-            // إنشاء بيانات المستخدم الافتراضية للمستخدم الجديد فقط
-            const defaultUserData = this.getDefaultUserData();
-            defaultUserData.userProfile = userProfile;
-            
-            // حفظ بيانات المستخدم الجديد في وثيقته الخاصة
-            await this.db.collection('userData').doc(this.currentUser.uid).set(defaultUserData);
-            
-            console.log('✅ Account created successfully:', this.currentUser.email);
-            return { 
-                success: true, 
-                user: this.currentUser,
-                userId: this.currentUser.uid 
-            };
-        } catch (error) {
-            console.error('❌ Account creation error:', error);
-            
-            if (error.code === 'auth/email-already-in-use') {
-                try {
-                    console.log('🔄 Email already in use, trying to login...');
-                    const loginResult = await this.login(email, password);
-                    if (loginResult.success) {
-                        return {
-                            success: true,
-                            user: loginResult.user,
-                            message: 'تم تسجيل الدخول إلى الحساب الموجود'
-                        };
-                    }
-                } catch (loginError) {
-                    return { 
-                        success: false, 
-                        error: 'الحساب موجود لكن كلمة المرور غير صحيحة' 
-                    };
-                }
-            }
-            
-            let errorMessage = 'فشل في إنشاء الحساب';
-            switch (error.code) {
-                case 'auth/email-already-in-use': errorMessage = 'البريد الإلكتروني مستخدم مسبقاً'; break;
-                case 'auth/weak-password': errorMessage = 'كلمة المرور ضعيفة'; break;
-                case 'auth/invalid-email': errorMessage = 'البريد الإلكتروني غير صالح'; break;
-                default: errorMessage = error.message;
-            }
-            
-            return { success: false, error: errorMessage };
-        }
-    }
-
     async logout() {
         try {
             await this.auth.signOut();
@@ -1380,13 +1326,13 @@ class FirebaseManager {
             userData._metadata.lastUpdatedBy = this.currentUser.email;
             userData._metadata.userId = userId;
             
-            // حفظ البيانات في Firestore للمستخدم الحالي فقط
+            // حفظ البيانات في Firestore للحساب الرئيسي
             await this.db.collection('userData').doc(userId).set(userData, { merge: true });
             
-            // أيضًا حفظ نسخة محلية للمستخدم الحالي فقط
+            // أيضًا حفظ نسخة محلية
             localStorage.setItem(`userData_${userId}`, JSON.stringify(userData));
             
-            console.log('💾 User data saved successfully for user:', userId);
+            console.log('💾 Main account data saved to Firebase');
             return { success: true };
         } catch (error) {
             console.error('❌ Save user data error:', error);
@@ -1394,7 +1340,7 @@ class FirebaseManager {
             try {
                 if (this.currentUser) {
                     localStorage.setItem(`userData_${this.currentUser.uid}`, JSON.stringify(userData));
-                    console.log('📱 Data saved locally as backup for user:', this.currentUser.uid);
+                    console.log('📱 Data saved locally as backup');
                     return { success: true, source: 'local' };
                 }
             } catch (localError) {
@@ -1431,7 +1377,7 @@ class FirebaseManager {
                 };
             }
             
-            // ثانياً: جلب البيانات من Firebase للمستخدم الحالي فقط
+            // ثانياً: جلب البيانات من Firebase للحساب الرئيسي
             const doc = await this.db.collection('userData').doc(userId).get();
             
             if (doc.exists) {
@@ -1447,7 +1393,7 @@ class FirebaseManager {
                     source: 'firebase'
                 };
             } else {
-                // إذا لم توجد بيانات، إنشاء بيانات افتراضية للمستخدم الحالي
+                // إذا لم توجد بيانات، إنشاء بيانات افتراضية للحساب الرئيسي
                 console.log('🆕 No data found, creating default data for user:', userId);
                 const defaultData = this.getDefaultUserData();
                 await this.saveUserData(defaultData);
@@ -1487,13 +1433,13 @@ class FirebaseManager {
             userProfile: {
                 name: '',
                 email: this.currentUser?.email || '',
-                role: 'user',
+                role: 'admin',
                 joinDate: currentDate,
                 lastLogin: new Date().toISOString()
             },
             contracts: [],
             invoices: [],
-            users: [],
+            members: [], // تغيير من users إلى members
             permissions: {},
             settings: {
                 theme: 'dark-gold',
