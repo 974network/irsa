@@ -836,21 +836,26 @@ class DataManagementSystem {
 
 // ===== نظام التكامل مع Excel =====
 
+// ===== نظام التكامل مع Excel & Google Sheets =====
 class ExcelIntegration {
     static async connectToExcelOnline(data, service = 'microsoft') {
         try {
-            console.log(`جاري الربط مع ${service}...`);
-            
+            console.log(`🔗 جاري الربط مع ${service}...`);
+
             if (service === 'microsoft') {
                 return await this.connectToMicrosoftExcel(data);
             } else if (service === 'google') {
-                return await this.connectToGoogleSheets(data);
+                // الاتصال مع Google Sheets
+                const sheetId = "ضع_هنا_ID_الجدول"; // مثل: 1aBcD_EfgHijKlmNOPqrStUvWxYZ12345
+                const sheetName = "Sheet1";
+                const result = await this.syncWithGoogleSheet(sheetId, sheetName, data);
+                return result;
             } else {
-                throw new Error('Service not supported');
+                throw new Error('الخدمة غير مدعومة');
             }
         } catch (error) {
-            console.error('Connection error:', error);
-            throw error;
+            console.error('❌ خطأ في الاتصال:', error);
+            return { success: false, error: error.message };
         }
     }
 
@@ -863,12 +868,12 @@ class ExcelIntegration {
                     message: 'تم الربط مع Microsoft Excel Online بنجاح',
                     url: 'https://excel.office.com'
                 });
-            }, 2000);
+            }, 1500);
         });
     }
 
     static async connectToGoogleSheets(data) {
-        // محاكاة الاتصال مع Google Sheets
+        // محاكاة بسيطة (يمكن حذفها إذا استخدمت syncWithGoogleSheet مباشرة)
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve({
@@ -876,18 +881,43 @@ class ExcelIntegration {
                     message: 'تم الربط مع Google Sheets بنجاح',
                     url: 'https://sheets.google.com'
                 });
-            }, 2000);
+            }, 1000);
         });
     }
 
+    // ===== دالة المزامنة مع Google Sheets =====
+    static async syncWithGoogleSheet(sheetId, sheetName = "Sheet1", data = []) {
+        try {
+            // تحويل البيانات إلى CSV
+            const worksheet = XLSX.utils.aoa_to_sheet(data);
+            const csv = XLSX.utils.sheet_to_csv(worksheet);
+
+            // عنوان تطبيق Apps Script (تضعه من النشر)
+            const url = "https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec";
+
+            const response = await fetch(url, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ sheetId, sheetName, csv })
+            });
+
+            const result = await response.json();
+
+            if (result.error) throw new Error(result.error);
+            return { success: true, message: result.message || "تم تحديث Google Sheet بنجاح" };
+        } catch (error) {
+            console.error("❌ خطأ في مزامنة Google Sheet:", error);
+            return { success: false, error: error.message };
+        }
+    }
+
+    // ===== تصدير إلى صيغ متعددة =====
     static async exportToVariousFormats(data, format = 'xlsx') {
         const formats = {
             'xlsx': () => this.exportToXLSX(data),
             'csv': () => this.exportToCSV(data),
-            'json': () => this.exportToJSON(data),
-            'pdf': () => this.exportToPDF(data)
+            'json': () => this.exportToJSON(data)
         };
-
         return formats[format] ? formats[format]() : this.exportToXLSX(data);
     }
 
@@ -896,11 +926,11 @@ class ExcelIntegration {
             const workbook = XLSX.utils.book_new();
             const worksheet = XLSX.utils.aoa_to_sheet(data);
             XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
-            
+
             const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.xlsx`;
             XLSX.writeFile(workbook, fileName);
-            
-            return { success: true, fileName: fileName };
+
+            return { success: true, fileName };
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -911,9 +941,8 @@ class ExcelIntegration {
             const worksheet = XLSX.utils.aoa_to_sheet(data);
             const csv = XLSX.utils.sheet_to_csv(worksheet);
             const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.csv`;
-            
             this.downloadFile(csv, fileName, 'text/csv');
-            return { success: true, fileName: fileName };
+            return { success: true, fileName };
         } catch (error) {
             return { success: false, error: error.message };
         }
@@ -923,7 +952,6 @@ class ExcelIntegration {
         try {
             const headers = data[0];
             const jsonData = [];
-            
             for (let i = 1; i < data.length; i++) {
                 const obj = {};
                 headers.forEach((header, index) => {
@@ -931,28 +959,13 @@ class ExcelIntegration {
                 });
                 jsonData.push(obj);
             }
-            
             const jsonString = JSON.stringify(jsonData, null, 2);
             const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.json`;
-            
             this.downloadFile(jsonString, fileName, 'application/json');
-            return { success: true, fileName: fileName };
+            return { success: true, fileName };
         } catch (error) {
             return { success: false, error: error.message };
         }
-    }
-
-    static exportToPDF(data) {
-        // محاكاة تصدير PDF
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve({
-                    success: true,
-                    message: 'تم تصدير البيانات بصيغة PDF',
-                    fileName: `البيانات_${new Date().toISOString().split('T')[0]}.pdf`
-                });
-            }, 1500);
-        });
     }
 
     static downloadFile(content, fileName, contentType) {
@@ -967,65 +980,24 @@ class ExcelIntegration {
         URL.revokeObjectURL(url);
     }
 
+    // ===== بيانات نموذجية =====
     static generateSampleData(type = 'customers', count = 10) {
-        const dataTypes = {
-            customers: () => {
-                const headers = ['ID', 'الاسم', 'البريد الإلكتروني', 'الهاتف', 'العنوان', 'تاريخ التسجيل'];
-                const data = [headers];
-                
-                for (let i = 1; i <= count; i++) {
-                    data.push([
-                        i,
-                        `عميل ${i}`,
-                        `customer${i}@example.com`,
-                        `05${Math.floor(10000000 + Math.random() * 90000000)}`,
-                        `عنوان ${i}`,
-                        new Date().toISOString().split('T')[0]
-                    ]);
-                }
-                return data;
-            },
-            
-            products: () => {
-                const headers = ['ID', 'اسم المنتج', 'الفئة', 'السعر', 'الكمية', 'التوفر'];
-                const data = [headers];
-                
-                for (let i = 1; i <= count; i++) {
-                    data.push([
-                        i,
-                        `منتج ${i}`,
-                        ['إلكترونيات', 'ملابس', 'أغذية', 'أثاث'][Math.floor(Math.random() * 4)],
-                        Math.floor(Math.random() * 1000) + 100,
-                        Math.floor(Math.random() * 100) + 1,
-                        Math.random() > 0.2 ? 'متوفر' : 'غير متوفر'
-                    ]);
-                }
-                return data;
-            },
-            
-            sales: () => {
-                const headers = ['رقم العملية', 'العميل', 'المبلغ', 'التاريخ', 'الحالة'];
-                const data = [headers];
-                
-                for (let i = 1; i <= count; i++) {
-                    const date = new Date();
-                    date.setDate(date.getDate() - Math.floor(Math.random() * 30));
-                    
-                    data.push([
-                        `INV-${1000 + i}`,
-                        `عميل ${Math.floor(Math.random() * 10) + 1}`,
-                        Math.floor(Math.random() * 5000) + 100,
-                        date.toISOString().split('T')[0],
-                        ['مكتمل', 'معلق', 'ملغى'][Math.floor(Math.random() * 3)]
-                    ]);
-                }
-                return data;
-            }
-        };
-        
-        return dataTypes[type] ? dataTypes[type]() : dataTypes.customers();
+        const headers = ['ID', 'الاسم', 'البريد الإلكتروني', 'الهاتف', 'العنوان', 'التاريخ'];
+        const data = [headers];
+        for (let i = 1; i <= count; i++) {
+            data.push([
+                i,
+                `عميل ${i}`,
+                `customer${i}@example.com`,
+                `05${Math.floor(10000000 + Math.random() * 90000000)}`,
+                `الدوحة - قطر`,
+                new Date().toLocaleDateString('ar-QA')
+            ]);
+        }
+        return data;
     }
 }
+
 
 // ===== مدير Firebase - الإصدار النهائي =====
 
@@ -1397,3 +1369,4 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
