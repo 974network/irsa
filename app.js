@@ -838,26 +838,31 @@ class DataManagementSystem {
 
 // ===== نظام التكامل مع Excel & Google Sheets =====
 class ExcelIntegration {
-    static async connectToExcelOnline(data, service = 'microsoft') {
-        try {
-            console.log(`🔗 جاري الربط مع ${service}...`);
+    static async exportToXLSX(data) {
+    try {
+        // قبل إنشاء الملف، نجلب أحدث نسخة من Google Sheet
+        const sheetId = "1dtxlQthn2b2prfXOxdEn28r5hHfGZB"; // معرّف الجدول الصحيح
+        const sheetName = "Sheet1";
+        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${sheetName}`;
+        
+        const response = await fetch(url);
+        const csvText = await response.text();
+        const rows = csvText.split('\n').map(r => r.split(','));
 
-            if (service === 'microsoft') {
-                return await this.connectToMicrosoftExcel(data);
-            } else if (service === 'google') {
-                // الاتصال مع Google Sheets
-                const sheetId = "1dtXLQhtnb2h2prRXOxdEn28r5hFIFGZB"
-                const sheetName = "Sheet1";
-                const result = await this.syncWithGoogleSheet(sheetId, sheetName, data);
-                return result;
-            } else {
-                throw new Error('الخدمة غير مدعومة');
-            }
-        } catch (error) {
-            console.error('❌ خطأ في الاتصال:', error);
-            return { success: false, error: error.message };
-        }
+        const workbook = XLSX.utils.book_new();
+        const worksheet = XLSX.utils.aoa_to_sheet(rows);
+        XLSX.utils.book_append_sheet(workbook, worksheet, "البيانات");
+
+        const fileName = `البيانات_${new Date().toISOString().split('T')[0]}.xlsx`;
+        XLSX.writeFile(workbook, fileName);
+
+        return { success: true, fileName };
+    } catch (error) {
+        console.error("❌ خطأ في التصدير من Google Sheet:", error);
+        return { success: false, error: error.message };
     }
+}
+}
 
     static async connectToMicrosoftExcel(data) {
         // محاكاة الاتصال مع Microsoft Excel Online
@@ -1369,5 +1374,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
