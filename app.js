@@ -847,7 +847,7 @@ class ExcelIntegration {
         const sheetName = "New Rents"; // اسم الورقة بالضبط مثل ما يظهر أسفل الجدول في Google Sheets
 
         // -------- جلب البيانات الفعلية من Google Sheet --------
-        const url = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(sheetName)}`;
+        const url = `https://script.google.com/macros/s/AKfycbxM9uh0czTbOq06i1jYuuC0jnsZVgb7FX8_Zri3cG2jXF4wvQVxAlKkfsKlYomKGzioQg/exec`;
         const response = await fetch(url);
         const csv = await response.text();
 
@@ -1388,6 +1388,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
 
 
