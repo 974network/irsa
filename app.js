@@ -318,31 +318,6 @@ class DataManagementSystem {
         await this.saveCurrentData();
     }
 
-    exportDataToExcel(data) {
-        try {
-            // إنشاء ملف Excel
-            const workbook = XLSX.utils.book_new();
-            const worksheet = XLSX.utils.aoa_to_sheet(data);
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'البيانات');
-
-            // تحميل الملف
-            const fileName = `البيانات_المصدّرة_${new Date().toISOString().split('T')[0]}.xlsx`;
-            XLSX.writeFile(workbook, fileName);
-            
-            // حفظ في السجل
-            this.saveExportHistory({
-                type: 'excel',
-                fileName: fileName,
-                recordCount: data.length - 1,
-                date: new Date().toISOString()
-            });
-            
-        } catch (error) {
-            this.showNotification('خطأ في تصدير البيانات', 'error');
-            console.error('Export error:', error);
-        }
-    }
-
     // دالة استيراد من Excel - معدلة للحفظ التلقائي
     async importFromExcel() {
         const input = document.createElement('input');
@@ -1360,4 +1335,5 @@ document.addEventListener('DOMContentLoaded', () => {
         document.head.appendChild(script);
     }
 });
+
 
