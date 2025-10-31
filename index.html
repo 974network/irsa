@@ -901,7 +901,7 @@
 
     <script>
         // تهيئة المتغيرات
-        const totalSteps = 8;
+        const totalSteps = 7;
         let currentStep = 1;
         
         // عناصر DOM
@@ -966,107 +966,89 @@
         
         // التحقق من صحة الإجابة في الخطوة الحالية
 function validateStep(step) {
-    switch(step) {
-        case 1:
-            const projectName = document.querySelector('input[name="project_name"]').value.trim();
-            if (!projectName) {
-                showError(1, "يرجى إدخال اسم الورشة أو المشروع");
-                return false;
-            }
-            return true;
-            
-        case 2:
-            const workType = document.querySelector('input[name="work_type"]:checked');
-            if (!workType) {
-                showError(2, "يرجى اختيار نوع الشغل الأساسي");
-                return false;
-            }
-            if (workType.value === "شيء آخر") {
-                const customWork = document.querySelector('input[name="work_custom"]').value.trim();
-                if (!customWork) {
-                    showError(2, "يرجى تحديد نوع الشغل الآخر");
-                    return false;
-                }
-            }
-            return true;
+  switch (step) {
+    case 1:
+      const projectName = document.querySelector('input[name="project_name"]').value.trim();
+      if (!projectName) {
+        showError(1, "يرجى إدخال اسم الورشة أو المشروع");
+        return false;
+      }
+      return true;
 
-        case 3:
-            const logoStyle = document.querySelector('input[name="logo_style"]:checked');
-            if (!logoStyle) {
-                showError(3, "يرجى اختيار شكل الشعار المفضل");
-                return false;
-            }
-            return true;
-            
-        case 4:
-            const colors = document.querySelector('input[name="colors"]:checked');
-            if (!colors) {
-                showError(4, "يرجى اختيار الألوان المفضلة");
-                return false;
-            }
-            if (colors.value === "شيء آخر") {
-                const customColor = document.querySelector('input[name="color_custom"]').value.trim();
-                if (!customColor) {
-                    showError(4, "يرجى تحديد الألوان المفضلة الأخرى");
-                    return false;
-                }
-            }
-            return true;
-            
-        case 5:
-            const logoType = document.querySelector('input[name="logo_type"]:checked');
-            if (!logoType) {
-                showError(5, "يرجى اختيار نوع الشعار");
-                return false;
-            }
-            return true;
-            
-        case 6:
-            const feeling = document.querySelector('input[name="feeling"]:checked');
-            if (!feeling) {
-                showError(6, "يرجى اختيار الإحساس المطلوب");
-                return false;
-            }
-            if (feeling.value === "شيء آخر") {
-                const customFeeling = document.querySelector('input[name="feeling_custom"]').value.trim();
-                if (!customFeeling) {
-                    showError(6, "يرجى تحديد الإحساس المطلوب الآخر");
-                    return false;
-                }
-            }
-            return true;
-            
-        case 7:
-            const usage = document.querySelectorAll('input[name="usage"]:checked');
-            if (usage.length === 0) {
-                showError(7, "يرجى اختيار الاستخدام على الأقل");
-                return false;
-            }
-            let hasOtherUsage = false;
-            usage.forEach(use => {
-                if (use.value === "شيء آخر") hasOtherUsage = true;
-            });
-            if (hasOtherUsage) {
-                const customUsage = document.querySelector('input[name="usage_custom"]').value.trim();
-                if (!customUsage) {
-                    showError(7, "يرجى تحديد الاستخدامات الأخرى");
-                    return false;
-                }
-            }
-            return true;
-            
-        case 8:
-            const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-            if (!oldLogo) {
-                showError(8, "يرجى الإجابة على هذا السؤال");
-                return false;
-            }
-            return true;
-            
-        default:
-            return true;
-    }
+    case 2:
+      const workType = document.querySelector('input[name="work_type"]:checked');
+      if (!workType) {
+        showError(2, "يرجى اختيار نوع الشغل الأساسي");
+        return false;
+      }
+      if (workType.value === "شيء آخر") {
+        const customWork = document.querySelector('input[name="work_custom"]').value.trim();
+        if (!customWork) {
+          showError(2, "يرجى تحديد نوع الشغل الآخر");
+          return false;
+        }
+      }
+      return true;
+
+    case 3:
+      const logoStyle = document.querySelector('input[name="logo_style"]:checked');
+      if (!logoStyle) {
+        showError(3, "يرجى اختيار شكل الشعار المفضل");
+        return false;
+      }
+      return true;
+
+    case 4:
+      const colors = document.querySelector('input[name="colors"]:checked');
+      if (!colors) {
+        showError(4, "يرجى اختيار الألوان المفضلة");
+        return false;
+      }
+      if (colors.value === "شيء آخر") {
+        const customColor = document.querySelector('input[name="color_custom"]').value.trim();
+        if (!customColor) {
+          showError(4, "يرجى تحديد الألوان المفضلة الأخرى");
+          return false;
+        }
+      }
+      return true;
+
+    case 5:
+      const logoType = document.querySelector('input[name="logo_type"]:checked');
+      if (!logoType) {
+        showError(5, "يرجى اختيار نوع الشعار");
+        return false;
+      }
+      return true;
+
+    case 6:
+      const feeling = document.querySelector('input[name="feeling"]:checked');
+      if (!feeling) {
+        showError(6, "يرجى اختيار الإحساس المطلوب");
+        return false;
+      }
+      if (feeling.value === "شيء آخر") {
+        const customFeeling = document.querySelector('input[name="feeling_custom"]').value.trim();
+        if (!customFeeling) {
+          showError(6, "يرجى تحديد الإحساس المطلوب الآخر");
+          return false;
+        }
+      }
+      return true;
+
+    case 7:
+      const oldLogo = document.querySelector('input[name="old_logo"]:checked');
+      if (!oldLogo) {
+        showError(7, "يرجى الإجابة على هذا السؤال");
+        return false;
+      }
+      return true;
+
+    default:
+      return true;
+  }
 }
+
 
         
         // إظهار رسالة الخطأ
@@ -1264,6 +1246,7 @@ radioFields.forEach(f => {
     </script>
 </body>
 </html>
+
 
 
 
