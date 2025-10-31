@@ -3,52 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>استبيان العصيل المآخر ❤</title>
+  <title>استبيان العميل الفاخر</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
     
     :root {
-      --primary: #ff2a70;
-      --secondary: #ff7bac;
-      --accent: #ffb8d9;
-      --dark: #1a1a2e;
-      --light: #f8f8ff;
-      --glass: rgba(255, 255, 255, 0.1);
-      --glass-border: rgba(255, 255, 255, 0.2);
+      --gold: #d4af37;
+      --dark-gold: #b8860b;
+      --light-gold: #f1c75e;
+      --bg-dark: rgba(20, 15, 10, 0.95);
+      --text-light: #f8e9c4;
+      --glass: rgba(255, 255, 255, 0.08);
+      --glass-border: rgba(212, 175, 55, 0.3);
     }
     
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: 'Tajawal', sans-serif;
+      font-family: 'El Messiri', sans-serif;
     }
     
     body {
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-      color: var(--light);
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(180, 140, 20, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
+      color: var(--text-light);
       min-height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
       padding: 20px;
       position: relative;
-      overflow-x: hidden;
-    }
-    
-    body::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(255, 42, 112, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(255, 123, 172, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 40% 80%, rgba(255, 184, 217, 0.1) 0%, transparent 50%);
-      z-index: -1;
     }
     
     .container {
@@ -64,36 +52,32 @@
     }
     
     .title {
-      font-size: 3.2rem;
+      font-size: 2.8rem;
       font-weight: 700;
       margin-bottom: 15px;
-      background: linear-gradient(45deg, var(--primary), var(--secondary), var(--accent));
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 0 30px rgba(255, 42, 112, 0.3);
+      color: var(--gold);
+      text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
       position: relative;
       display: inline-block;
     }
     
     .title::after {
-      content: '❤';
+      content: '✨';
       position: absolute;
-      top: -15px;
-      right: -30px;
-      font-size: 2rem;
-      animation: pulse 2s infinite;
+      top: -10px;
+      left: -35px;
+      font-size: 1.8rem;
+      animation: sparkle 3s infinite;
     }
     
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.2); }
-      100% { transform: scale(1); }
+    @keyframes sparkle {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.2); }
     }
     
     .subtitle {
       font-size: 1.2rem;
-      color: rgba(255, 255, 255, 0.8);
+      color: #f5e9c2;
       max-width: 600px;
       margin: 0 auto;
       line-height: 1.6;
@@ -105,7 +89,7 @@
       border: 1px solid var(--glass-border);
       border-radius: 25px;
       padding: 40px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
       position: relative;
       overflow: hidden;
     }
@@ -117,46 +101,52 @@
       left: -50%;
       width: 200%;
       height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
       z-index: -1;
     }
     
-    .section {
-      margin-bottom: 40px;
-      padding-bottom: 30px;
-      border-bottom: 1px solid var(--glass-border);
+    .form-step {
+      display: none;
+      animation: fadeIn 0.5s ease;
     }
     
-    .section:last-of-type {
-      border-bottom: none;
-      margin-bottom: 0;
-      padding-bottom: 0;
+    .form-step.active {
+      display: block;
     }
     
-    .section-title {
-      font-size: 1.8rem;
-      margin-bottom: 25px;
-      color: var(--accent);
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .question {
+      margin-bottom: 30px;
+    }
+    
+    .question-title {
+      font-size: 1.4rem;
+      margin-bottom: 20px;
+      color: var(--light-gold);
       display: flex;
       align-items: center;
       gap: 10px;
     }
     
-    .section-title i {
-      font-size: 1.5rem;
+    .question-title i {
+      font-size: 1.2rem;
     }
     
     .options-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
+      gap: 15px;
     }
     
     .option-card {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--glass-border);
       border-radius: 15px;
-      padding: 20px;
+      padding: 18px;
       cursor: pointer;
       transition: all 0.3s ease;
       position: relative;
@@ -170,7 +160,7 @@
       right: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(255, 42, 112, 0.1) 0%, transparent 70%);
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
       opacity: 0;
       transition: opacity 0.3s ease;
     }
@@ -178,7 +168,7 @@
     .option-card:hover {
       transform: translateY(-5px);
       box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      border-color: var(--primary);
+      border-color: var(--gold);
     }
     
     .option-card:hover::before {
@@ -186,9 +176,9 @@
     }
     
     .option-card.selected {
-      border-color: var(--primary);
-      background: rgba(255, 42, 112, 0.1);
-      box-shadow: 0 0 20px rgba(255, 42, 112, 0.2);
+      border-color: var(--gold);
+      background: rgba(212, 175, 55, 0.1);
+      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
     }
     
     .option-card.selected::before {
@@ -201,10 +191,10 @@
     }
     
     .option-title {
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       font-weight: 600;
-      margin-bottom: 10px;
-      color: var(--light);
+      margin-bottom: 8px;
+      color: var(--light-gold);
     }
     
     .option-desc {
@@ -213,90 +203,111 @@
       line-height: 1.5;
     }
     
-    .checkbox {
+    .checkbox, .radio {
       display: none;
     }
     
-    .submit-btn {
-      display: block;
+    .text-input {
       width: 100%;
-      padding: 18px;
-      background: linear-gradient(45deg, var(--primary), var(--secondary));
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      color: var(--text-light);
+      font-size: 1rem;
+      transition: all 0.3s ease;
+    }
+    
+    .text-input:focus {
+      outline: none;
+      border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .form-navigation {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 40px;
+    }
+    
+    .nav-btn {
+      padding: 12px 25px;
+      background: linear-gradient(45deg, var(--dark-gold), var(--gold));
       border: none;
-      border-radius: 15px;
-      color: white;
-      font-size: 1.2rem;
-      font-weight: 600;
+      border-radius: 10px;
+      color: #1c1a1a;
+      font-weight: bold;
+      font-size: 1rem;
       cursor: pointer;
       transition: all 0.3s ease;
-      margin-top: 30px;
-      box-shadow: 0 5px 15px rgba(255, 42, 112, 0.3);
-      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .nav-btn:hover {
+      background: linear-gradient(45deg, var(--gold), var(--light-gold));
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
+    }
+    
+    .nav-btn:disabled {
+      background: rgba(255, 255, 255, 0.1);
+      color: rgba(255, 255, 255, 0.5);
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .progress-container {
+      margin-bottom: 30px;
+    }
+    
+    .progress-bar {
+      height: 8px;
+      background: rgba(212, 175, 55, 0.2);
+      border-radius: 4px;
       overflow: hidden;
     }
     
-    .submit-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
+    .progress {
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transition: left 0.5s;
+      background: linear-gradient(90deg, var(--dark-gold), var(--gold));
+      width: 10%;
+      transition: width 0.5s ease;
     }
     
-    .submit-btn:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 8px 20px rgba(255, 42, 112, 0.4);
+    .progress-text {
+      text-align: center;
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--light-gold);
     }
     
-    .submit-btn:hover::before {
-      left: 100%;
+    .step-indicators {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 30px;
     }
     
-    .submit-btn:active {
-      transform: translateY(0);
+    .step-indicator {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.3);
+      transition: all 0.3s ease;
     }
     
-    .floating-hearts {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: -1;
-    }
-    
-    .heart {
-      position: absolute;
-      font-size: 1.5rem;
-      color: var(--primary);
-      opacity: 0.3;
-      animation: float 8s infinite linear;
-    }
-    
-    @keyframes float {
-      0% {
-        transform: translateY(100vh) rotate(0deg);
-        opacity: 0;
-      }
-      10% {
-        opacity: 0.5;
-      }
-      90% {
-        opacity: 0.5;
-      }
-      100% {
-        transform: translateY(-100px) rotate(360deg);
-        opacity: 0;
-      }
+    .step-indicator.active {
+      background: var(--gold);
+      box-shadow: 0 0 10px var(--gold);
     }
     
     @media (max-width: 768px) {
       .title {
-        font-size: 2.5rem;
+        font-size: 2.2rem;
       }
       
       .form-container {
@@ -306,168 +317,477 @@
       .options-grid {
         grid-template-columns: 1fr;
       }
+      
+      .form-navigation {
+        flex-direction: column;
+        gap: 15px;
+      }
+      
+      .nav-btn {
+        width: 100%;
+        justify-content: center;
+      }
     }
     
     @media (max-width: 480px) {
       .title {
-        font-size: 2rem;
+        font-size: 1.8rem;
       }
       
       .subtitle {
         font-size: 1rem;
       }
       
-      .section-title {
-        font-size: 1.5rem;
+      .question-title {
+        font-size: 1.2rem;
       }
     }
   </style>
 </head>
 <body>
-  <div class="floating-hearts" id="hearts-container"></div>
-  
   <div class="container">
     <div class="header">
-      <h1 class="title">استبيان العصيل المآخر</h1>
-      <p class="subtitle">لحن هنا لمصمم هوية فريدة تزيد وجاهة الرقم بك. أجب عن الأسئلة بدقة</p>
+      <h1 class="title">استبيان العميل الفاخر</h1>
+      <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة البيانات بدقة</p>
     </div>
     
     <div class="form-container">
-      <form id="designForm">
-        <div class="section">
-          <h2 class="section-title"><i class="fas fa-palette"></i> نوع الشكل</h2>
-          <div class="options-grid">
-            <label class="option-card">
-              <input type="radio" name="shape" value="كلاسيكي" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">كلاسيكي</h3>
-                <p class="option-desc">تصميم تقليدي أنيق يناسب العلامات التجارية الراسخة</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="shape" value="حديث" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">حديث</h3>
-                <p class="option-desc">تصميم معاصر بخطوط نظيفة وألوان عصرية</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="shape" value="فني" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">فني</h3>
-                <p class="option-desc">تصميم إبداعي يعبر عن الشخصية الفريدة</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="shape" value="بسيط" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">بسيط</h3>
-                <p class="option-desc">تصميم minimalistic يركز على الجوهر</p>
-              </div>
-            </label>
+      <div class="progress-container">
+        <div class="progress-bar">
+          <div class="progress" id="progress"></div>
+        </div>
+        <div class="progress-text" id="progress-text">السؤال 1 من 10</div>
+      </div>
+      
+      <div class="step-indicators" id="step-indicators">
+        <!-- سيتم إضافة مؤشرات الخطوات هنا عبر JavaScript -->
+      </div>
+      
+      <form id="clientForm">
+        <!-- الخطوة 1 -->
+        <div class="form-step active" id="step-1">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-signature"></i> 1️⃣ اسم الورشة أو المشروع</h2>
+            <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" required>
           </div>
         </div>
         
-        <div class="section">
-          <h2 class="section-title"><i class="fas fa-pen-nib"></i> نوع الخط</h2>
-          <div class="options-grid">
-            <label class="option-card">
-              <input type="radio" name="font" value="خط عربي تقليدي" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">خط عربي تقليدي</h3>
-                <p class="option-desc">خطوط عربية كلاسيكية تعبر عن الأصالة</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="font" value="خط عربي حديث" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">خط عربي حديث</h3>
-                <p class="option-desc">خطوط عربية معاصرة تجمع بين الأصالة والحداثة</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="font" value="خط لاتيني" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">خط لاتيني</h3>
-                <p class="option-desc">خطوط إنجليزية تناسب العلامات العالمية</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="font" value="مزيج الخطين" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">مزيج الخطين</h3>
-                <p class="option-desc">دمج بين الخط العربي واللاتيني في تصميم متناغم</p>
-              </div>
-            </label>
+        <!-- الخطوة 2 -->
+        <div class="form-step" id="step-2">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-language"></i> 2️⃣ اللغة المفضلة</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="language" value="عربي فقط" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">عربي فقط</h3>
+                  <p class="option-desc">استخدام اللغة العربية فقط في التصميم</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="language" value="إنجليزي فقط" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">إنجليزي فقط</h3>
+                  <p class="option-desc">استخدام اللغة الإنجليزية فقط في التصميم</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="language" value="الاثنين معاً" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">الاثنين معاً</h3>
+                  <p class="option-desc">دمج اللغتين العربية والإنجليزية في التصميم</p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
         
-        <div class="section">
-          <h2 class="section-title"><i class="fas fa-fill-drip"></i> الألوان المفضلة</h2>
-          <div class="options-grid">
-            <label class="option-card">
-              <input type="radio" name="colors" value="ألوان دافئة" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">ألوان دافئة</h3>
-                <p class="option-desc">الأحمر، البرتقالي، الأصفر وتدرجاتها</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="colors" value="ألوان باردة" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">ألوان باردة</h3>
-                <p class="option-desc">الأزرق، الأخضر، البنفسجي وتدرجاتها</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="colors" value="ألوان محايدة" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">ألوان محايدة</h3>
-                <p class="option-desc">الأبيض، الأسود، الرمادي وتدرجاتها</p>
-              </div>
-            </label>
-            
-            <label class="option-card">
-              <input type="radio" name="colors" value="مزيج خاص" class="checkbox">
-              <div class="option-content">
-                <h3 class="option-title">مزيج خاص</h3>
-                <p class="option-desc">مزيج مخصص من الألوان حسب الطلب</p>
-              </div>
-            </label>
+        <!-- الخطوة 3 -->
+        <div class="form-step" id="step-3">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-tools"></i> 3️⃣ نوع الشغل الأساسي</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="work_type" value="دهان" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">دهان</h3>
+                  <p class="option-desc">أعمال الدهان والديكور</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="work_type" value="تذهيب" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">تذهيب</h3>
+                  <p class="option-desc">أعمال التذهيب والزخرفة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="work_type" value="تشطيب" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">تشطيب</h3>
+                  <p class="option-desc">أعمال التشطيب النهائي</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="work_type" value="حفر ونقش" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">حفر ونقش</h3>
+                  <p class="option-desc">أعمال الحفر والنقش على الخشب وغيره</p>
+                </div>
+              </label>
+            </div>
           </div>
         </div>
         
-        <button type="submit" class="submit-btn">إرسال الاستبيان</button>
+        <!-- الخطوة 4 -->
+        <div class="form-step" id="step-4">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-users"></i> 4️⃣ نوع العملاء</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="checkbox" name="clients" value="نجارين" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">نجارين</h3>
+                  <p class="option-desc">التعامل مع أصحاب ورش النجارة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="clients" value="محلات" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">محلات</h3>
+                  <p class="option-desc">التعامل مع المحلات التجارية</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="clients" value="زبائن مباشر" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">زبائن مباشر</h3>
+                  <p class="option-desc">التعامل المباشر مع العملاء</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="clients" value="فلل وقصور" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">فلل وقصور</h3>
+                  <p class="option-desc">التعامل مع ملاك الفلل والقصور</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 5 -->
+        <div class="form-step" id="step-5">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-paint-brush"></i> 5️⃣ شكل الشعار المفضل</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">فخم وكلاسيكي</h3>
+                  <p class="option-desc">تصميم تقليدي أنيق يعكس الفخامة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="logo_style" value="بسيط وحديث" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">بسيط وحديث</h3>
+                  <p class="option-desc">تصميم معاصر بسيط وواضح</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">مزيج من الإثنين</h3>
+                  <p class="option-desc">دمج بين الفخامة والبساطة</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 6 -->
+        <div class="form-step" id="step-6">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-palette"></i> 6️⃣ الألوان المفضلة</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">ذهبي وكلاسيكي</h3>
+                  <p class="option-desc">ألوان ذهبية مع ألوان كلاسيكية</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="colors" value="ألوان ترابية" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">ألوان ترابية</h3>
+                  <p class="option-desc">درجات البني والألوان الترابية</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="colors" value="ألوان زاهية" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">ألوان زاهية</h3>
+                  <p class="option-desc">ألوان مشرقة وزاهية</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="colors" value="ألوان محايدة" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">ألوان محايدة</h3>
+                  <p class="option-desc">أبيض، أسود، رمادي وتدرجاتها</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 7 -->
+        <div class="form-step" id="step-7">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-drafting-compass"></i> 7️⃣ نوع الشعار</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="logo_type" value="رمز فقط" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">رمز فقط</h3>
+                  <p class="option-desc">شعار يعتمد على رمز مثل فرشة أو زخرفة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="logo_type" value="كتابة فقط" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">كتابة فقط</h3>
+                  <p class="option-desc">شعار يعتمد على النص والخطوط فقط</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="logo_type" value="رمز وكتابة" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">رمز وكتابة</h3>
+                  <p class="option-desc">دمج بين الرمز والنص في التصميم</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 8 -->
+        <div class="form-step" id="step-8">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-heart"></i> 8️⃣ الإحساس المطلوب</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="feeling" value="فخامة" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">فخامة</h3>
+                  <p class="option-desc">إيحاء بالفخامة والتميز</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="feeling" value="احتراف" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">احتراف</h3>
+                  <p class="option-desc">إيحاء بالاحترافية والخبرة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="feeling" value="ذوق" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">ذوق</h3>
+                  <p class="option-desc">إيحاء بالذوق الرفيع</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="feeling" value="ثقة" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">ثقة</h3>
+                  <p class="option-desc">إيحاء بالثقة والموثوقية</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 9 -->
+        <div class="form-step" id="step-9">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-share-alt"></i> 9️⃣ أول استخدام للشعار</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="checkbox" name="usage" value="سوشال ميديا" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">سوشال ميديا</h3>
+                  <p class="option-desc">منصات التواصل الاجتماعي</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="usage" value="لوحة الورشة" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">لوحة الورشة</h3>
+                  <p class="option-desc">لوحة إعلانية للورشة</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="usage" value="كرت شخصي" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">كرت شخصي</h3>
+                  <p class="option-desc">بطاقات العمل الشخصية</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="checkbox" name="usage" value">موقع إلكتروني" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">موقع إلكتروني</h3>
+                  <p class="option-desc">الموقع الإلكتروني للورشة</p>
+                </div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <!-- الخطوة 10 -->
+        <div class="form-step" id="step-10">
+          <div class="question">
+            <h2 class="question-title"><i class="fas fa-history"></i> 🔟 هل لديك لوجو قديم؟</h2>
+            <div class="options-grid">
+              <label class="option-card">
+                <input type="radio" name="old_logo" value="نعم" class="radio" required>
+                <div class="option-content">
+                  <h3 class="option-title">نعم</h3>
+                  <p class="option-desc">لدي شعار قديم وأرغب في تطويره</p>
+                </div>
+              </label>
+              
+              <label class="option-card">
+                <input type="radio" name="old_logo" value="لا" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">لا</h3>
+                  <p class="option-desc">لا أملك شعاراً قديماً، أريد تصميم جديد</p>
+                </div>
+              </label>
+            </div>
+          </div>
+          
+          <div class="question" id="logo-details" style="display: none; margin-top: 30px;">
+            <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
+            <textarea class="text-input" name="logo_details" rows="4" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
+          </div>
+        </div>
+        
+        <div class="form-navigation">
+          <button type="button" class="nav-btn" id="prev-btn" disabled>
+            <i class="fas fa-arrow-right"></i> السابق
+          </button>
+          <button type="button" class="nav-btn" id="next-btn">
+            التالي <i class="fas fa-arrow-left"></i>
+          </button>
+          <button type="submit" class="nav-btn" id="submit-btn" style="display: none;">
+            إرسال الاستبيان <i class="fas fa-paper-plane"></i>
+          </button>
+        </div>
       </form>
     </div>
   </div>
 
   <script>
-    // إنشاء القلوب العائمة
-    const heartsContainer = document.getElementById('hearts-container');
-    for (let i = 0; i < 15; i++) {
-      const heart = document.createElement('div');
-      heart.classList.add('heart');
-      heart.innerHTML = '❤';
-      heart.style.left = `${Math.random() * 100}%`;
-      heart.style.animationDelay = `${Math.random() * 8}s`;
-      heart.style.fontSize = `${Math.random() * 1 + 1}rem`;
-      heartsContainer.appendChild(heart);
+    // تهيئة المتغيرات
+    const totalSteps = 10;
+    let currentStep = 1;
+    
+    // عناصر DOM
+    const progressBar = document.getElementById('progress');
+    const progressText = document.getElementById('progress-text');
+    const stepIndicators = document.getElementById('step-indicators');
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const submitBtn = document.getElementById('submit-btn');
+    const logoDetails = document.getElementById('logo-details');
+    
+    // إنشاء مؤشرات الخطوات
+    for (let i = 1; i <= totalSteps; i++) {
+      const indicator = document.createElement('div');
+      indicator.classList.add('step-indicator');
+      if (i === 1) indicator.classList.add('active');
+      stepIndicators.appendChild(indicator);
     }
     
+    // تحديث واجهة المستخدم بناءً على الخطوة الحالية
+    function updateUI() {
+      // تحديث شريط التقدم
+      const progressPercentage = (currentStep / totalSteps) * 100;
+      progressBar.style.width = `${progressPercentage}%`;
+      progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
+      
+      // إظهار/إخفاء الأزرار
+      prevBtn.disabled = currentStep === 1;
+      nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+      submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+      
+      // تحديث مؤشرات الخطوات
+      document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+        if (index + 1 <= currentStep) {
+          indicator.classList.add('active');
+        } else {
+          indicator.classList.remove('active');
+        }
+      });
+      
+      // إظهار/إخفاء الخطوات
+      document.querySelectorAll('.form-step').forEach(step => {
+        step.classList.remove('active');
+      });
+      document.getElementById(`step-${currentStep}`).classList.add('active');
+    }
+    
+    // الانتقال إلى الخطوة التالية
+    function nextStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateUI();
+      }
+    }
+    
+    // الانتقال إلى الخطوة السابقة
+    function prevStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateUI();
+      }
+    }
+    
+    // إضافة مستمعي الأحداث
+    nextBtn.addEventListener('click', nextStep);
+    prevBtn.addEventListener('click', prevStep);
+    
     // تفاعل اختيار البطاقات
-    const optionCards = document.querySelectorAll('.option-card');
-    optionCards.forEach(card => {
+    document.querySelectorAll('.option-card').forEach(card => {
       card.addEventListener('click', function() {
         const radio = this.querySelector('input[type="radio"]');
+        const checkbox = this.querySelector('input[type="checkbox"]');
+        
         if (radio) {
           // إلغاء تحديد جميع البطاقات في نفس المجموعة
           const groupName = radio.getAttribute('name');
@@ -478,30 +798,62 @@
           // تحديد البطاقة المختارة
           radio.checked = true;
           this.classList.add('selected');
+          
+          // إذا كانت الخطوة 10 وتم اختيار "نعم"، إظهار حقل التفاصيل
+          if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'نعم') {
+            logoDetails.style.display = 'block';
+          } else if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'لا') {
+            logoDetails.style.display = 'none';
+          }
+        }
+        
+        if (checkbox) {
+          // تبديل حالة التحديد للـ checkbox
+          checkbox.checked = !checkbox.checked;
+          this.classList.toggle('selected', checkbox.checked);
         }
       });
     });
     
     // إرسال النموذج
-    document.getElementById('designForm').addEventListener('submit', function(e) {
+    document.getElementById('clientForm').addEventListener('submit', function(e) {
       e.preventDefault();
       
       // جمع البيانات
       const formData = new FormData(this);
       const data = {};
-      for (let [key, value] of formData.entries()) {
-        data[key] = value;
-      }
+      
+      // معالجة الحقول متعددة القيم (checkboxes)
+      const checkboxes = ['clients', 'usage'];
+      checkboxes.forEach(name => {
+        const values = [];
+        document.querySelectorAll(`input[name="${name}"]:checked`).forEach(checkbox => {
+          values.push(checkbox.value);
+        });
+        data[name] = values.join(', ');
+      });
+      
+      // جمع باقي الحقول
+      formData.forEach((value, key) => {
+        if (!checkboxes.includes(key)) {
+          data[key] = value;
+        }
+      });
       
       // هنا يمكنك إرسال البيانات إلى الخادم
-      alert('شكراً لك! تم استلام استبيانك بنجاح ❤');
+      alert('شكراً لك! تم استلام استبيانك بنجاح 🌟\nسنقوم بالتواصل معك قريباً لبدء التصميم.');
       
       // إعادة تعيين النموذج
       this.reset();
       document.querySelectorAll('.option-card').forEach(card => {
         card.classList.remove('selected');
       });
+      currentStep = 1;
+      updateUI();
     });
+    
+    // التهيئة الأولية
+    updateUI();
   </script>
 </body>
 </html>
