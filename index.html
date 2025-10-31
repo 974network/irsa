@@ -3,64 +3,428 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>استبيان العميل</title>
-  <link rel="stylesheet" href="style.css">
+  <title>استبيان العميل الفاخر</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700&display=swap');
+    
+    :root {
+      --gold: #d4af37;
+      --dark-gold: #b8860b;
+      --light-gold: #f1c75e;
+      --bg-dark: rgba(20, 15, 10, 0.95);
+      --text-light: #f8e9c4;
+    }
+    
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    
+    body {
+      margin: 0;
+      font-family: "Cairo", sans-serif;
+      background: url('https://i.ibb.co/6ZfXQ2T/wood-bg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: var(--text-light);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      position: relative;
+      padding: 20px;
+    }
+    
+    .overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      z-index: 1;
+    }
+    
+    .form-wrapper {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-dark);
+      border: 2px solid var(--gold);
+      border-radius: 20px;
+      padding: 40px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+    }
+    
+    .title {
+      text-align: center;
+      color: var(--gold);
+      margin-bottom: 15px;
+      font-size: 28px;
+      font-weight: 700;
+    }
+    
+    .subtitle {
+      text-align: center;
+      font-size: 16px;
+      color: #f5e9c2;
+      margin-bottom: 30px;
+      line-height: 1.6;
+    }
+    
+    .form {
+      max-height: 70vh;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .form::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .form::-webkit-scrollbar-track {
+      background: rgba(212, 175, 55, 0.1);
+      border-radius: 10px;
+    }
+    
+    .form::-webkit-scrollbar-thumb {
+      background: var(--gold);
+      border-radius: 10px;
+    }
+    
+    .input-group {
+      margin-bottom: 20px;
+      position: relative;
+    }
+    
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #f7e7b1;
+      font-size: 16px;
+    }
+    
+    input, select {
+      width: 100%;
+      padding: 12px 15px;
+      border: 1px solid var(--gold);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.05);
+      color: #fff;
+      outline: none;
+      font-family: "Cairo", sans-serif;
+      font-size: 15px;
+      transition: all 0.3s ease;
+    }
+    
+    input:focus, select:focus {
+      border-color: var(--light-gold);
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 0 10px rgba(241, 199, 94, 0.3);
+    }
+    
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 8px;
+    }
+    
+    .radio-option, .checkbox-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    
+    .radio-option input, .checkbox-option input {
+      width: auto;
+      margin-left: 8px;
+    }
+    
+    .radio-option label, .checkbox-option label {
+      margin-bottom: 0;
+      font-weight: 500;
+    }
+    
+    .submit-btn {
+      width: 100%;
+      margin-top: 25px;
+      padding: 15px;
+      background: linear-gradient(90deg, var(--gold), var(--dark-gold));
+      border: none;
+      color: #1c1a1a;
+      font-weight: bold;
+      font-size: 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s;
+      box-shadow: 0 4px 15px rgba(212, 175, 55, 0.4);
+    }
+    
+    .submit-btn:hover {
+      background: linear-gradient(90deg, var(--light-gold), var(--gold));
+      transform: translateY(-3px);
+      box-shadow: 0 6px 20px rgba(212, 175, 55, 0.6);
+    }
+    
+    .submit-btn:active {
+      transform: translateY(0);
+    }
+    
+    .thankyou {
+      text-align: center;
+      color: #f9eec9;
+      margin-top: 30px;
+      padding: 20px;
+    }
+    
+    .thankyou h2 {
+      color: var(--gold);
+      margin-bottom: 15px;
+      font-size: 26px;
+    }
+    
+    .thankyou p {
+      font-size: 17px;
+      line-height: 1.6;
+    }
+    
+    .hidden {
+      display: none;
+    }
+    
+    .progress-bar {
+      height: 6px;
+      background: rgba(212, 175, 55, 0.2);
+      border-radius: 3px;
+      margin-bottom: 25px;
+      overflow: hidden;
+    }
+    
+    .progress {
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--light-gold));
+      width: 0%;
+      transition: width 0.5s ease;
+    }
+    
+    @media (max-width: 768px) {
+      .form-wrapper {
+        padding: 25px;
+      }
+      
+      .title {
+        font-size: 24px;
+      }
+      
+      .radio-group, .checkbox-group {
+        flex-direction: column;
+        gap: 8px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .form-wrapper {
+        padding: 20px;
+      }
+      
+      .title {
+        font-size: 22px;
+      }
+      
+      .subtitle {
+        font-size: 14px;
+      }
+    }
+  </style>
 </head>
 <body>
   <div class="overlay"></div>
   <div class="form-wrapper">
-    <h1 class="title">مرحباً بك في استبيان العميل ✨</h1>
-    <p class="subtitle">يرجى تعبئة البيانات بدقة حتى نصمم لك هوية تناسب ذوقك.</p>
+    <h1 class="title">استبيان العميل الفاخر ✨</h1>
+    <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة البيانات بدقة</p>
+    
+    <div class="progress-bar">
+      <div class="progress" id="progress"></div>
+    </div>
 
     <form id="clientForm" class="form">
       <div class="input-group">
         <label>1️⃣ اسم الورشة أو المشروع</label>
-        <input type="text" name="project_name" required>
+        <input type="text" name="project_name" placeholder="أدخل اسم المشروع" required>
       </div>
 
       <div class="input-group">
-        <label>2️⃣ اللغة المفضلة (عربي / إنجليزي / الاثنين)</label>
-        <input type="text" name="language" required>
+        <label>2️⃣ اللغة المفضلة</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="lang_ar" name="language" value="عربي" required>
+            <label for="lang_ar">عربي</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="lang_en" name="language" value="إنجليزي">
+            <label for="lang_en">إنجليزي</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="lang_both" name="language" value="الاثنين">
+            <label for="lang_both">الاثنين معاً</label>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
-        <label>3️⃣ نوع الشغل (دهان، تذهيب، تشطيب...)</label>
-        <input type="text" name="work_type" required>
+        <label>3️⃣ نوع الشغل</label>
+        <select name="work_type" required>
+          <option value="" disabled selected>اختر نوع الشغل</option>
+          <option value="دهان">دهان</option>
+          <option value="تذهيب">تذهيب</option>
+          <option value="تشطيب">تشطيب</option>
+          <option value="نجارة">نجارة</option>
+          <option value="حدادة">حدادة</option>
+          <option value="بناء">بناء</option>
+          <option value="أخرى">أخرى</option>
+        </select>
       </div>
 
       <div class="input-group">
-        <label>4️⃣ نوع العملاء (فلل، محلات، زبائن مباشر...)</label>
-        <input type="text" name="clients" required>
+        <label>4️⃣ نوع العملاء</label>
+        <div class="checkbox-group">
+          <div class="checkbox-option">
+            <input type="checkbox" id="client_villas" name="clients" value="فلل">
+            <label for="client_villas">فلل</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="client_shops" name="clients" value="محلات">
+            <label for="client_shops">محلات</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="client_direct" name="clients" value="زبائن مباشر">
+            <label for="client_direct">زبائن مباشر</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="client_companies" name="clients" value="شركات">
+            <label for="client_companies">شركات</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="client_government" name="clients" value="جهات حكومية">
+            <label for="client_government">جهات حكومية</label>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
-        <label>5️⃣ شكل الشعار (فخم كلاسيكي / بسيط حديث)</label>
-        <input type="text" name="style" required>
+        <label>5️⃣ شكل الشعار المفضل</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="style_classic" name="style" value="فخم كلاسيكي" required>
+            <label for="style_classic">فخم كلاسيكي</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="style_modern" name="style" value="بسيط حديث">
+            <label for="style_modern">بسيط حديث</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="style_minimal" name="style" value="بسيط جداً">
+            <label for="style_minimal">بسيط جداً</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="style_luxury" name="style" value="فاخر جداً">
+            <label for="style_luxury">فاخر جداً</label>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
         <label>6️⃣ الألوان المفضلة</label>
-        <input type="text" name="colors" required>
+        <select name="colors" required>
+          <option value="" disabled selected>اختر الألوان المفضلة</option>
+          <option value="ذهبي وأسود">ذهبي وأسود</option>
+          <option value="أزرق وذهبي">أزرق وذهبي</option>
+          <option value="أحمر وذهبي">أحمر وذهبي</option>
+          <option value="أبيض وأسود">أبيض وأسود</option>
+          <option value="ألوان ترابية">ألوان ترابية</option>
+          <option value="ألوان زاهية">ألوان زاهية</option>
+          <option value="درجات الذهب">درجات الذهب</option>
+          <option value="أخرى">أخرى</option>
+        </select>
       </div>
 
       <div class="input-group">
-        <label>7️⃣ نوع الشعار (رمز / كتابة فقط)</label>
-        <input type="text" name="logo_type" required>
+        <label>7️⃣ نوع الشعار</label>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="logo_symbol" name="logo_type" value="رمز" required>
+            <label for="logo_symbol">رمز</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="logo_text" name="logo_type" value="كتابة فقط">
+            <label for="logo_text">كتابة فقط</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="logo_combined" name="logo_type" value="رمز وكتابة">
+            <label for="logo_combined">رمز وكتابة</label>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
-        <label>8️⃣ الإحساس المطلوب (فخامة – احتراف – ذوق...)</label>
-        <input type="text" name="feeling" required>
+        <label>8️⃣ الإحساس المطلوب</label>
+        <select name="feeling" required>
+          <option value="" disabled selected>اختر الإحساس المطلوب</option>
+          <option value="فخامة">فخامة</option>
+          <option value="احتراف">احتراف</option>
+          <option value="ذوق">ذوق</option>
+          <option value="حداثة">حداثة</option>
+          <option value="ثقة">ثقة</option>
+          <option value="ابتكار">ابتكار</option>
+          <option value="تراث">تراث</option>
+          <option value="أناقة">أناقة</option>
+        </select>
       </div>
 
       <div class="input-group">
-        <label>9️⃣ أول استخدام للشعار (سوشال ميديا – لوحة – كرت...)</label>
-        <input type="text" name="usage" required>
+        <label>9️⃣ أول استخدام للشعار</label>
+        <div class="checkbox-group">
+          <div class="checkbox-option">
+            <input type="checkbox" id="usage_social" name="usage" value="سوشال ميديا">
+            <label for="usage_social">سوشال ميديا</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="usage_board" name="usage" value="لوحة">
+            <label for="usage_board">لوحة</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="usage_card" name="usage" value="كرت">
+            <label for="usage_card">كرت</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="usage_website" name="usage" value="موقع إلكتروني">
+            <label for="usage_website">موقع إلكتروني</label>
+          </div>
+          <div class="checkbox-option">
+            <input type="checkbox" id="usage_packaging" name="usage" value="تغليف">
+            <label for="usage_packaging">تغليف</label>
+          </div>
+        </div>
       </div>
 
       <div class="input-group">
         <label>🔟 هل لديك لوجو قديم أو فكرة سابقة؟</label>
-        <input type="text" name="old_logo" required>
+        <div class="radio-group">
+          <div class="radio-option">
+            <input type="radio" id="old_logo_yes" name="old_logo" value="نعم" required>
+            <label for="old_logo_yes">نعم</label>
+          </div>
+          <div class="radio-option">
+            <input type="radio" id="old_logo_no" name="old_logo" value="لا">
+            <label for="old_logo_no">لا</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group" id="logo_details" style="display: none;">
+        <label>يرجى وصف اللوجو القديم أو الفكرة السابقة</label>
+        <textarea name="logo_details" rows="3" placeholder="أدخل وصفاً مفصلاً..." style="width: 100%; padding: 12px 15px; border: 1px solid var(--gold); border-radius: 10px; background: rgba(255, 255, 255, 0.05); color: #fff; outline: none; font-family: 'Cairo', sans-serif; font-size: 15px;"></textarea>
       </div>
 
       <button type="submit" class="submit-btn">إرسال الاستبيان</button>
@@ -68,10 +432,92 @@
 
     <div id="thankyou" class="thankyou hidden">
       <h2>شكرًا لتعبئتك الاستبيان 🌟</h2>
-      <p>تم إرسال ردّك بنجاح.</p>
+      <p>تم إرسال ردّك بنجاح. سنتواصل معك قريباً لبدء تصميم الهوية الخاصة بك.</p>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const form = document.getElementById("clientForm");
+    const thankyou = document.getElementById("thankyou");
+    const progressBar = document.getElementById("progress");
+    const logoDetails = document.getElementById("logo_details");
+    
+    // إظهار/إخفاء حقل تفاصيل اللوجو القديم
+    document.querySelectorAll('input[name="old_logo"]').forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value === 'نعم') {
+          logoDetails.style.display = 'block';
+        } else {
+          logoDetails.style.display = 'none';
+        }
+      });
+    });
+    
+    // تحديث شريط التقدم
+    form.addEventListener('input', function() {
+      const inputs = Array.from(form.querySelectorAll('input, select, textarea'));
+      const filledInputs = inputs.filter(input => {
+        if (input.type === 'checkbox' || input.type === 'radio') {
+          const name = input.name;
+          const checked = form.querySelector(`input[name="${name}"]:checked`);
+          return checked !== null;
+        } else {
+          return input.value.trim() !== '';
+        }
+      });
+      
+      const progress = (filledInputs.length / inputs.length) * 100;
+      progressBar.style.width = `${progress}%`;
+    });
+    
+    // إرسال النموذج
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      // جمع البيانات من النموذج
+      const formData = new FormData(form);
+      const data = {};
+      
+      // معالجة الحقول متعددة القيم (checkboxes)
+      const checkboxes = ['clients', 'usage'];
+      checkboxes.forEach(name => {
+        const values = [];
+        form.querySelectorAll(`input[name="${name}"]:checked`).forEach(checkbox => {
+          values.push(checkbox.value);
+        });
+        data[name] = values.join(', ');
+      });
+      
+      // جمع باقي الحقول
+      formData.forEach((value, key) => {
+        if (!checkboxes.includes(key)) {
+          data[key] = value;
+        }
+      });
+      
+      // رابط Google Apps Script (يجب استبداله برابطك الخاص)
+      const scriptURL = "ضع هنا رابط Google Script بعد نشره كخدمة ويب";
+      
+      try {
+        const response = await fetch(scriptURL, {
+          method: "POST",
+          mode: "no-cors",
+          body: JSON.stringify(data),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        
+        // بما أننا نستخدم no-cors، لا يمكننا التحقق من حالة الاستجابة
+        // لذلك نعرض رسالة النجاح مباشرة
+        form.classList.add("hidden");
+        thankyou.classList.remove("hidden");
+        
+      } catch (error) {
+        alert("حدث خطأ أثناء الإرسال، يرجى المحاولة مرة أخرى.");
+        console.error("Error:", error);
+      }
+    });
+  </script>
 </body>
 </html>
