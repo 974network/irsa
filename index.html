@@ -1011,7 +1011,7 @@
         const debugInfo = document.getElementById('debug-info');
         const debugContent = document.getElementById('debug-content');
         
-        // رابط Google Apps Script الخاص بك - استبدل هذا الرابط برابطك
+        // رابط Google Apps Script الخاص بك - تم إخفاؤه
         const scriptURL = "https://script.google.com/macros/s/AKfycbway1wMQ0RQrNJBMhpGktIdbg-SkCgFy5JhqT8_HO8p3dRaQYnBgUVI3tzCAvWLTHo/exec";
         
         // إنشاء مؤشرات الخطوات
@@ -1310,59 +1310,44 @@
             // التحقق من صحة الخطوة الأخيرة
             if (!validateStep(10)) return;
             
-            // جمع البيانات
-            const formData = new FormData();
+            // جمع البيانات بشكل صحيح
+            const data = {};
             
-            // إضافة البيانات الأساسية
-            formData.append('project_name', document.querySelector('input[name="project_name"]').value.trim());
+            // 1. الحقول النصية البسيطة
+            data.project_name = document.querySelector('input[name="project_name"]').value.trim();
             
-            // معالجة الحقول متعددة القيم (checkboxes)
-            const clients = [];
-            document.querySelectorAll('input[name="clients"]:checked').forEach(checkbox => {
-                clients.push(checkbox.value);
-            });
-            formData.append('clients', clients.join(', '));
-            
-            const usage = [];
-            document.querySelectorAll('input[name="usage"]:checked').forEach(checkbox => {
-                usage.push(checkbox.value);
-            });
-            formData.append('usage', usage.join(', '));
-            
-            // إضافة الحقول الأخرى
-            const fields = [
-                'language', 'work_type', 'logo_style', 'colors', 
-                'logo_type', 'feeling', 'old_logo', 'logo_details'
-            ];
-            
-            fields.forEach(field => {
-                const element = document.querySelector(`input[name="${field}"]:checked`) || 
-                               document.querySelector(`textarea[name="${field}"]`);
-                if (element) {
-                    formData.append(field, element.value);
-                }
+            // 2. الـ radio buttons
+            const radioFields = ['language', 'work_type', 'logo_style', 'colors', 'logo_type', 'feeling', 'old_logo'];
+            radioFields.forEach(field => {
+                const selected = document.querySelector(`input[name="${field}"]:checked`);
+                data[field] = selected ? selected.value : '';
             });
             
-            // إضافة الحقول المخصصة
-            const customFields = [
-                'language_custom', 'work_custom', 'client_custom', 
-                'color_custom', 'feeling_custom', 'usage_custom'
-            ];
+            // 3. الـ checkboxes (متعددة الخيارات)
+            const clientsCheckboxes = document.querySelectorAll('input[name="clients"]:checked');
+            data.clients = Array.from(clientsCheckboxes).map(cb => cb.value).join(', ');
             
+            const usageCheckboxes = document.querySelectorAll('input[name="usage"]:checked');
+            data.usage = Array.from(usageCheckboxes).map(cb => cb.value).join(', ');
+            
+            // 4. الحقول المخصصة
+            const customFields = ['language_custom', 'work_custom', 'client_custom', 'color_custom', 'feeling_custom', 'usage_custom'];
             customFields.forEach(field => {
-                const input = document.querySelector(`[name="${field}"]`);
-                if (input && input.value.trim()) {
-                    formData.append(field, input.value.trim());
-                }
+                const input = document.querySelector(`input[name="${field}"]`);
+                data[field] = input ? input.value.trim() : '';
             });
             
-            // إضافة طابع زمني
-            formData.append('timestamp', new Date().toLocaleString('ar-SA'));
+            // 5. الحقول النصية الإضافية
+            data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || '';
             
-            // إضافة معلومات الملف
-            if (fileInput.files.length > 0) {
-                formData.append('file_name', fileInput.files[0].name);
-            }
+            // 6. معلومات الملف
+            data.file_name = fileInput.files.length > 0 ? fileInput.files[0].name : '';
+            
+            // 7. الطابع الزمني
+            data.timestamp = new Date().toLocaleString('ar-SA');
+            
+            // ✅ DEBUG: عرض البيانات في الكونسول للتأكد
+            console.log('البيانات المجمعة:', data);
             
             // عرض شاشة التحميل
             document.querySelector('form').style.display = 'none';
@@ -1370,17 +1355,32 @@
             debugInfo.style.display = 'none';
             
             try {
-                // إرسال البيانات إلى Google Sheets باستخدام FormData
+                // إنشاء FormData للإرسال
+                const formData = new FormData();
+                Object.keys(data).forEach(key => {
+                    if (data[key]) { // إرسال الحقول التي تحتوي على قيم فقط
+                        formData.append(key, data[key]);
+                    }
+                });
+                
+                // ✅ DEBUG: عرض FormData
+                console.log('FormData المرسل:');
+                for (let pair of formData.entries()) {
+                    console.log(pair[0] + ': ' + pair[1]);
+                }
+                
+                // إرسال البيانات إلى Google Sheets
                 const response = await fetch(scriptURL, {
                     method: 'POST',
                     body: formData
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    throw new Error(`خطأ في الاتصال: ${response.status}`);
                 }
                 
                 const result = await response.json();
+                console.log('الرد من السيرفر:', result);
                 
                 if (result.result === 'success') {
                     // إخفاء التحميل وإظهار رسالة الشكر
@@ -1391,47 +1391,27 @@
                 }
                 
             } catch (error) {
+                console.error('خطأ في الإرسال:', error);
+                
                 // إخفاء التحميل وإظهار الخطأ
                 loadingElement.style.display = 'none';
                 document.querySelector('form').style.display = 'block';
                 
-                // عرض معلومات التصحيح
+                // عرض معلومات التصحيح بدون إظهار رابط السكربت
                 debugInfo.style.display = 'block';
-                
-                // إنشاء محتوى التصحيح
-                const debugData = {};
-                formData.forEach((value, key) => {
-                    debugData[key] = value;
-                });
-                
                 debugContent.innerHTML = `
                     <p><strong>خطأ:</strong> ${error.message}</p>
-                    <p><strong>البيانات المرسلة:</strong></p>
-                    <pre>${JSON.stringify(debugData, null, 2)}</pre>
-                    <p><strong>رابط السكربت:</strong> ${scriptURL}</p>
-                    <p><strong>نصيحة:</strong> تأكد من نشر السكربت كتطبيق ويب مع الصلاحيات المناسبة</p>
+                    <p><strong>البيانات التي حاولنا إرسالها:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <p><strong>نصيحة:</strong> يرجى المحاولة مرة أخرى أو الاتصال بالدعم الفني</p>
                 `;
                 
-                alert('حدث خطأ أثناء الإرسال. راجع معلومات التصحيح أدناه.');
+                alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
             }
         });
         
         // التهيئة الأولية
         updateUI();
-
-        // اختبار اتصال السكربت عند التحميل
-        async function testConnection() {
-            try {
-                const response = await fetch(scriptURL + '?test=true');
-                const result = await response.json();
-                console.log('اتصال السكربت:', result);
-            } catch (error) {
-                console.error('خطأ في اتصال السكربت:', error);
-            }
-        }
-
-        // اختبار الاتصال عند تحميل الصفحة
-        window.addEventListener('load', testConnection);
     </script>
 </body>
 </html>
