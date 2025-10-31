@@ -1349,9 +1349,11 @@ document.getElementById('clientForm').addEventListener('submit', async function(
     for (let key in data) formData.append(key, data[key]);
 
     const response = await fetch(scriptURL, {
-      method: 'POST',
-      body: formData
-    });
+  method: 'POST',
+  body: new URLSearchParams([...formData]),
+  headers: { "Content-Type": "application/x-www-form-urlencoded" }
+});
+
 
     const result = await response.json();
     console.log('📥 الرد من السيرفر:', result);
@@ -1376,5 +1378,6 @@ document.getElementById('clientForm').addEventListener('submit', async function(
     </script>
 </body>
 </html>
+
 
 
