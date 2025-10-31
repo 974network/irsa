@@ -1,1374 +1,1305 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>استبيان العميل الفاخر</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
-    
-    :root {
-      --gold: #d4af37;
-      --dark-gold: #b8860b;
-      --light-gold: #f1c75e;
-      --bg-dark: rgba(20, 15, 10, 0.95);
-      --text-light: #f8e9c4;
-      --glass: rgba(255, 255, 255, 0.08);
-      --glass-border: rgba(212, 175, 55, 0.3);
-      --error: #ff6b6b;
-    }
-    
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'El Messiri', sans-serif;
-    }
-    
-    body {
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(180, 140, 20, 0.1) 0%, transparent 50%),
-        linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
-      color: var(--text-light);
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-      position: relative;
-      overflow: hidden;
-      cursor: none;
-    }
-    
-    /* تأثيرات الذهب التفاعلية */
-    .gold-effect {
-      position: absolute;
-      width: 150px;
-      height: 150px;
-      background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0;
-      transition: opacity 0.3s ease;
-      mix-blend-mode: screen;
-      filter: blur(10px);
-    }
-    
-    .gold-particle {
-      position: absolute;
-      width: 8px;
-      height: 8px;
-      background: var(--gold);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 1;
-      opacity: 0;
-      box-shadow: 0 0 15px var(--gold);
-    }
-    
-    .cursor-gold {
-      position: absolute;
-      width: 20px;
-      height: 20px;
-      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      mix-blend-mode: screen;
-      transition: transform 0.1s ease;
-    }
-    
-    .container {
-      width: 100%;
-      max-width: 800px;
-      margin: 0 auto;
-      position: relative;
-      z-index: 2;
-    }
-    
-    .header {
-      text-align: center;
-      margin-bottom: 40px;
-      position: relative;
-    }
-    
-    .title {
-      font-size: 2.8rem;
-      font-weight: 700;
-      margin-bottom: 15px;
-      color: var(--gold);
-      text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
-      position: relative;
-      display: inline-block;
-    }
-    
-    .title::after {
-      content: '✨';
-      position: absolute;
-      top: -10px;
-      left: -35px;
-      font-size: 1.8rem;
-      animation: sparkle 3s infinite;
-    }
-    
-    @keyframes sparkle {
-      0%, 100% { opacity: 0.7; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.2); }
-    }
-    
-    .subtitle {
-      font-size: 1.2rem;
-      color: #f5e9c2;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.6;
-    }
-    
-    .form-container {
-      background: var(--glass);
-      backdrop-filter: blur(15px);
-      border: 1px solid var(--glass-border);
-      border-radius: 25px;
-      padding: 40px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .form-container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
-      z-index: -1;
-    }
-    
-    .form-step {
-      display: none;
-      animation: fadeIn 0.5s ease;
-    }
-    
-    .form-step.active {
-      display: block;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(20px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .question {
-      margin-bottom: 30px;
-    }
-    
-    .question-title {
-      font-size: 1.4rem;
-      margin-bottom: 20px;
-      color: var(--light-gold);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .question-title i {
-      font-size: 1.2rem;
-    }
-    
-    .options-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 15px;
-    }
-    
-    .option-card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-border);
-      border-radius: 15px;
-      padding: 18px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .option-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.3s ease;
-    }
-    
-    .option-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-      border-color: var(--gold);
-    }
-    
-    .option-card:hover::before {
-      opacity: 1;
-    }
-    
-    .option-card.selected {
-      border-color: var(--gold);
-      background: rgba(212, 175, 55, 0.1);
-      box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
-    }
-    
-    .option-card.selected::before {
-      opacity: 1;
-    }
-    
-    .option-content {
-      position: relative;
-      z-index: 1;
-    }
-    
-    .option-title {
-      font-size: 1.1rem;
-      font-weight: 600;
-      margin-bottom: 8px;
-      color: var(--light-gold);
-    }
-    
-    .option-desc {
-      font-size: 0.9rem;
-      color: rgba(255, 255, 255, 0.7);
-      line-height: 1.5;
-    }
-    
-    .checkbox, .radio {
-      display: none;
-    }
-    
-    .text-input {
-      width: 100%;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--glass-border);
-      border-radius: 12px;
-      color: var(--text-light);
-      font-size: 1rem;
-      transition: all 0.3s ease;
-    }
-    
-    .text-input:focus {
-      outline: none;
-      border-color: var(--gold);
-      box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
-      background: rgba(255, 255, 255, 0.08);
-    }
-    
-    .custom-input {
-      margin-top: 15px;
-      display: none;
-    }
-    
-    .file-upload {
-      margin-top: 15px;
-      padding: 15px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px dashed var(--glass-border);
-      border-radius: 12px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-    
-    .file-upload:hover {
-      border-color: var(--gold);
-      background: rgba(255, 255, 255, 0.08);
-    }
-    
-    .file-upload i {
-      font-size: 2rem;
-      color: var(--gold);
-      margin-bottom: 10px;
-    }
-    
-    .file-name {
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: var(--light-gold);
-    }
-    
-    .form-navigation {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 40px;
-    }
-    
-    .nav-btn {
-      padding: 12px 25px;
-      background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-      border: none;
-      border-radius: 10px;
-      color: #1c1a1a;
-      font-weight: bold;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      position: relative;
-      overflow: hidden;
-    }
-    
-    .nav-btn::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transform: translateX(-100%);
-      transition: transform 0.6s;
-    }
-    
-    .nav-btn:hover {
-      background: linear-gradient(45deg, var(--gold), var(--light-gold));
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
-    }
-    
-    .nav-btn:hover::before {
-      transform: translateX(100%);
-    }
-    
-    .nav-btn:disabled {
-      background: rgba(255, 255, 255, 0.1);
-      color: rgba(255, 255, 255, 0.5);
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-    
-    .nav-btn:disabled::before {
-      display: none;
-    }
-    
-    .error-message {
-      color: var(--error);
-      font-size: 0.9rem;
-      margin-top: 10px;
-      display: none;
-    }
-    
-    .progress-container {
-      margin-bottom: 30px;
-    }
-    
-    .progress-bar {
-      height: 8px;
-      background: rgba(212, 175, 55, 0.2);
-      border-radius: 4px;
-      overflow: hidden;
-    }
-    
-    .progress {
-      height: 100%;
-      background: linear-gradient(90deg, var(--dark-gold), var(--gold));
-      width: 10%;
-      transition: width 0.5s ease;
-    }
-    
-    .progress-text {
-      text-align: center;
-      margin-top: 10px;
-      font-size: 0.9rem;
-      color: var(--light-gold);
-    }
-    
-    .step-indicators {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin-bottom: 30px;
-    }
-    
-    .step-indicator {
-      width: 12px;
-      height: 12px;
-      border-radius: 50%;
-      background: rgba(212, 175, 55, 0.3);
-      transition: all 0.3s ease;
-    }
-    
-    .step-indicator.active {
-      background: var(--gold);
-      box-shadow: 0 0 10px var(--gold);
-    }
-    
-    .thankyou-message {
-      text-align: center;
-      padding: 40px;
-      display: none;
-    }
-    
-    .thankyou-message i {
-      font-size: 4rem;
-      color: var(--gold);
-      margin-bottom: 20px;
-    }
-    
-    .thankyou-message h2 {
-      font-size: 2.2rem;
-      color: var(--gold);
-      margin-bottom: 15px;
-    }
-    
-    .thankyou-message p {
-      font-size: 1.2rem;
-      line-height: 1.6;
-      color: var(--text-light);
-    }
-    
-    @media (max-width: 768px) {
-      .title {
-        font-size: 2.2rem;
-      }
-      
-      .form-container {
-        padding: 25px;
-      }
-      
-      .options-grid {
-        grid-template-columns: 1fr;
-      }
-      
-      .form-navigation {
-        flex-direction: column;
-        gap: 15px;
-      }
-      
-      .nav-btn {
-        width: 100%;
-        justify-content: center;
-      }
-      
-      body {
-        cursor: auto;
-      }
-      
-      .cursor-gold {
-        display: none;
-      }
-    }
-    
-    @media (max-width: 480px) {
-      .title {
-        font-size: 1.8rem;
-      }
-      
-      .subtitle {
-        font-size: 1rem;
-      }
-      
-      .question-title {
-        font-size: 1.2rem;
-      }
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان العميل الفاخر</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --gold: #d4af37;
+            --dark-gold: #b8860b;
+            --light-gold: #f1c75e;
+            --bg-dark: rgba(20, 15, 10, 0.95);
+            --text-light: #f8e9c4;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --error: #ff6b6b;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'El Messiri', sans-serif;
+        }
+        
+        body {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(180, 140, 20, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            position: relative;
+            display: inline-block;
+            line-height: 1.3;
+        }
+        
+        .title::after {
+            content: '✨';
+            position: absolute;
+            top: -8px;
+            left: -25px;
+            font-size: 1.3rem;
+            animation: sparkle 3s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+            color: #f5e9c2;
+            max-width: 100%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .form-container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question {
+            margin-bottom: 25px;
+        }
+        
+        .question-title {
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+            color: var(--light-gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.4;
+        }
+        
+        .question-title i {
+            font-size: 1.1rem;
+        }
+        
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .option-card:active {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-color: var(--gold);
+        }
+        
+        .option-card:active::before {
+            opacity: 1;
+        }
+        
+        .option-card.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        
+        .option-card.selected::before {
+            opacity: 1;
+        }
+        
+        .option-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .option-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--light-gold);
+        }
+        
+        .option-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+        
+        .checkbox, .radio {
+            display: none;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .custom-input {
+            margin-top: 12px;
+            display: none;
+        }
+        
+        .file-upload {
+            margin-top: 12px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--glass-border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:active {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .file-upload i {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--light-gold);
+        }
+        
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            padding: 14px 20px;
+            background: linear-gradient(45deg, var(--dark-gold), var(--gold));
+            border: none;
+            border-radius: 10px;
+            color: #1c1a1a;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            min-height: 50px;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .nav-btn:active {
+            background: linear-gradient(45deg, var(--gold), var(--light-gold));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+        }
+        
+        .nav-btn:active::before {
+            transform: translateX(100%);
+        }
+        
+        .nav-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .nav-btn:disabled::before {
+            display: none;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--dark-gold), var(--gold));
+            width: 10%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--light-gold);
+        }
+        
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .step-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold);
+        }
+        
+        .thankyou-message {
+            text-align: center;
+            padding: 30px 20px;
+            display: none;
+        }
+        
+        .thankyou-message i {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .thankyou-message h2 {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .thankyou-message p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        /* تأثيرات اللمس للجوال */
+        @media (hover: hover) {
+            .option-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                border-color: var(--gold);
+            }
+            
+            .option-card:hover::before {
+                opacity: 1;
+            }
+            
+            .file-upload:hover {
+                border-color: var(--gold);
+                background: rgba(255, 255, 255, 0.08);
+            }
+            
+            .nav-btn:hover {
+                background: linear-gradient(45deg, var(--gold), var(--light-gold));
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+            }
+            
+            .nav-btn:hover::before {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* تحسينات للأجهزة الصغيرة جداً */
+        @media (max-width: 360px) {
+            .title {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .question-title {
+                font-size: 1.1rem;
+            }
+            
+            .nav-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* تحسينات للأجهزة الأكبر */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+            }
+            
+            .form-container {
+                padding: 35px 30px;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .options-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+        
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 800px;
+            }
+            
+            .form-container {
+                padding: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <!-- تأثيرات الذهب التفاعلية -->
-  <div class="cursor-gold" id="cursor"></div>
-  
-  <div class="container">
-    <div class="header">
-      <h1 class="title">استبيان العميل الفاخر</h1>
-      <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
-    </div>
-    
-    <div class="form-container">
-      <div class="progress-container">
-        <div class="progress-bar">
-          <div class="progress" id="progress"></div>
-        </div>
-        <div class="progress-text" id="progress-text">السؤال 1 من 10</div>
-      </div>
-      
-      <div class="step-indicators" id="step-indicators">
-        <!-- سيتم إضافة مؤشرات الخطوات هنا عبر JavaScript -->
-      </div>
-      
-      <form id="clientForm">
-        <!-- الخطوة 1 -->
-        <div class="form-step active" id="step-1">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-signature"></i> 1️⃣ اسم الورشة أو المشروع</h2>
-            <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" required>
-            <div class="error-message" id="error-1">يرجى إدخال اسم الورشة أو المشروع</div>
-          </div>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">استبيان العميل الفاخر</h1>
+            <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
         </div>
         
-        <!-- الخطوة 2 -->
-        <div class="form-step" id="step-2">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-language"></i> 2️⃣ اللغة المفضلة</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="language" value="عربي فقط" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">عربي فقط</h3>
-                  <p class="option-desc">استخدام اللغة العربية فقط في التصميم</p>
+        <div class="form-container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
                 </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="language" value="إنجليزي فقط" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">إنجليزي فقط</h3>
-                  <p class="option-desc">استخدام اللغة الإنجليزية فقط في التصميم</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="language" value="الاثنين معاً" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">الاثنين معاً</h3>
-                  <p class="option-desc">دمج اللغتين العربية والإنجليزية في التصميم</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-language">
-                <input type="radio" name="language" value="شيء آخر" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد اللغة المفضلة الأخرى</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="language-custom">
-              <input type="text" class="text-input" name="language_custom" placeholder="أدخل اللغة المفضلة الأخرى">
-            </div>
-            <div class="error-message" id="error-2">يرجى اختيار اللغة المفضلة</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 3 -->
-        <div class="form-step" id="step-3">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-tools"></i> 3️⃣ نوع الشغل الأساسي</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="work_type" value="دهان" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">دهان</h3>
-                  <p class="option-desc">أعمال الدهان والديكور</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="work_type" value="تذهيب" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">تذهيب</h3>
-                  <p class="option-desc">أعمال التذهيب والزخرفة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="work_type" value="تشطيب" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">تشطيب</h3>
-                  <p class="option-desc">أعمال التشطيب النهائي</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="work_type" value="حفر ونقش" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">حفر ونقش</h3>
-                  <p class="option-desc">أعمال الحفر والنقش على الخشب وغيره</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-work">
-                <input type="radio" name="work_type" value="شيء آخر" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد نوع الشغل الآخر</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="work-custom">
-              <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر">
-            </div>
-            <div class="error-message" id="error-3">يرجى اختيار نوع الشغل الأساسي</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 4 -->
-        <div class="form-step" id="step-4">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-users"></i> 4️⃣ نوع العملاء</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="checkbox" name="clients" value="نجارين" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">نجارين</h3>
-                  <p class="option-desc">التعامل مع أصحاب ورش النجارة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="clients" value="محلات" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">محلات</h3>
-                  <p class="option-desc">التعامل مع المحلات التجارية</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="clients" value="زبائن مباشر" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">زبائن مباشر</h3>
-                  <p class="option-desc">التعامل المباشر مع العملاء</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="clients" value="فلل وقصور" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">فلل وقصور</h3>
-                  <p class="option-desc">التعامل مع ملاك الفلل والقصور</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-client">
-                <input type="checkbox" name="clients" value="شيء آخر" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد نوع العملاء الآخرين</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="client-custom">
-              <input type="text" class="text-input" name="client_custom" placeholder="أدخل نوع العملاء الآخرين">
-            </div>
-            <div class="error-message" id="error-4">يرجى اختيار نوع العملاء على الأقل</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 5 -->
-        <div class="form-step" id="step-5">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-paint-brush"></i> 5️⃣ شكل الشعار المفضل</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">فخم وكلاسيكي</h3>
-                  <p class="option-desc">تصميم تقليدي أنيق يعكس الفخامة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="logo_style" value="بسيط وحديث" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">بسيط وحديث</h3>
-                  <p class="option-desc">تصميم معاصر بسيط وواضح</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">مزيج من الإثنين</h3>
-                  <p class="option-desc">دمج بين الفخامة والبساطة</p>
-                </div>
-              </label>
-            </div>
-            <div class="error-message" id="error-5">يرجى اختيار شكل الشعار المفضل</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 6 -->
-        <div class="form-step" id="step-6">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-palette"></i> 6️⃣ الألوان المفضلة</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">ذهبي وكلاسيكي</h3>
-                  <p class="option-desc">ألوان ذهبية مع ألوان كلاسيكية</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="colors" value="ألوان ترابية" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">ألوان ترابية</h3>
-                  <p class="option-desc">درجات البني والألوان الترابية</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="colors" value="ألوان زاهية" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">ألوان زاهية</h3>
-                  <p class="option-desc">ألوان مشرقة وزاهية</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="colors" value="ألوان محايدة" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">ألوان محايدة</h3>
-                  <p class="option-desc">أبيض، أسود، رمادي وتدرجاتها</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-color">
-                <input type="radio" name="colors" value="شيء آخر" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد الألوان المفضلة الأخرى</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="color-custom">
-              <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان المفضلة الأخرى">
-            </div>
-            <div class="error-message" id="error-6">يرجى اختيار الألوان المفضلة</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 7 -->
-        <div class="form-step" id="step-7">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-drafting-compass"></i> 7️⃣ نوع الشعار</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="logo_type" value="رمز فقط" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">رمز فقط</h3>
-                  <p class="option-desc">شعار يعتمد على رمز مثل فرشة أو زخرفة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="logo_type" value="كتابة فقط" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">كتابة فقط</h3>
-                  <p class="option-desc">شعار يعتمد على النص والخطوط فقط</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="logo_type" value="رمز وكتابة" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">رمز وكتابة</h3>
-                  <p class="option-desc">دمج بين الرمز والنص في التصميم</p>
-                </div>
-              </label>
-            </div>
-            <div class="error-message" id="error-7">يرجى اختيار نوع الشعار</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 8 -->
-        <div class="form-step" id="step-8">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-heart"></i> 8️⃣ الإحساس المطلوب</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="feeling" value="فخامة" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">فخامة</h3>
-                  <p class="option-desc">إيحاء بالفخامة والتميز</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="feeling" value="احتراف" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">احتراف</h3>
-                  <p class="option-desc">إيحاء بالاحترافية والخبرة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="feeling" value="ذوق" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">ذوق</h3>
-                  <p class="option-desc">إيحاء بالذوق الرفيع</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="feeling" value="ثقة" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">ثقة</h3>
-                  <p class="option-desc">إيحاء بالثقة والموثوقية</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-feeling">
-                <input type="radio" name="feeling" value="شيء آخر" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد الإحساس المطلوب الآخر</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="feeling-custom">
-              <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس المطلوب الآخر">
-            </div>
-            <div class="error-message" id="error-8">يرجى اختيار الإحساس المطلوب</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 9 -->
-        <div class="form-step" id="step-9">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-share-alt"></i> 9️⃣ أول استخدام للشعار</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="checkbox" name="usage" value="سوشال ميديا" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">سوشال ميديا</h3>
-                  <p class="option-desc">منصات التواصل الاجتماعي</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="usage" value="لوحة الورشة" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">لوحة الورشة</h3>
-                  <p class="option-desc">لوحة إعلانية للورشة</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="usage" value="كرت شخصي" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">كرت شخصي</h3>
-                  <p class="option-desc">بطاقات العمل الشخصية</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="checkbox" name="usage" value="موقع إلكتروني" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">موقع إلكتروني</h3>
-                  <p class="option-desc">الموقع الإلكتروني للورشة</p>
-                </div>
-              </label>
-              
-              <label class="option-card" id="other-usage">
-                <input type="checkbox" name="usage" value="شيء آخر" class="checkbox">
-                <div class="option-content">
-                  <h3 class="option-title">شيء آخر</h3>
-                  <p class="option-desc">حدد الاستخدامات الأخرى</p>
-                </div>
-              </label>
-            </div>
-            <div class="custom-input" id="usage-custom">
-              <input type="text" class="text-input" name="usage_custom" placeholder="أدخل الاستخدامات الأخرى">
-            </div>
-            <div class="error-message" id="error-9">يرجى اختيار الاستخدام على الأقل</div>
-          </div>
-        </div>
-        
-        <!-- الخطوة 10 -->
-        <div class="form-step" id="step-10">
-          <div class="question">
-            <h2 class="question-title"><i class="fas fa-history"></i> 🔟 هل لديك لوجو قديم؟</h2>
-            <div class="options-grid">
-              <label class="option-card">
-                <input type="radio" name="old_logo" value="نعم" class="radio" required>
-                <div class="option-content">
-                  <h3 class="option-title">نعم</h3>
-                  <p class="option-desc">لدي شعار قديم وأرغب في تطويره</p>
-                </div>
-              </label>
-              
-              <label class="option-card">
-                <input type="radio" name="old_logo" value="لا" class="radio">
-                <div class="option-content">
-                  <h3 class="option-title">لا</h3>
-                  <p class="option-desc">لا أملك شعاراً قديماً، أريد تصميم جديد</p>
-                </div>
-              </label>
+                <div class="progress-text" id="progress-text">السؤال 1 من 10</div>
             </div>
             
-            <div id="logo-details" style="display: none; margin-top: 30px;">
-              <div class="question">
-                <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
-                <textarea class="text-input" name="logo_details" rows="4" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
-              </div>
-              
-              <div class="question">
-                <h2 class="question-title"><i class="fas fa-file-upload"></i> رفع ملفات اللوجو القديم</h2>
-                <div class="file-upload" id="file-upload">
-                  <i class="fas fa-cloud-upload-alt"></i>
-                  <p>انقر لرفع ملفات اللوجو القديم</p>
-                  <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
-                </div>
-                <input type="file" id="file-input" style="display: none;" accept="image/*,.pdf,.psd,.ai">
-              </div>
+            <div class="step-indicators" id="step-indicators">
+                <!-- سيتم إضافة مؤشرات الخطوات هنا عبر JavaScript -->
             </div>
-            <div class="error-message" id="error-10">يرجى الإجابة على هذا السؤال</div>
-          </div>
+            
+            <form id="clientForm">
+                <!-- الخطوة 1 -->
+                <div class="form-step active" id="step-1">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-signature"></i> 1️⃣ اسم الورشة أو المشروع</h2>
+                        <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" required>
+                        <div class="error-message" id="error-1">يرجى إدخال اسم الورشة أو المشروع</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 2 -->
+                <div class="form-step" id="step-2">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-language"></i> 2️⃣ اللغة المفضلة</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="language" value="عربي فقط" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">عربي فقط</h3>
+                                    <p class="option-desc">استخدام اللغة العربية فقط في التصميم</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="language" value="إنجليزي فقط" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">إنجليزي فقط</h3>
+                                    <p class="option-desc">استخدام اللغة الإنجليزية فقط في التصميم</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="language" value="الاثنين معاً" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">الاثنين معاً</h3>
+                                    <p class="option-desc">دمج اللغتين العربية والإنجليزية في التصميم</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-language">
+                                <input type="radio" name="language" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد اللغة المفضلة الأخرى</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="language-custom">
+                            <input type="text" class="text-input" name="language_custom" placeholder="أدخل اللغة المفضلة الأخرى">
+                        </div>
+                        <div class="error-message" id="error-2">يرجى اختيار اللغة المفضلة</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 3 -->
+                <div class="form-step" id="step-3">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-tools"></i> 3️⃣ نوع الشغل الأساسي</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="دهان" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">دهان</h3>
+                                    <p class="option-desc">أعمال الدهان والديكور</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="تذهيب" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">تذهيب</h3>
+                                    <p class="option-desc">أعمال التذهيب والزخرفة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="تشطيب" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">تشطيب</h3>
+                                    <p class="option-desc">أعمال التشطيب النهائي</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="حفر ونقش" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">حفر ونقش</h3>
+                                    <p class="option-desc">أعمال الحفر والنقش على الخشب وغيره</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-work">
+                                <input type="radio" name="work_type" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد نوع الشغل الآخر</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="work-custom">
+                            <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر">
+                        </div>
+                        <div class="error-message" id="error-3">يرجى اختيار نوع الشغل الأساسي</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 4 -->
+                <div class="form-step" id="step-4">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-users"></i> 4️⃣ نوع العملاء</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="checkbox" name="clients" value="نجارين" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">نجارين</h3>
+                                    <p class="option-desc">التعامل مع أصحاب ورش النجارة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="clients" value="محلات" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">محلات</h3>
+                                    <p class="option-desc">التعامل مع المحلات التجارية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="clients" value="زبائن مباشر" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">زبائن مباشر</h3>
+                                    <p class="option-desc">التعامل المباشر مع العملاء</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="clients" value="فلل وقصور" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">فلل وقصور</h3>
+                                    <p class="option-desc">التعامل مع ملاك الفلل والقصور</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-client">
+                                <input type="checkbox" name="clients" value="شيء آخر" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد نوع العملاء الآخرين</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="client-custom">
+                            <input type="text" class="text-input" name="client_custom" placeholder="أدخل نوع العملاء الآخرين">
+                        </div>
+                        <div class="error-message" id="error-4">يرجى اختيار نوع العملاء على الأقل</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 5 -->
+                <div class="form-step" id="step-5">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-paint-brush"></i> 5️⃣ شكل الشعار المفضل</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">فخم وكلاسيكي</h3>
+                                    <p class="option-desc">تصميم تقليدي أنيق يعكس الفخامة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="بسيط وحديث" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">بسيط وحديث</h3>
+                                    <p class="option-desc">تصميم معاصر بسيط وواضح</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">مزيج من الإثنين</h3>
+                                    <p class="option-desc">دمج بين الفخامة والبساطة</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="error-message" id="error-5">يرجى اختيار شكل الشعار المفضل</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 6 -->
+                <div class="form-step" id="step-6">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-palette"></i> 6️⃣ الألوان المفضلة</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">ذهبي وكلاسيكي</h3>
+                                    <p class="option-desc">ألوان ذهبية مع ألوان كلاسيكية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان ترابية" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان ترابية</h3>
+                                    <p class="option-desc">درجات البني والألوان الترابية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان زاهية" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان زاهية</h3>
+                                    <p class="option-desc">ألوان مشرقة وزاهية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان محايدة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان محايدة</h3>
+                                    <p class="option-desc">أبيض، أسود، رمادي وتدرجاتها</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-color">
+                                <input type="radio" name="colors" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد الألوان المفضلة الأخرى</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="color-custom">
+                            <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان المفضلة الأخرى">
+                        </div>
+                        <div class="error-message" id="error-6">يرجى اختيار الألوان المفضلة</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 7 -->
+                <div class="form-step" id="step-7">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-drafting-compass"></i> 7️⃣ نوع الشعار</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="رمز فقط" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">رمز فقط</h3>
+                                    <p class="option-desc">شعار يعتمد على رمز مثل فرشة أو زخرفة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="كتابة فقط" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">كتابة فقط</h3>
+                                    <p class="option-desc">شعار يعتمد على النص والخطوط فقط</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="رمز وكتابة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">رمز وكتابة</h3>
+                                    <p class="option-desc">دمج بين الرمز والنص في التصميم</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="error-message" id="error-7">يرجى اختيار نوع الشعار</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 8 -->
+                <div class="form-step" id="step-8">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-heart"></i> 8️⃣ الإحساس المطلوب</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="فخامة" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">فخامة</h3>
+                                    <p class="option-desc">إيحاء بالفخامة والتميز</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="احتراف" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">احتراف</h3>
+                                    <p class="option-desc">إيحاء بالاحترافية والخبرة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="ذوق" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ذوق</h3>
+                                    <p class="option-desc">إيحاء بالذوق الرفيع</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="ثقة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ثقة</h3>
+                                    <p class="option-desc">إيحاء بالثقة والموثوقية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-feeling">
+                                <input type="radio" name="feeling" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد الإحساس المطلوب الآخر</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="feeling-custom">
+                            <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس المطلوب الآخر">
+                        </div>
+                        <div class="error-message" id="error-8">يرجى اختيار الإحساس المطلوب</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 9 -->
+                <div class="form-step" id="step-9">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-share-alt"></i> 9️⃣ أول استخدام للشعار</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="checkbox" name="usage" value="سوشال ميديا" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">سوشال ميديا</h3>
+                                    <p class="option-desc">منصات التواصل الاجتماعي</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="usage" value="لوحة الورشة" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">لوحة الورشة</h3>
+                                    <p class="option-desc">لوحة إعلانية للورشة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="usage" value="كرت شخصي" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">كرت شخصي</h3>
+                                    <p class="option-desc">بطاقات العمل الشخصية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="checkbox" name="usage" value="موقع إلكتروني" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">موقع إلكتروني</h3>
+                                    <p class="option-desc">الموقع الإلكتروني للورشة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-usage">
+                                <input type="checkbox" name="usage" value="شيء آخر" class="checkbox">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد الاستخدامات الأخرى</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="usage-custom">
+                            <input type="text" class="text-input" name="usage_custom" placeholder="أدخل الاستخدامات الأخرى">
+                        </div>
+                        <div class="error-message" id="error-9">يرجى اختيار الاستخدام على الأقل</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 10 -->
+                <div class="form-step" id="step-10">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-history"></i> 🔟 هل لديك لوجو قديم؟</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="old_logo" value="نعم" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">نعم</h3>
+                                    <p class="option-desc">لدي شعار قديم وأرغب في تطويره</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="old_logo" value="لا" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">لا</h3>
+                                    <p class="option-desc">لا أملك شعاراً قديماً، أريد تصميم جديد</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div id="logo-details" style="display: none; margin-top: 25px;">
+                            <div class="question">
+                                <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
+                                <textarea class="text-input" name="logo_details" rows="3" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
+                            </div>
+                            
+                            <div class="question">
+                                <h2 class="question-title"><i class="fas fa-file-upload"></i> رفع ملفات اللوجو القديم</h2>
+                                <div class="file-upload" id="file-upload">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>انقر لرفع ملفات اللوجو القديم</p>
+                                    <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
+                                </div>
+                                <input type="file" id="file-input" style="display: none;" accept="image/*,.pdf,.psd,.ai">
+                            </div>
+                        </div>
+                        <div class="error-message" id="error-10">يرجى الإجابة على هذا السؤال</div>
+                    </div>
+                </div>
+                
+                <div class="form-navigation">
+                    <button type="button" class="nav-btn" id="prev-btn" disabled>
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button type="button" class="nav-btn" id="next-btn">
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button type="submit" class="nav-btn" id="submit-btn" style="display: none;">
+                        إرسال الاستبيان <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="thankyou-message" id="thankyou-message">
+                <i class="fas fa-check-circle"></i>
+                <h2>شكراً لك يا عميلنا العزيز</h2>
+                <p>تم استلام استبيانك بنجاح وسوف نتواصل معك قريباً</p>
+                <p>إذا احتجنا لأي معلومات إضافية</p>
+            </div>
         </div>
-        
-        <div class="form-navigation">
-          <button type="button" class="nav-btn" id="prev-btn" disabled>
-            <i class="fas fa-arrow-right"></i> السابق
-          </button>
-          <button type="button" class="nav-btn" id="next-btn">
-            التالي <i class="fas fa-arrow-left"></i>
-          </button>
-          <button type="submit" class="nav-btn" id="submit-btn" style="display: none;">
-            إرسال الاستبيان <i class="fas fa-paper-plane"></i>
-          </button>
-        </div>
-      </form>
-      
-      <div class="thankyou-message" id="thankyou-message">
-        <i class="fas fa-check-circle"></i>
-        <h2>شكراً لك يا عميلنا العزيز</h2>
-        <p>تم استلام استبيانك بنجاح وسوف نتواصل معك قريباً</p>
-        <p>إذا احتجنا لأي معلومات إضافية</p>
-      </div>
     </div>
-  </div>
 
-  <script>
-    // تهيئة المتغيرات
-    const totalSteps = 10;
-    let currentStep = 1;
-    
-    // عناصر DOM
-    const progressBar = document.getElementById('progress');
-    const progressText = document.getElementById('progress-text');
-    const stepIndicators = document.getElementById('step-indicators');
-    const prevBtn = document.getElementById('prev-btn');
-    const nextBtn = document.getElementById('next-btn');
-    const submitBtn = document.getElementById('submit-btn');
-    const thankyouMessage = document.getElementById('thankyou-message');
-    const fileUpload = document.getElementById('file-upload');
-    const fileInput = document.getElementById('file-input');
-    const fileName = document.getElementById('file-name');
-    const cursor = document.getElementById('cursor');
-    
-    // إنشاء مؤشرات الخطوات
-    for (let i = 1; i <= totalSteps; i++) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('step-indicator');
-      if (i === 1) indicator.classList.add('active');
-      stepIndicators.appendChild(indicator);
-    }
-    
-    // تأثيرات الذهب التفاعلية
-    document.addEventListener('mousemove', (e) => {
-      // تحديث موقع المؤشر الذهبي
-      cursor.style.left = `${e.clientX - 10}px`;
-      cursor.style.top = `${e.clientY - 10}px`;
-      
-      // إنشاء تأثيرات ذهبية عشوائية
-      if (Math.random() > 0.7) {
-        createGoldEffect(e.clientX, e.clientY);
-      }
-    });
-    
-    // إنشاء تأثير ذهبي
-    function createGoldEffect(x, y) {
-      const effect = document.createElement('div');
-      effect.classList.add('gold-effect');
-      effect.style.left = `${x - 75}px`;
-      effect.style.top = `${y - 75}px`;
-      effect.style.opacity = '0.7';
-      
-      document.body.appendChild(effect);
-      
-      // إزالة التأثير بعد فترة
-      setTimeout(() => {
-        effect.style.opacity = '0';
-        setTimeout(() => {
-          document.body.removeChild(effect);
-        }, 300);
-      }, 500);
-      
-      // إنشاء جزيئات ذهبية
-      for (let i = 0; i < 5; i++) {
-        createGoldParticle(x, y);
-      }
-    }
-    
-    // إنشاء جزيئات ذهبية
-    function createGoldParticle(x, y) {
-      const particle = document.createElement('div');
-      particle.classList.add('gold-particle');
-      particle.style.left = `${x}px`;
-      particle.style.top = `${y}px`;
-      particle.style.opacity = '1';
-      
-      // حركة عشوائية للجزيئات
-      const angle = Math.random() * Math.PI * 2;
-      const distance = 20 + Math.random() * 50;
-      const targetX = x + Math.cos(angle) * distance;
-      const targetY = y + Math.sin(angle) * distance;
-      
-      document.body.appendChild(particle);
-      
-      // تحريك الجزيئات
-      setTimeout(() => {
-        particle.style.left = `${targetX}px`;
-        particle.style.top = `${targetY}px`;
-        particle.style.opacity = '0';
+    <script>
+        // تهيئة المتغيرات
+        const totalSteps = 10;
+        let currentStep = 1;
         
-        // إزالة الجزيئات بعد الانتهاء
-        setTimeout(() => {
-          if (particle.parentNode) {
-            document.body.removeChild(particle);
-          }
-        }, 1000);
-      }, 10);
-    }
-    
-    // تأثيرات إضافية عند النقر
-    document.addEventListener('click', (e) => {
-      for (let i = 0; i < 10; i++) {
-        createGoldParticle(e.clientX, e.clientY);
-      }
-    });
-    
-    // تحديث واجهة المستخدم بناءً على الخطوة الحالية
-    function updateUI() {
-      // تحديث شريط التقدم
-      const progressPercentage = (currentStep / totalSteps) * 100;
-      progressBar.style.width = `${progressPercentage}%`;
-      progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
-      
-      // إظهار/إخفاء الأزرار
-      prevBtn.disabled = currentStep === 1;
-      nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
-      submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
-      
-      // تحديث مؤشرات الخطوات
-      document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-        if (index + 1 <= currentStep) {
-          indicator.classList.add('active');
-        } else {
-          indicator.classList.remove('active');
-        }
-      });
-      
-      // إظهار/إخفاء الخطوات
-      document.querySelectorAll('.form-step').forEach(step => {
-        step.classList.remove('active');
-      });
-      document.getElementById(`step-${currentStep}`).classList.add('active');
-      
-      // إخفاء رسائل الخطأ عند تغيير الخطوة
-      hideError(currentStep);
-    }
-    
-    // التحقق من صحة الإجابة في الخطوة الحالية
-    function validateStep(step) {
-      switch(step) {
-        case 1:
-          const projectName = document.querySelector('input[name="project_name"]').value.trim();
-          if (!projectName) {
-            showError(1, "يرجى إدخال اسم الورشة أو المشروع");
-            return false;
-          }
-          return true;
-          
-        case 2:
-          const language = document.querySelector('input[name="language"]:checked');
-          if (!language) {
-            showError(2, "يرجى اختيار اللغة المفضلة");
-            return false;
-          }
-          if (language.value === "شيء آخر") {
-            const customLanguage = document.querySelector('input[name="language_custom"]').value.trim();
-            if (!customLanguage) {
-              showError(2, "يرجى تحديد اللغة المفضلة الأخرى");
-              return false;
-            }
-          }
-          return true;
-          
-        case 3:
-          const workType = document.querySelector('input[name="work_type"]:checked');
-          if (!workType) {
-            showError(3, "يرجى اختيار نوع الشغل الأساسي");
-            return false;
-          }
-          if (workType.value === "شيء آخر") {
-            const customWork = document.querySelector('input[name="work_custom"]').value.trim();
-            if (!customWork) {
-              showError(3, "يرجى تحديد نوع الشغل الآخر");
-              return false;
-            }
-          }
-          return true;
-          
-        case 4:
-          const clients = document.querySelectorAll('input[name="clients"]:checked');
-          if (clients.length === 0) {
-            showError(4, "يرجى اختيار نوع العملاء على الأقل");
-            return false;
-          }
-          let hasOtherClient = false;
-          clients.forEach(client => {
-            if (client.value === "شيء آخر") hasOtherClient = true;
-          });
-          if (hasOtherClient) {
-            const customClient = document.querySelector('input[name="client_custom"]').value.trim();
-            if (!customClient) {
-              showError(4, "يرجى تحديد نوع العملاء الآخرين");
-              return false;
-            }
-          }
-          return true;
-          
-        case 5:
-          const logoStyle = document.querySelector('input[name="logo_style"]:checked');
-          if (!logoStyle) {
-            showError(5, "يرجى اختيار شكل الشعار المفضل");
-            return false;
-          }
-          return true;
-          
-        case 6:
-          const colors = document.querySelector('input[name="colors"]:checked');
-          if (!colors) {
-            showError(6, "يرجى اختيار الألوان المفضلة");
-            return false;
-          }
-          if (colors.value === "شيء آخر") {
-            const customColor = document.querySelector('input[name="color_custom"]').value.trim();
-            if (!customColor) {
-              showError(6, "يرجى تحديد الألوان المفضلة الأخرى");
-              return false;
-            }
-          }
-          return true;
-          
-        case 7:
-          const logoType = document.querySelector('input[name="logo_type"]:checked');
-          if (!logoType) {
-            showError(7, "يرجى اختيار نوع الشعار");
-            return false;
-          }
-          return true;
-          
-        case 8:
-          const feeling = document.querySelector('input[name="feeling"]:checked');
-          if (!feeling) {
-            showError(8, "يرجى اختيار الإحساس المطلوب");
-            return false;
-          }
-          if (feeling.value === "شيء آخر") {
-            const customFeeling = document.querySelector('input[name="feeling_custom"]').value.trim();
-            if (!customFeeling) {
-              showError(8, "يرجى تحديد الإحساس المطلوب الآخر");
-              return false;
-            }
-          }
-          return true;
-          
-        case 9:
-          const usage = document.querySelectorAll('input[name="usage"]:checked');
-          if (usage.length === 0) {
-            showError(9, "يرجى اختيار الاستخدام على الأقل");
-            return false;
-          }
-          let hasOtherUsage = false;
-          usage.forEach(use => {
-            if (use.value === "شيء آخر") hasOtherUsage = true;
-          });
-          if (hasOtherUsage) {
-            const customUsage = document.querySelector('input[name="usage_custom"]').value.trim();
-            if (!customUsage) {
-              showError(9, "يرجى تحديد الاستخدامات الأخرى");
-              return false;
-            }
-          }
-          return true;
-          
-        case 10:
-          const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-          if (!oldLogo) {
-            showError(10, "يرجى الإجابة على هذا السؤال");
-            return false;
-          }
-          return true;
-          
-        default:
-          return true;
-      }
-    }
-    
-    // إظهار رسالة الخطأ
-    function showError(step, message) {
-      const errorElement = document.getElementById(`error-${step}`);
-      errorElement.textContent = message;
-      errorElement.style.display = 'block';
-    }
-    
-    // إخفاء رسالة الخطأ
-    function hideError(step) {
-      const errorElement = document.getElementById(`error-${step}`);
-      errorElement.style.display = 'none';
-    }
-    
-    // الانتقال إلى الخطوة التالية
-    function nextStep() {
-      if (validateStep(currentStep)) {
-        if (currentStep < totalSteps) {
-          currentStep++;
-          updateUI();
-        }
-      }
-    }
-    
-    // الانتقال إلى الخطوة السابقة
-    function prevStep() {
-      if (currentStep > 1) {
-        currentStep--;
-        updateUI();
-      }
-    }
-    
-    // إضافة مستمعي الأحداث
-    nextBtn.addEventListener('click', nextStep);
-    prevBtn.addEventListener('click', prevStep);
-    
-    // تفاعل اختيار البطاقات
-    document.querySelectorAll('.option-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const radio = this.querySelector('input[type="radio"]');
-        const checkbox = this.querySelector('input[type="checkbox"]');
+        // عناصر DOM
+        const progressBar = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+        const stepIndicators = document.getElementById('step-indicators');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const thankyouMessage = document.getElementById('thankyou-message');
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('file-input');
+        const fileName = document.getElementById('file-name');
         
-        if (radio) {
-          // إلغاء تحديد جميع البطاقات في نفس المجموعة
-          const groupName = radio.getAttribute('name');
-          document.querySelectorAll(`input[name="${groupName}"]`).forEach(input => {
-            input.closest('.option-card').classList.remove('selected');
-          });
-          
-          // تحديد البطاقة المختارة
-          radio.checked = true;
-          this.classList.add('selected');
-          
-          // إظهار/إخفاء الحقول المخصصة
-          handleCustomInput(radio);
-          
-          // إذا كانت الخطوة 10 وتم اختيار "نعم"، إظهار حقل التفاصيل
-          if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'نعم') {
-            document.getElementById('logo-details').style.display = 'block';
-          } else if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'لا') {
-            document.getElementById('logo-details').style.display = 'none';
-          }
+        // إنشاء مؤشرات الخطوات
+        for (let i = 1; i <= totalSteps; i++) {
+            const indicator = document.createElement('div');
+            indicator.classList.add('step-indicator');
+            if (i === 1) indicator.classList.add('active');
+            stepIndicators.appendChild(indicator);
         }
         
-        if (checkbox) {
-          // تبديل حالة التحديد للـ checkbox
-          checkbox.checked = !checkbox.checked;
-          this.classList.toggle('selected', checkbox.checked);
-          
-          // إظهار/إخفاء الحقول المخصصة
-          handleCustomInput(checkbox);
+        // تحديث واجهة المستخدم بناءً على الخطوة الحالية
+        function updateUI() {
+            // تحديث شريط التقدم
+            const progressPercentage = (currentStep / totalSteps) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
+            
+            // إظهار/إخفاء الأزرار
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+            submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+            
+            // تحديث مؤشرات الخطوات
+            document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+                if (index + 1 <= currentStep) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+            
+            // إظهار/إخفاء الخطوات
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            // إخفاء رسائل الخطأ عند تغيير الخطوة
+            hideError(currentStep);
+            
+            // التمرير إلى الأعلى عند تغيير الخطوة (لتحسين تجربة الجوال)
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
         
-        // إخفاء رسالة الخطأ عند اختيار إجابة
-        hideError(currentStep);
-      });
-    });
-    
-    // التعامل مع الحقول المخصصة لخيار "شيء آخر"
-    function handleCustomInput(input) {
-      const customInputIds = {
-        'language': 'language-custom',
-        'work_type': 'work-custom',
-        'clients': 'client-custom',
-        'colors': 'color-custom',
-        'feeling': 'feeling-custom',
-        'usage': 'usage-custom'
-      };
-      
-      const inputName = input.getAttribute('name');
-      if (customInputIds[inputName] && input.value === 'شيء آخر') {
-        document.getElementById(customInputIds[inputName]).style.display = 'block';
-      } else if (customInputIds[inputName]) {
-        document.getElementById(customInputIds[inputName]).style.display = 'none';
-      }
-    }
-    
-    // رفع الملفات
-    fileUpload.addEventListener('click', () => {
-      fileInput.click();
-    });
-    
-    fileInput.addEventListener('change', () => {
-      if (fileInput.files.length > 0) {
-        fileName.textContent = fileInput.files[0].name;
-      } else {
-        fileName.textContent = 'لم يتم رفع أي ملف بعد';
-      }
-    });
-    
-    // إرسال النموذج
-    document.getElementById('clientForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      // التحقق من صحة الخطوة الأخيرة
-      if (!validateStep(10)) return;
-      
-      // جمع البيانات
-      const formData = new FormData(this);
-      const data = {};
-      
-      // معالجة الحقول متعددة القيم (checkboxes)
-      const checkboxes = ['clients', 'usage'];
-      checkboxes.forEach(name => {
-        const values = [];
-        document.querySelectorAll(`input[name="${name}"]:checked`).forEach(checkbox => {
-          values.push(checkbox.value);
+        // التحقق من صحة الإجابة في الخطوة الحالية
+        function validateStep(step) {
+            switch(step) {
+                case 1:
+                    const projectName = document.querySelector('input[name="project_name"]').value.trim();
+                    if (!projectName) {
+                        showError(1, "يرجى إدخال اسم الورشة أو المشروع");
+                        return false;
+                    }
+                    return true;
+                    
+                case 2:
+                    const language = document.querySelector('input[name="language"]:checked');
+                    if (!language) {
+                        showError(2, "يرجى اختيار اللغة المفضلة");
+                        return false;
+                    }
+                    if (language.value === "شيء آخر") {
+                        const customLanguage = document.querySelector('input[name="language_custom"]').value.trim();
+                        if (!customLanguage) {
+                            showError(2, "يرجى تحديد اللغة المفضلة الأخرى");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 3:
+                    const workType = document.querySelector('input[name="work_type"]:checked');
+                    if (!workType) {
+                        showError(3, "يرجى اختيار نوع الشغل الأساسي");
+                        return false;
+                    }
+                    if (workType.value === "شيء آخر") {
+                        const customWork = document.querySelector('input[name="work_custom"]').value.trim();
+                        if (!customWork) {
+                            showError(3, "يرجى تحديد نوع الشغل الآخر");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 4:
+                    const clients = document.querySelectorAll('input[name="clients"]:checked');
+                    if (clients.length === 0) {
+                        showError(4, "يرجى اختيار نوع العملاء على الأقل");
+                        return false;
+                    }
+                    let hasOtherClient = false;
+                    clients.forEach(client => {
+                        if (client.value === "شيء آخر") hasOtherClient = true;
+                    });
+                    if (hasOtherClient) {
+                        const customClient = document.querySelector('input[name="client_custom"]').value.trim();
+                        if (!customClient) {
+                            showError(4, "يرجى تحديد نوع العملاء الآخرين");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 5:
+                    const logoStyle = document.querySelector('input[name="logo_style"]:checked');
+                    if (!logoStyle) {
+                        showError(5, "يرجى اختيار شكل الشعار المفضل");
+                        return false;
+                    }
+                    return true;
+                    
+                case 6:
+                    const colors = document.querySelector('input[name="colors"]:checked');
+                    if (!colors) {
+                        showError(6, "يرجى اختيار الألوان المفضلة");
+                        return false;
+                    }
+                    if (colors.value === "شيء آخر") {
+                        const customColor = document.querySelector('input[name="color_custom"]').value.trim();
+                        if (!customColor) {
+                            showError(6, "يرجى تحديد الألوان المفضلة الأخرى");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 7:
+                    const logoType = document.querySelector('input[name="logo_type"]:checked');
+                    if (!logoType) {
+                        showError(7, "يرجى اختيار نوع الشعار");
+                        return false;
+                    }
+                    return true;
+                    
+                case 8:
+                    const feeling = document.querySelector('input[name="feeling"]:checked');
+                    if (!feeling) {
+                        showError(8, "يرجى اختيار الإحساس المطلوب");
+                        return false;
+                    }
+                    if (feeling.value === "شيء آخر") {
+                        const customFeeling = document.querySelector('input[name="feeling_custom"]').value.trim();
+                        if (!customFeeling) {
+                            showError(8, "يرجى تحديد الإحساس المطلوب الآخر");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 9:
+                    const usage = document.querySelectorAll('input[name="usage"]:checked');
+                    if (usage.length === 0) {
+                        showError(9, "يرجى اختيار الاستخدام على الأقل");
+                        return false;
+                    }
+                    let hasOtherUsage = false;
+                    usage.forEach(use => {
+                        if (use.value === "شيء آخر") hasOtherUsage = true;
+                    });
+                    if (hasOtherUsage) {
+                        const customUsage = document.querySelector('input[name="usage_custom"]').value.trim();
+                        if (!customUsage) {
+                            showError(9, "يرجى تحديد الاستخدامات الأخرى");
+                            return false;
+                        }
+                    }
+                    return true;
+                    
+                case 10:
+                    const oldLogo = document.querySelector('input[name="old_logo"]:checked');
+                    if (!oldLogo) {
+                        showError(10, "يرجى الإجابة على هذا السؤال");
+                        return false;
+                    }
+                    return true;
+                    
+                default:
+                    return true;
+            }
+        }
+        
+        // إظهار رسالة الخطأ
+        function showError(step, message) {
+            const errorElement = document.getElementById(`error-${step}`);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+        
+        // إخفاء رسالة الخطأ
+        function hideError(step) {
+            const errorElement = document.getElementById(`error-${step}`);
+            errorElement.style.display = 'none';
+        }
+        
+        // الانتقال إلى الخطوة التالية
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+        }
+        
+        // الانتقال إلى الخطوة السابقة
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
+        
+        // إضافة مستمعي الأحداث
+        nextBtn.addEventListener('click', nextStep);
+        prevBtn.addEventListener('click', prevStep);
+        
+        // تفاعل اختيار البطاقات
+        document.querySelectorAll('.option-card').forEach(card => {
+            card.addEventListener('click', function() {
+                const radio = this.querySelector('input[type="radio"]');
+                const checkbox = this.querySelector('input[type="checkbox"]');
+                
+                if (radio) {
+                    // إلغاء تحديد جميع البطاقات في نفس المجموعة
+                    const groupName = radio.getAttribute('name');
+                    document.querySelectorAll(`input[name="${groupName}"]`).forEach(input => {
+                        input.closest('.option-card').classList.remove('selected');
+                    });
+                    
+                    // تحديد البطاقة المختارة
+                    radio.checked = true;
+                    this.classList.add('selected');
+                    
+                    // إظهار/إخفاء الحقول المخصصة
+                    handleCustomInput(radio);
+                    
+                    // إذا كانت الخطوة 10 وتم اختيار "نعم"، إظهار حقل التفاصيل
+                    if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'نعم') {
+                        document.getElementById('logo-details').style.display = 'block';
+                    } else if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'لا') {
+                        document.getElementById('logo-details').style.display = 'none';
+                    }
+                }
+                
+                if (checkbox) {
+                    // تبديل حالة التحديد للـ checkbox
+                    checkbox.checked = !checkbox.checked;
+                    this.classList.toggle('selected', checkbox.checked);
+                    
+                    // إظهار/إخفاء الحقول المخصصة
+                    handleCustomInput(checkbox);
+                }
+                
+                // إخفاء رسالة الخطأ عند اختيار إجابة
+                hideError(currentStep);
+            });
         });
-        data[name] = values.join(', ');
-      });
-      
-      // جمع باقي الحقول
-      formData.forEach((value, key) => {
-        if (!checkboxes.includes(key)) {
-          data[key] = value;
+        
+        // التعامل مع الحقول المخصصة لخيار "شيء آخر"
+        function handleCustomInput(input) {
+            const customInputIds = {
+                'language': 'language-custom',
+                'work_type': 'work-custom',
+                'clients': 'client-custom',
+                'colors': 'color-custom',
+                'feeling': 'feeling-custom',
+                'usage': 'usage-custom'
+            };
+            
+            const inputName = input.getAttribute('name');
+            if (customInputIds[inputName] && input.value === 'شيء آخر') {
+                document.getElementById(customInputIds[inputName]).style.display = 'block';
+            } else if (customInputIds[inputName]) {
+                document.getElementById(customInputIds[inputName]).style.display = 'none';
+            }
         }
-      });
-      
-      // إضافة الملفات إذا كانت موجودة
-      if (fileInput.files.length > 0) {
-        data['logo_files'] = fileInput.files[0].name;
-      }
-      
-      // هنا يمكنك إرسال البيانات إلى الخادم
-      console.log('بيانات الاستبيان:', data);
-      
-      // إظهار رسالة الشكر
-      document.querySelector('form').style.display = 'none';
-      thankyouMessage.style.display = 'block';
-    });
-    
-    // التهيئة الأولية
-    updateUI();
-  </script>
+        
+        // رفع الملفات
+        fileUpload.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', () => {
+            if (fileInput.files.length > 0) {
+                fileName.textContent = fileInput.files[0].name;
+            } else {
+                fileName.textContent = 'لم يتم رفع أي ملف بعد';
+            }
+        });
+        
+        // إرسال النموذج
+        document.getElementById('clientForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // التحقق من صحة الخطوة الأخيرة
+            if (!validateStep(10)) return;
+            
+            // جمع البيانات
+            const formData = new FormData(this);
+            const data = {};
+            
+            // معالجة الحقول متعددة القيم (checkboxes)
+            const checkboxes = ['clients', 'usage'];
+            checkboxes.forEach(name => {
+                const values = [];
+                document.querySelectorAll(`input[name="${name}"]:checked`).forEach(checkbox => {
+                    values.push(checkbox.value);
+                });
+                data[name] = values.join(', ');
+            });
+            
+            // جمع باقي الحقول
+            formData.forEach((value, key) => {
+                if (!checkboxes.includes(key)) {
+                    data[key] = value;
+                }
+            });
+            
+            // إضافة الملفات إذا كانت موجودة
+            if (fileInput.files.length > 0) {
+                data['logo_files'] = fileInput.files[0].name;
+            }
+            
+            // هنا يمكنك إرسال البيانات إلى الخادم
+            console.log('بيانات الاستبيان:', data);
+            
+            // إظهار رسالة الشكر
+            document.querySelector('form').style.display = 'none';
+            thankyouMessage.style.display = 'block';
+        });
+        
+        // التهيئة الأولية
+        updateUI();
+    </script>
 </body>
 </html>
