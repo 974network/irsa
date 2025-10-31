@@ -7,45 +7,66 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="form-container">
-    <h1>استبيان العميل</h1>
-    <p>يرجى تعبئة النموذج بدقة حتى نصمم لك هوية تناسب عملك.</p>
+  <div class="overlay"></div>
+  <div class="form-wrapper">
+    <h1 class="title">مرحباً بك في استبيان العميل ✨</h1>
+    <p class="subtitle">يرجى تعبئة البيانات بدقة حتى نصمم لك هوية تناسب ذوقك.</p>
 
-    <form id="clientForm">
-      <label>1️⃣ اسم الورشة أو المشروع:</label>
-      <input type="text" name="project_name" required>
+    <form id="clientForm" class="form">
+      <div class="input-group">
+        <label>1️⃣ اسم الورشة أو المشروع</label>
+        <input type="text" name="project_name" required>
+      </div>
 
-      <label>2️⃣ اللغة المفضلة (عربي / إنجليزي / الاثنين):</label>
-      <input type="text" name="language" required>
+      <div class="input-group">
+        <label>2️⃣ اللغة المفضلة (عربي / إنجليزي / الاثنين)</label>
+        <input type="text" name="language" required>
+      </div>
 
-      <label>3️⃣ نوع الشغل (دهان، تذهيب، تشطيب، حفر...):</label>
-      <input type="text" name="work_type" required>
+      <div class="input-group">
+        <label>3️⃣ نوع الشغل (دهان، تذهيب، تشطيب...)</label>
+        <input type="text" name="work_type" required>
+      </div>
 
-      <label>4️⃣ نوع العملاء (فلل، محلات، شركات...):</label>
-      <input type="text" name="clients" required>
+      <div class="input-group">
+        <label>4️⃣ نوع العملاء (فلل، محلات، زبائن مباشر...)</label>
+        <input type="text" name="clients" required>
+      </div>
 
-      <label>5️⃣ شكل الشعار (فخم كلاسيكي / بسيط حديث):</label>
-      <input type="text" name="style" required>
+      <div class="input-group">
+        <label>5️⃣ شكل الشعار (فخم كلاسيكي / بسيط حديث)</label>
+        <input type="text" name="style" required>
+      </div>
 
-      <label>6️⃣ الألوان المفضلة:</label>
-      <input type="text" name="colors" required>
+      <div class="input-group">
+        <label>6️⃣ الألوان المفضلة</label>
+        <input type="text" name="colors" required>
+      </div>
 
-      <label>7️⃣ نوع الشعار (رمز / كتابة فقط):</label>
-      <input type="text" name="logo_type" required>
+      <div class="input-group">
+        <label>7️⃣ نوع الشعار (رمز / كتابة فقط)</label>
+        <input type="text" name="logo_type" required>
+      </div>
 
-      <label>8️⃣ الإحساس المطلوب (فخامة – احتراف – ذوق...):</label>
-      <input type="text" name="feeling" required>
+      <div class="input-group">
+        <label>8️⃣ الإحساس المطلوب (فخامة – احتراف – ذوق...)</label>
+        <input type="text" name="feeling" required>
+      </div>
 
-      <label>9️⃣ أول استخدام للشعار (سوشال ميديا – لوحة – كرت...):</label>
-      <input type="text" name="usage" required>
+      <div class="input-group">
+        <label>9️⃣ أول استخدام للشعار (سوشال ميديا – لوحة – كرت...)</label>
+        <input type="text" name="usage" required>
+      </div>
 
-      <label>🔟 هل لديك لوجو قديم أو فكرة سابقة؟</label>
-      <input type="text" name="old_logo" required>
+      <div class="input-group">
+        <label>🔟 هل لديك لوجو قديم أو فكرة سابقة؟</label>
+        <input type="text" name="old_logo" required>
+      </div>
 
-      <button type="submit">إرسال الاستبيان</button>
+      <button type="submit" class="submit-btn">إرسال الاستبيان</button>
     </form>
 
-    <div id="message" class="hidden">
+    <div id="thankyou" class="thankyou hidden">
       <h2>شكرًا لتعبئتك الاستبيان 🌟</h2>
       <p>تم إرسال ردّك بنجاح.</p>
     </div>
