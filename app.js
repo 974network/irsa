@@ -1,5 +1,5 @@
 const form = document.getElementById("clientForm");
-const message = document.getElementById("message");
+const thankyou = document.getElementById("thankyou");
 
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -22,7 +22,7 @@ form.addEventListener("submit", async (e) => {
 
     if (response.ok) {
       form.classList.add("hidden");
-      message.classList.remove("hidden");
+      thankyou.classList.remove("hidden");
     } else {
       alert("حدث خطأ أثناء الإرسال، حاول مرة أخرى.");
     }
