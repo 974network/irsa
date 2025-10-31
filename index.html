@@ -96,15 +96,38 @@ body{background:linear-gradient(135deg,#1a1208 0%,#2c1e0f 50%,#1a1208 100%);colo
 <div class="error-message" id="error-4"></div>
 </div>
 <!-- 5 -->
+<!-- 5 -->
 <div class="form-step" id="step-5">
 <h2 class="question-title"><i class="fas fa-drafting-compass"></i> نوع الشعار</h2>
 <div class="options-grid">
-<label class="option-card"><input type="radio" name="logo_type" value="رمز فقط" class="radio"/><div class="option-content"><h3 class="option-title">رمز فقط</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_type" value="كتابة فقط" class="radio"/><div class="option-content"><h3 class="option-title">كتابة فقط</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_type" value="رمز وكتابة" class="radio"/><div class="option-content"><h3 class="option-title">رمز وكتابة</h3></div></label>
+<label class="option-card">
+<input type="radio" name="logo_type" value="رمز فقط" class="radio"/>
+<div class="option-content"><h3 class="option-title">رمز فقط</h3></div>
+</label>
+
+<label class="option-card">
+<input type="radio" name="logo_type" value="كتابة فقط" class="radio"/>
+<div class="option-content"><h3 class="option-title">كتابة فقط</h3></div>
+</label>
+
+<label class="option-card">
+<input type="radio" name="logo_type" value="رمز وكتابة" class="radio"/>
+<div class="option-content"><h3 class="option-title">رمز وكتابة</h3></div>
+</label>
+
+<label class="option-card" id="other-logo-type">
+<input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
+<div class="option-content"><h3 class="option-title">شيء آخر</h3></div>
+</label>
 </div>
+
+<div class="custom-input" id="logo-type-custom">
+<input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل نوع الشعار الآخر" />
+</div>
+
 <div class="error-message" id="error-5"></div>
 </div>
+
 <!-- 6 -->
 <div class="form-step" id="step-6">
 <h2 class="question-title"><i class="fas fa-heart"></i> الإحساس المطلوب</h2>
@@ -216,3 +239,4 @@ updateUI();
 </script>
 </body>
 </html>
+
