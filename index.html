@@ -1352,67 +1352,59 @@ document.getElementById('clientForm').addEventListener('submit', async function(
 async function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(',')[1]); // نأخذ الجزء بعد "base64,"
+    reader.onload = () => resolve(reader.result.split(",")[1]);
     reader.onerror = reject;
     reader.readAsDataURL(file);
   });
 }
 
-document.getElementById('clientForm').addEventListener('submit', async function(e) {
+document.getElementById("clientForm").addEventListener("submit", async function (e) {
   e.preventDefault();
-
   if (!validateStep(10)) return;
 
   const data = {};
-  data.timestamp = new Date().toLocaleString('ar-SA');
+  data.timestamp = new Date().toLocaleString("ar-SA");
   data.project_name = document.querySelector('input[name="project_name"]').value.trim();
 
-  const radioFields = ['language', 'work_type', 'logo_style', 'colors', 'logo_type', 'feeling', 'old_logo'];
+  const radioFields = ["language","work_type","logo_style","colors","logo_type","feeling","old_logo"];
   radioFields.forEach(f => {
     const selected = document.querySelector(`input[name="${f}"]:checked`);
-    data[f] = selected ? selected.value : '';
+    data[f] = selected ? selected.value : "";
   });
 
-  const checkboxFields = ['clients', 'usage'];
+  const checkboxFields = ["clients","usage"];
   checkboxFields.forEach(f => {
     const selected = Array.from(document.querySelectorAll(`input[name="${f}"]:checked`))
       .map(cb => cb.value);
-    data[f] = selected.join(', ');
+    data[f] = selected.join(", ");
   });
 
-  const customFields = ['language_custom', 'work_custom', 'client_custom', 'color_custom', 'feeling_custom', 'usage_custom'];
+  const customFields = ["language_custom","work_custom","client_custom","color_custom","feeling_custom","usage_custom"];
   customFields.forEach(f => {
     const input = document.querySelector(`input[name="${f}"]`);
-    data[f] = input ? input.value.trim() : '';
+    data[f] = input ? input.value.trim() : "";
   });
 
-  data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || '';
+  data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || "";
 
-  // ✅ تحويل الملف إلى Base64
+  // 🔹 إعداد FormData
+  const formData = new FormData();
+  for (let key in data) formData.append(key, data[key]);
+
+  // 🔹 إضافة الملف كـBase64
   if (fileInput.files.length > 0) {
     const file = fileInput.files[0];
-    data.file_name = file.name;
-    data.file_type = file.type;
-    data.file_base64 = await fileToBase64(file);
-  } else {
-    data.file_name = '';
-    data.file_type = '';
-    data.file_base64 = '';
+    formData.append("file_name", file.name);
+    formData.append("file_type", file.type);
+    formData.append("file_base64", await fileToBase64(file));
   }
 
-  // عرض التحميل
-  document.querySelector('form').style.display = 'none';
-  loadingElement.style.display = 'block';
+  document.querySelector("form").style.display = "none";
+  loadingElement.style.display = "block";
 
   try {
-    const response = await fetch(scriptURL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
-    });
-
+    const response = await fetch(scriptURL, { method: "POST", body: formData });
     const result = await response.json();
-    console.log(result);
 
     if (result.result === "success") {
       loadingElement.style.display = "none";
@@ -1421,12 +1413,12 @@ document.getElementById('clientForm').addEventListener('submit', async function(
       throw new Error(result.message);
     }
   } catch (err) {
-    console.error(err);
     alert("خطأ أثناء الإرسال: " + err.message);
-    document.querySelector('form').style.display = 'block';
-    loadingElement.style.display = 'none';
+    document.querySelector("form").style.display = "block";
+    loadingElement.style.display = "none";
   }
 });
+
 
 
     const result = await response.json();
@@ -1452,6 +1444,7 @@ document.getElementById('clientForm').addEventListener('submit', async function(
     </script>
 </body>
 </html>
+
 
 
 
