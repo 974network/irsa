@@ -1,215 +1,1312 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>استبيان العميل الفاخر</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
-@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
-:root {--gold:#d4af37;--dark-gold:#b8860b;--light-gold:#f1c75e;--text-light:#f8e9c4;--glass:rgba(255,255,255,0.08);--glass-border:rgba(212,175,55,0.3);--error:#ff6b6b;}
-*{margin:0;padding:0;box-sizing:border-box;font-family:'El Messiri',sans-serif;}
-body{background:linear-gradient(135deg,#1a1208 0%,#2c1e0f 50%,#1a1208 100%);color:var(--text-light);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:15px;}
-.container{max-width:700px;width:100%;}
-.header{text-align:center;margin-bottom:25px;}
-.title{font-size:1.8rem;font-weight:700;color:var(--gold);text-shadow:0 0 10px rgba(212,175,55,0.4);}
-.subtitle{font-size:0.95rem;color:#f5e9c2;}
-.form-container{background:var(--glass);backdrop-filter:blur(10px);border:1px solid var(--glass-border);border-radius:20px;padding:25px 20px;box-shadow:0 8px 25px rgba(0,0,0,0.3);}
-.form-step{display:none;}
-.form-step.active{display:block;}
-.question-title{font-size:1.2rem;margin-bottom:18px;color:var(--light-gold);}
-.options-grid{display:flex;flex-direction:column;gap:12px;}
-.option-card{background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:12px;padding:16px;cursor:pointer;transition:0.3s;}
-.option-card.selected{border-color:var(--gold);background:rgba(212,175,55,0.1);}
-.option-title{font-size:1rem;font-weight:600;color:var(--light-gold);}
-.option-desc{font-size:0.85rem;color:rgba(255,255,255,0.7);}
-.radio{display:none;}
-.text-input{width:100%;padding:14px;background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:10px;color:var(--text-light);}
-.custom-input{margin-top:12px;display:none;}
-.error-message{color:var(--error);font-size:0.85rem;margin-top:8px;display:none;}
-.form-navigation{display:flex;justify-content:space-between;margin-top:30px;gap:10px;}
-.nav-btn{padding:14px 20px;background:linear-gradient(45deg,var(--dark-gold),var(--gold));border:none;border-radius:10px;color:#1c1a1a;font-weight:bold;font-size:1rem;cursor:pointer;flex:1;}
-.progress-bar{height:6px;background:rgba(212,175,55,0.2);border-radius:3px;}
-.progress{height:100%;background:linear-gradient(90deg,var(--dark-gold),var(--gold));width:10%;transition:width 0.5s ease;}
-.progress-text{text-align:center;margin-top:8px;font-size:0.9rem;color:var(--light-gold);}
-.step-indicators{display:flex;justify-content:center;gap:8px;margin:15px 0;}
-.step-indicator{width:10px;height:10px;border-radius:50%;background:rgba(212,175,55,0.3);}
-.step-indicator.active{background:var(--gold);}
-.file-upload{margin-top:12px;padding:14px;background:rgba(255,255,255,0.05);border:1px dashed var(--glass-border);border-radius:10px;text-align:center;cursor:pointer;}
-.file-name{margin-top:8px;font-size:0.85rem;color:var(--light-gold);}
-.thankyou-message,.loading{text-align:center;display:none;padding:30px;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان العميل الفاخر</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --gold: #d4af37;
+            --dark-gold: #b8860b;
+            --light-gold: #f1c75e;
+            --bg-dark: rgba(20, 15, 10, 0.95);
+            --text-light: #f8e9c4;
+            --glass: rgba(255, 255, 255, 0.08);
+            --glass-border: rgba(212, 175, 55, 0.3);
+            --error: #ff6b6b;
+            --success: #4CAF50;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'El Messiri', sans-serif;
+        }
+        
+        body {
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(180, 140, 20, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
+            color: var(--text-light);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--gold);
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+            position: relative;
+            display: inline-block;
+            line-height: 1.3;
+        }
+        
+        .title::after {
+            content: '✨';
+            position: absolute;
+            top: -8px;
+            left: -25px;
+            font-size: 1.3rem;
+            animation: sparkle 3s infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { opacity: 0.7; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+        
+        .subtitle {
+            font-size: 0.95rem;
+            color: #f5e9c2;
+            max-width: 100%;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+        
+        .form-container {
+            background: var(--glass);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 25px 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            width: 100%;
+        }
+        
+        .form-container::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 70%);
+            z-index: -1;
+        }
+        
+        .form-step {
+            display: none;
+            animation: fadeIn 0.4s ease;
+        }
+        
+        .form-step.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .question {
+            margin-bottom: 25px;
+        }
+        
+        .question-title {
+            font-size: 1.2rem;
+            margin-bottom: 18px;
+            color: var(--light-gold);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.4;
+        }
+        
+        .question-title i {
+            font-size: 1.1rem;
+        }
+        
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .option-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .option-card:active {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            border-color: var(--gold);
+        }
+        
+        .option-card:active::before {
+            opacity: 1;
+        }
+        
+        .option-card.selected {
+            border-color: var(--gold);
+            background: rgba(212, 175, 55, 0.1);
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.2);
+        }
+        
+        .option-card.selected::before {
+            opacity: 1;
+        }
+        
+        .option-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .option-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: var(--light-gold);
+        }
+        
+        .option-desc {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.4;
+        }
+        
+        .checkbox, .radio {
+            display: none;
+        }
+        
+        .text-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .custom-input {
+            margin-top: 12px;
+            display: none;
+        }
+        
+        .file-upload {
+            margin-top: 12px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed var(--glass-border);
+            border-radius: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .file-upload:active {
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        
+        .file-upload i {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 8px;
+        }
+        
+        .file-name {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--light-gold);
+        }
+        
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        
+        .nav-btn {
+            padding: 14px 20px;
+            background: linear-gradient(45deg, var(--dark-gold), var(--gold));
+            border: none;
+            border-radius: 10px;
+            color: #1c1a1a;
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+            flex: 1;
+            min-height: 50px;
+        }
+        
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+        }
+        
+        .nav-btn:active {
+            background: linear-gradient(45deg, var(--gold), var(--light-gold));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+        }
+        
+        .nav-btn:active::before {
+            transform: translateX(100%);
+        }
+        
+        .nav-btn:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .nav-btn:disabled::before {
+            display: none;
+        }
+        
+        .error-message {
+            color: var(--error);
+            font-size: 0.85rem;
+            margin-top: 8px;
+            display: none;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-bar {
+            height: 6px;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--dark-gold), var(--gold));
+            width: 10%;
+            transition: width 0.5s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: var(--light-gold);
+        }
+        
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .step-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .step-indicator.active {
+            background: var(--gold);
+            box-shadow: 0 0 8px var(--gold);
+        }
+        
+        .thankyou-message {
+            text-align: center;
+            padding: 30px 20px;
+            display: none;
+        }
+        
+        .thankyou-message i {
+            font-size: 3rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .thankyou-message h2 {
+            font-size: 1.8rem;
+            color: var(--gold);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+        
+        .thankyou-message p {
+            font-size: 1rem;
+            line-height: 1.5;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .loading i {
+            font-size: 2.5rem;
+            color: var(--gold);
+            margin-bottom: 15px;
+        }
+        
+        .loading p {
+            font-size: 1.1rem;
+            color: var(--light-gold);
+        }
+        
+        .debug-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--light-gold);
+            display: none;
+        }
+        
+        /* تأثيرات اللمس للجوال */
+        @media (hover: hover) {
+            .option-card:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                border-color: var(--gold);
+            }
+            
+            .option-card:hover::before {
+                opacity: 1;
+            }
+            
+            .file-upload:hover {
+                border-color: var(--gold);
+                background: rgba(255, 255, 255, 0.08);
+            }
+            
+            .nav-btn:hover {
+                background: linear-gradient(45deg, var(--gold), var(--light-gold));
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+            }
+            
+            .nav-btn:hover::before {
+                transform: translateX(100%);
+            }
+        }
+        
+        /* تحسينات للأجهزة الصغيرة جداً */
+        @media (max-width: 360px) {
+            .title {
+                font-size: 1.6rem;
+            }
+            
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .question-title {
+                font-size: 1.1rem;
+            }
+            
+            .nav-btn {
+                padding: 12px 15px;
+                font-size: 0.9rem;
+            }
+        }
+        
+        /* تحسينات للأجهزة الأكبر */
+        @media (min-width: 768px) {
+            .container {
+                max-width: 700px;
+            }
+            
+            .form-container {
+                padding: 35px 30px;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .options-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+        }
+        
+        /* تحسينات للشاشات الكبيرة */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 800px;
+            }
+            
+            .form-container {
+                padding: 40px;
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="container">
-<div class="header">
-<h1 class="title">استبيان العميل الفاخر</h1>
-<p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
-</div>
-<div class="form-container">
-<div class="progress-bar"><div class="progress" id="progress"></div></div>
-<div class="progress-text" id="progress-text">السؤال 1 من 7</div>
-<div class="step-indicators" id="step-indicators"></div>
-<form id="clientForm">
+    <div class="container">
+        <div class="header">
+            <h1 class="title">استبيان العميل الفاخر</h1>
+            <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
+        </div>
+        
+        <div class="form-container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
+            </div>
+            
+            <div class="step-indicators" id="step-indicators">
+                <!-- سيتم إضافة مؤشرات الخطوات هنا عبر JavaScript -->
+            </div>
+            
+            <form id="clientForm">
+                <!-- الخطوة 1 -->
+                <div class="form-step active" id="step-1">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-signature"></i> 1️⃣ اسم الورشة أو المشروع</h2>
+                        <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" required>
+                        <div class="error-message" id="error-1">يرجى إدخال اسم الورشة أو المشروع</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 2 -->
+                <div class="form-step" id="step-2">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-tools"></i> 2️⃣ نوع الشغل الأساسي</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="دهان" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">دهان</h3>
+                                    <p class="option-desc">أعمال الدهان والديكور</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="تذهيب" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">تذهيب</h3>
+                                    <p class="option-desc">أعمال التذهيب والزخرفة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="تشطيب" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">تشطيب</h3>
+                                    <p class="option-desc">أعمال التشطيب النهائي</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="work_type" value="حفر ونقش" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">حفر ونقش</h3>
+                                    <p class="option-desc">أعمال الحفر والنقش على الخشب وغيره</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-work">
+                                <input type="radio" name="work_type" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد نوع الشغل الآخر</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="work-custom">
+                            <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر">
+                        </div>
+                        <div class="error-message" id="error-2">يرجى اختيار نوع الشغل الأساسي</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 3 -->
+                <div class="form-step" id="step-3">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-paint-brush"></i> 3️⃣ شكل الشعار المفضل</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">فخم وكلاسيكي</h3>
+                                    <p class="option-desc">تصميم تقليدي أنيق يعكس الفخامة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="بسيط وحديث" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">بسيط وحديث</h3>
+                                    <p class="option-desc">تصميم معاصر بسيط وواضح</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">مزيج من الإثنين</h3>
+                                    <p class="option-desc">دمج بين الفخامة والبساطة</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="error-message" id="error-3">يرجى اختيار شكل الشعار المفضل</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 4 -->
+                <div class="form-step" id="step-4">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-palette"></i> 4️⃣ الألوان المفضلة</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">ذهبي وكلاسيكي</h3>
+                                    <p class="option-desc">ألوان ذهبية مع ألوان كلاسيكية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان ترابية" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان ترابية</h3>
+                                    <p class="option-desc">درجات البني والألوان الترابية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان زاهية" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان زاهية</h3>
+                                    <p class="option-desc">ألوان مشرقة وزاهية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="colors" value="ألوان محايدة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ألوان محايدة</h3>
+                                    <p class="option-desc">أبيض، أسود، رمادي وتدرجاتها</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-color">
+                                <input type="radio" name="colors" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد الألوان المفضلة الأخرى</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="color-custom">
+                            <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان المفضلة الأخرى">
+                        </div>
+                        <div class="error-message" id="error-4">يرجى اختيار الألوان المفضلة</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 5 -->
+                <div class="form-step" id="step-5">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-drafting-compass"></i> 5️⃣ نوع الشعار</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="رمز فقط" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">رمز فقط</h3>
+                                    <p class="option-desc">شعار يعتمد على رمز مثل فرشة أو زخرفة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="كتابة فقط" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">كتابة فقط</h3>
+                                    <p class="option-desc">شعار يعتمد على النص والخطوط فقط</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="logo_type" value="رمز وكتابة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">رمز وكتابة</h3>
+                                    <p class="option-desc">دمج بين الرمز والنص في التصميم</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="error-message" id="error-5">يرجى اختيار نوع الشعار</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 6 -->
+                <div class="form-step" id="step-6">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-heart"></i> 6️⃣ الإحساس المطلوب</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="فخامة" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">فخامة</h3>
+                                    <p class="option-desc">إيحاء بالفخامة والتميز</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="احتراف" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">احتراف</h3>
+                                    <p class="option-desc">إيحاء بالاحترافية والخبرة</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="ذوق" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ذوق</h3>
+                                    <p class="option-desc">إيحاء بالذوق الرفيع</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="feeling" value="ثقة" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">ثقة</h3>
+                                    <p class="option-desc">إيحاء بالثقة والموثوقية</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card" id="other-feeling">
+                                <input type="radio" name="feeling" value="شيء آخر" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">شيء آخر</h3>
+                                    <p class="option-desc">حدد الإحساس المطلوب الآخر</p>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="custom-input" id="feeling-custom">
+                            <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس المطلوب الآخر">
+                        </div>
+                        <div class="error-message" id="error-6">يرجى اختيار الإحساس المطلوب</div>
+                    </div>
+                </div>
+                
+                <!-- الخطوة 7 -->
+                <div class="form-step" id="step-7">
+                    <div class="question">
+                        <h2 class="question-title"><i class="fas fa-history"></i> 7️⃣ هل لديك لوجو قديم؟</h2>
+                        <div class="options-grid">
+                            <label class="option-card">
+                                <input type="radio" name="old_logo" value="نعم" class="radio" required>
+                                <div class="option-content">
+                                    <h3 class="option-title">نعم</h3>
+                                    <p class="option-desc">لدي شعار قديم وأرغب في تطويره</p>
+                                </div>
+                            </label>
+                            
+                            <label class="option-card">
+                                <input type="radio" name="old_logo" value="لا" class="radio">
+                                <div class="option-content">
+                                    <h3 class="option-title">لا</h3>
+                                    <p class="option-desc">لا أملك شعاراً قديماً، أريد تصميم جديد</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div id="logo-details" style="display: none; margin-top: 25px;">
+                            <div class="question">
+                                <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
+                                <textarea class="text-input" name="logo_details" rows="3" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
+                            </div>
+                            
+                            <div class="question">
+                                <h2 class="question-title"><i class="fas fa-file-upload"></i> رفع ملفات اللوجو القديم</h2>
+                                <div class="file-upload" id="file-upload">
+                                    <i class="fas fa-cloud-upload-alt"></i>
+                                    <p>انقر لرفع ملفات اللوجو القديم</p>
+                                    <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
+                                </div>
+                                <input type="file" id="file-input" style="display: none;" accept="image/*,.pdf,.psd,.ai">
+                            </div>
+                        </div>
+                        <div class="error-message" id="error-7">يرجى الإجابة على هذا السؤال</div>
+                    </div>
+                </div>
+                
+                <div class="form-navigation">
+                    <button type="button" class="nav-btn" id="prev-btn" disabled>
+                        <i class="fas fa-arrow-right"></i> السابق
+                    </button>
+                    <button type="button" class="nav-btn" id="next-btn">
+                        التالي <i class="fas fa-arrow-left"></i>
+                    </button>
+                    <button type="submit" class="nav-btn" id="submit-btn" style="display: none;">
+                        إرسال الاستبيان <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+            </form>
+            
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري إرسال البيانات إلى السيرفر...</p>
+                <p>يرجى الانتظار</p>
+            </div>
+            
+            <div class="thankyou-message" id="thankyou-message">
+                <i class="fas fa-check-circle"></i>
+                <h2>شكراً لك يا عميلنا العزيز</h2>
+                <p>تم استلام استبيانك بنجاح وسوف نتواصل معك قريباً</p>
+                <p>إذا احتجنا لأي معلومات إضافية</p>
+            </div>
 
-<!-- 1 -->
-<div class="form-step active" id="step-1">
-<h2 class="question-title"><i class="fas fa-signature"></i> اسم الورشة أو المشروع</h2>
-<input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" />
-<div class="error-message" id="error-1"></div>
-</div>
+            <div class="debug-info" id="debug-info">
+                <h3>معلومات التصحيح:</h3>
+                <div id="debug-content"></div>
+            </div>
+        </div>
+    </div>
 
-<!-- 2 -->
-<div class="form-step" id="step-2">
-<h2 class="question-title"><i class="fas fa-tools"></i> نوع الشغل الأساسي</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="work_type" value="دهان" class="radio"/><div class="option-content"><h3 class="option-title">دهان</h3></div></label>
-<label class="option-card"><input type="radio" name="work_type" value="تذهيب" class="radio"/><div class="option-content"><h3 class="option-title">تذهيب</h3></div></label>
-<label class="option-card"><input type="radio" name="work_type" value="تشطيب" class="radio"/><div class="option-content"><h3 class="option-title">تشطيب</h3></div></label>
-<label class="option-card" id="other-work"><input type="radio" name="work_type" value="شيء آخر" class="radio"/><div class="option-content"><h3 class="option-title">شيء آخر</h3></div></label>
-</div>
-<div class="custom-input" id="work-custom"><input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر" /></div>
-<div class="error-message" id="error-2"></div>
-</div>
-
-<!-- 3 -->
-<div class="form-step" id="step-3">
-<h2 class="question-title"><i class="fas fa-paint-brush"></i> شكل الشعار المفضل</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio"/><div class="option-content"><h3 class="option-title">فخم وكلاسيكي</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_style" value="بسيط وحديث" class="radio"/><div class="option-content"><h3 class="option-title">بسيط وحديث</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio"/><div class="option-content"><h3 class="option-title">مزيج من الإثنين</h3></div></label>
-</div>
-<div class="error-message" id="error-3"></div>
-</div>
-
-<!-- 4 -->
-<div class="form-step" id="step-4">
-<h2 class="question-title"><i class="fas fa-palette"></i> الألوان المفضلة</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio"/><div class="option-content"><h3 class="option-title">ذهبي وكلاسيكي</h3></div></label>
-<label class="option-card"><input type="radio" name="colors" value="ألوان ترابية" class="radio"/><div class="option-content"><h3 class="option-title">ألوان ترابية</h3></div></label>
-<label class="option-card" id="other-color"><input type="radio" name="colors" value="شيء آخر" class="radio"/><div class="option-content"><h3 class="option-title">شيء آخر</h3></div></label>
-</div>
-<div class="custom-input" id="color-custom"><input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان الأخرى" /></div>
-<div class="error-message" id="error-4"></div>
-</div>
-
-<!-- 5 -->
-<div class="form-step" id="step-5">
-<h2 class="question-title"><i class="fas fa-drafting-compass"></i> نوع الشعار</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="logo_type" value="رمز فقط" class="radio"/><div class="option-content"><h3 class="option-title">رمز فقط</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_type" value="كتابة فقط" class="radio"/><div class="option-content"><h3 class="option-title">كتابة فقط</h3></div></label>
-<label class="option-card"><input type="radio" name="logo_type" value="رمز وكتابة" class="radio"/><div class="option-content"><h3 class="option-title">رمز وكتابة</h3></div></label>
-<label class="option-card" id="other-logo-type"><input type="radio" name="logo_type" value="شيء آخر" class="radio"/><div class="option-content"><h3 class="option-title">شيء آخر</h3></div></label>
-</div>
-<div class="custom-input" id="logo-type-custom"><input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل نوع الشعار الآخر" /></div>
-<div class="error-message" id="error-5"></div>
-</div>
-
-<!-- 6 -->
-<div class="form-step" id="step-6">
-<h2 class="question-title"><i class="fas fa-heart"></i> الإحساس المطلوب</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="feeling" value="فخامة" class="radio"/><div class="option-content"><h3 class="option-title">فخامة</h3></div></label>
-<label class="option-card"><input type="radio" name="feeling" value="احتراف" class="radio"/><div class="option-content"><h3 class="option-title">احتراف</h3></div></label>
-<label class="option-card" id="other-feeling"><input type="radio" name="feeling" value="شيء آخر" class="radio"/><div class="option-content"><h3 class="option-title">شيء آخر</h3></div></label>
-</div>
-<div class="custom-input" id="feeling-custom"><input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس الآخر" /></div>
-<div class="error-message" id="error-6"></div>
-</div>
-
-<!-- 7 -->
-<div class="form-step" id="step-7">
-<h2 class="question-title"><i class="fas fa-history"></i> هل لديك لوجو قديم؟</h2>
-<div class="options-grid">
-<label class="option-card"><input type="radio" name="old_logo" value="نعم" class="radio"/><div class="option-content"><h3 class="option-title">نعم</h3></div></label>
-<label class="option-card"><input type="radio" name="old_logo" value="لا" class="radio"/><div class="option-content"><h3 class="option-title">لا</h3></div></label>
-</div>
-<div id="logo-details" style="display:none;margin-top:20px;">
-<textarea class="text-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
-<div class="file-upload" id="file-upload"><i class="fas fa-cloud-upload-alt"></i><p>انقر لرفع اللوجو القديم</p><p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p></div>
-<input type="file" id="file-input" style="display:none;" accept="image/*,.pdf,.psd,.ai" />
-</div>
-<div class="error-message" id="error-7"></div>
-</div>
-
-<div class="form-navigation">
-<button type="button" class="nav-btn" id="prev-btn">السابق</button>
-<button type="button" class="nav-btn" id="next-btn">التالي</button>
-<button type="submit" class="nav-btn" id="submit-btn" style="display:none;">إرسال</button>
-</div>
-</form>
-
-<div class="loading" id="loading"><i class="fas fa-spinner fa-spin"></i><p>جاري الإرسال...</p></div>
-<div class="thankyou-message" id="thankyou-message"><i class="fas fa-check-circle"></i><h2>شكراً لك</h2><p>تم إرسال الاستبيان بنجاح</p></div>
-</div>
-</div>
-
-<script>
-const totalSteps=7;let currentStep=1;
-const progressBar=document.getElementById('progress');
-const progressText=document.getElementById('progress-text');
-const stepIndicators=document.getElementById('step-indicators');
-const prevBtn=document.getElementById('prev-btn');
-const nextBtn=document.getElementById('next-btn');
-const submitBtn=document.getElementById('submit-btn');
-const thankyouMessage=document.getElementById('thankyou-message');
-const loadingElement=document.getElementById('loading');
-const fileUpload=document.getElementById('file-upload');
-const fileInput=document.getElementById('file-input');
-const fileName=document.getElementById('file-name');
-const scriptURL="https://script.google.com/macros/s/AKfycbyrbeM-XjltWIR7T9qQGcbv3L1jTDiOWRWofzRi9Cm2ojrvYPWw0PPcC3YLv5D6smad/exec";
-for(let i=1;i<=totalSteps;i++){const d=document.createElement('div');d.classList.add('step-indicator');if(i===1)d.classList.add('active');stepIndicators.appendChild(d);}
-function updateUI(){progressBar.style.width=(currentStep/totalSteps*100)+'%';progressText.textContent=`السؤال ${currentStep} من ${totalSteps}`;prevBtn.style.display=currentStep===1?'none':'flex';nextBtn.style.display=currentStep===totalSteps?'none':'flex';submitBtn.style.display=currentStep===totalSteps?'flex':'none';document.querySelectorAll('.form-step').forEach(e=>e.classList.remove('active'));document.getElementById(`step-${currentStep}`).classList.add('active');document.querySelectorAll('.step-indicator').forEach((ind,i)=>ind.classList.toggle('active',i<currentStep));window.scrollTo({top:0,behavior:'smooth'});}
-function showError(s,m){const e=document.getElementById(`error-${s}`);if(e){e.textContent=m;e.style.display='block';}}
-function hideError(s){const e=document.getElementById(`error-${s}`);if(e)e.style.display='none';}
-function validateStep(s){
-switch(s){
-case 1:const p=document.querySelector('input[name="project_name"]').value.trim();if(!p){showError(1,"يرجى إدخال اسم الورشة أو المشروع");return false;}return true;
-case 2:const w=document.querySelector('input[name="work_type"]:checked');if(!w){showError(2,"يرجى اختيار نوع الشغل");return false;}if(w.value==="شيء آخر"&&!document.querySelector('input[name="work_custom"]').value.trim()){showError(2,"يرجى تحديد النوع الآخر");return false;}return true;
-case 3:if(!document.querySelector('input[name="logo_style"]:checked')){showError(3,"يرجى اختيار شكل الشعار");return false;}return true;
-case 4:const c=document.querySelector('input[name="colors"]:checked');if(!c){showError(4,"يرجى اختيار الألوان");return false;}if(c.value==="شيء آخر"&&!document.querySelector('input[name="color_custom"]').value.trim()){showError(4,"يرجى تحديد الألوان الأخرى");return false;}return true;
-case 5:const lt=document.querySelector('input[name="logo_type"]:checked');if(!lt){showError(5,"يرجى اختيار نوع الشعار");return false;}if(lt.value==="شيء آخر"&&!document.querySelector('input[name="logo_type_custom"]').value.trim()){showError(5,"يرجى تحديد نوع الشعار الآخر");return false;}return true;
-case 6:const f=document.querySelector('input[name="feeling"]:checked');if(!f){showError(6,"يرجى اختيار الإحساس");return false;}if(f.value==="شيء آخر"&&!document.querySelector('input[name="feeling_custom"]').value.trim()){showError(6,"يرجى تحديد الإحساس الآخر");return false;}return true;
-case 7:if(!document.querySelector('input[name="old_logo"]:checked')){showError(7,"يرجى الإجابة على هذا السؤال");return false;}return true;
-default:return true;
-}}
-nextBtn.onclick=()=>{if(validateStep(currentStep)&&currentStep<totalSteps){hideError(currentStep);currentStep++;updateUI();}};
-prevBtn.onclick=()=>{if(currentStep>1){currentStep--;updateUI();}};
-document.querySelectorAll('.option-card').forEach(card=>{
-card.onclick=function(){
-const r=this.querySelector('input[type="radio"]');
-if(r){document.querySelectorAll(`input[name="${r.name}"]`).forEach(i=>i.closest('.option-card').classList.remove('selected'));r.checked=true;this.classList.add('selected');if(r.name==='work_type')document.getElementById('work-custom').style.display=r.value==='شيء آخر'?'block':'none';
-if(r.name==='colors')document.getElementById('color-custom').style.display=r.value==='شيء آخر'?'block':'none';
-if(r.name==='feeling')document.getElementById('feeling-custom').style.display=r.value==='شيء آخر'?'block':'none';
-if(r.name==='logo_type')document.getElementById('logo-type-custom').style.display=r.value==='شيء آخر'?'block':'none';
-if(r.name==='old_logo')document.getElementById('logo-details').style.display=r.value==='نعم'?'block':'none';
-hideError(currentStep);}
-}});
-
-fileUpload.onclick=()=>fileInput.click();
-fileInput.onchange=()=>{fileName.textContent=fileInput.files.length>0?fileInput.files[0].name:'لم يتم رفع أي ملف بعد';};
-async function fileToBase64(file){return new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(",")[1]);r.onerror=rej;r.readAsDataURL(file);});}
-document.getElementById("clientForm").addEventListener("submit",async e=>{
-e.preventDefault();if(!validateStep(totalSteps))return;
-const data={timestamp:new Date().toLocaleString("ar-SA")};
-["project_name","work_type","logo_style","colors","logo_type","feeling","old_logo"].forEach(f=>{
-const el=document.querySelector(`input[name="${f}"]:checked`)||document.querySelector(`input[name="${f}"]`);
-data[f]=el?el.value:"";
-});
-["work_custom","color_custom","logo_type_custom","feeling_custom"].forEach(f=>{
-const i=document.querySelector(`input[name="${f}"]`);if(i)data[f]=i.value.trim();
-});
-data.logo_details=document.querySelector('textarea[name="logo_details"]')?.value.trim()||"";
-const formData=new FormData();for(let k in data)formData.append(k,data[k]);
-if(fileInput.files.length>0){const f=fileInput.files[0];formData.append("file_name",f.name);formData.append("file_type",f.type);formData.append("file_base64",await fileToBase64(f));}
-document.querySelector("form").style.display="none";loadingElement.style.display="block";
-try{const r=await fetch(scriptURL,{method:"POST",body:formData});const j=await r.json();loadingElement.style.display="none";if(j.result==="success"){thankyouMessage.style.display="block";}else throw new Error(j.message);}
-catch(err){alert("حدث خطأ أثناء الإرسال: "+err.message);document.querySelector("form").style.display="block";loadingElement.style.display="none";}
-});
-updateUI();
-</script>
+    <script>
+        // تهيئة المتغيرات
+        const totalSteps = 7;
+        let currentStep = 1;
+        
+        // عناصر DOM
+        const progressBar = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+        const stepIndicators = document.getElementById('step-indicators');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const thankyouMessage = document.getElementById('thankyou-message');
+        const loadingElement = document.getElementById('loading');
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('file-input');
+        const fileName = document.getElementById('file-name');
+        const debugInfo = document.getElementById('debug-info');
+        const debugContent = document.getElementById('debug-content');
+        
+        // رابط Google Apps Script الخاص بك - تم إخفاؤه
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyrbeM-XjltWIR7T9qQGcbv3L1jTDiOWRWofzRi9Cm2ojrvYPWw0PPcC3YLv5D6smad/exec";
+        
+        // إنشاء مؤشرات الخطوات
+        for (let i = 1; i <= totalSteps; i++) {
+            const indicator = document.createElement('div');
+            indicator.classList.add('step-indicator');
+            if (i === 1) indicator.classList.add('active');
+            stepIndicators.appendChild(indicator);
+        }
+        
+        // تحديث واجهة المستخدم بناءً على الخطوة الحالية
+        function updateUI() {
+            // تحديث شريط التقدم
+            const progressPercentage = (currentStep / totalSteps) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+            progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
+            
+            // إظهار/إخفاء الأزرار
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+            submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+            
+            // تحديث مؤشرات الخطوات
+            document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+                if (index + 1 <= currentStep) {
+                    indicator.classList.add('active');
+                } else {
+                    indicator.classList.remove('active');
+                }
+            });
+            
+            // إظهار/إخفاء الخطوات
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            // إخفاء رسائل الخطأ عند تغيير الخطوة
+            hideError(currentStep);
+            
+            // التمرير إلى الأعلى عند تغيير الخطوة
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // الانتقال إلى الخطوة التالية
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
+        }
+        
+        // الانتقال إلى الخطوة السابقة
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
+        
+        // التحقق من صحة الخطوة الحالية
+        function validateStep(step) {
+            let isValid = true;
+            
+            switch(step) {
+                case 1:
+                    const projectName = document.querySelector('input[name="project_name"]').value.trim();
+                    if (!projectName) {
+                        showError(1, 'يرجى إدخال اسم الورشة أو المشروع');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 2:
+                    const workType = document.querySelector('input[name="work_type"]:checked');
+                    if (!workType) {
+                        showError(2, 'يرجى اختيار نوع الشغل الأساسي');
+                        isValid = false;
+                    } else if (workType.value === 'شيء آخر') {
+                        const workCustom = document.querySelector('input[name="work_custom"]').value.trim();
+                        if (!workCustom) {
+                            showError(2, 'يرجى تحديد نوع الشغل الآخر');
+                            isValid = false;
+                        }
+                    }
+                    break;
+                    
+                case 3:
+                    const logoStyle = document.querySelector('input[name="logo_style"]:checked');
+                    if (!logoStyle) {
+                        showError(3, 'يرجى اختيار شكل الشعار المفضل');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 4:
+                    const colors = document.querySelector('input[name="colors"]:checked');
+                    if (!colors) {
+                        showError(4, 'يرجى اختيار الألوان المفضلة');
+                        isValid = false;
+                    } else if (colors.value === 'شيء آخر') {
+                        const colorCustom = document.querySelector('input[name="color_custom"]').value.trim();
+                        if (!colorCustom) {
+                            showError(4, 'يرجى تحديد الألوان المفضلة الأخرى');
+                            isValid = false;
+                        }
+                    }
+                    break;
+                    
+                case 5:
+                    const logoType = document.querySelector('input[name="logo_type"]:checked');
+                    if (!logoType) {
+                        showError(5, 'يرجى اختيار نوع الشعار');
+                        isValid = false;
+                    }
+                    break;
+                    
+                case 6:
+                    const feeling = document.querySelector('input[name="feeling"]:checked');
+                    if (!feeling) {
+                        showError(6, 'يرجى اختيار الإحساس المطلوب');
+                        isValid = false;
+                    } else if (feeling.value === 'شيء آخر') {
+                        const feelingCustom = document.querySelector('input[name="feeling_custom"]').value.trim();
+                        if (!feelingCustom) {
+                            showError(6, 'يرجى تحديد الإحساس المطلوب الآخر');
+                            isValid = false;
+                        }
+                    }
+                    break;
+                    
+                case 7:
+                    const oldLogo = document.querySelector('input[name="old_logo"]:checked');
+                    if (!oldLogo) {
+                        showError(7, 'يرجى الإجابة على هذا السؤال');
+                        isValid = false;
+                    }
+                    break;
+            }
+            
+            return isValid;
+        }
+        
+        // إظهار رسالة الخطأ
+        function showError(step, message) {
+            const errorElement = document.getElementById(`error-${step}`);
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+            
+            // إضافة تأثير اهتزاز للخطوة الحالية
+            const currentStepElement = document.getElementById(`step-${step}`);
+            currentStepElement.style.animation = 'none';
+            setTimeout(() => {
+                currentStepElement.style.animation = 'shake 0.5s ease';
+            }, 10);
+            
+            // إزالة تأثير الاهتزاز بعد انتهائه
+            setTimeout(() => {
+                currentStepElement.style.animation = '';
+            }, 500);
+        }
+        
+        // إخفاء رسالة الخطأ
+        function hideError(step) {
+            const errorElement = document.getElementById(`error-${step}`);
+            errorElement.style.display = 'none';
+        }
+        
+        // إرسال النموذج
+        async function submitForm() {
+            if (!validateStep(currentStep)) {
+                return;
+            }
+            
+            // إخفاء النموذج وإظهار شاشة التحميل
+            document.getElementById('clientForm').style.display = 'none';
+            loadingElement.style.display = 'block';
+            
+            // جمع البيانات من النموذج
+            const formData = new FormData();
+            
+            // جمع البيانات من الحقول
+            formData.append('project_name', document.querySelector('input[name="project_name"]').value.trim());
+            
+            const workType = document.querySelector('input[name="work_type"]:checked');
+            if (workType) {
+                if (workType.value === 'شيء آخر') {
+                    const workCustom = document.querySelector('input[name="work_custom"]').value.trim();
+                    formData.append('work_type', workCustom);
+                } else {
+                    formData.append('work_type', workType.value);
+                }
+            }
+            
+            const logoStyle = document.querySelector('input[name="logo_style"]:checked');
+            if (logoStyle) formData.append('logo_style', logoStyle.value);
+            
+            const colors = document.querySelector('input[name="colors"]:checked');
+            if (colors) {
+                if (colors.value === 'شيء آخر') {
+                    const colorCustom = document.querySelector('input[name="color_custom"]').value.trim();
+                    formData.append('colors', colorCustom);
+                } else {
+                    formData.append('colors', colors.value);
+                }
+            }
+            
+            const logoType = document.querySelector('input[name="logo_type"]:checked');
+            if (logoType) formData.append('logo_type', logoType.value);
+            
+            const feeling = document.querySelector('input[name="feeling"]:checked');
+            if (feeling) {
+                if (feeling.value === 'شيء آخر') {
+                    const feelingCustom = document.querySelector('input[name="feeling_custom"]').value.trim();
+                    formData.append('feeling', feelingCustom);
+                } else {
+                    formData.append('feeling', feeling.value);
+                }
+            }
+            
+            const oldLogo = document.querySelector('input[name="old_logo"]:checked');
+            if (oldLogo) formData.append('old_logo', oldLogo.value);
+            
+            formData.append('logo_details', document.querySelector('textarea[name="logo_details"]').value.trim());
+            
+            // إضافة الملف المرفوع إذا كان موجوداً
+            if (fileInput.files.length > 0) {
+                formData.append('logo_file', fileInput.files[0]);
+            }
+            
+            // إضافة طابع زمني
+            formData.append('timestamp', new Date().toLocaleString('ar-SA'));
+            
+            try {
+                // إرسال البيانات إلى Google Apps Script
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                // إخفاء شاشة التحميل وإظهار رسالة الشكر
+                loadingElement.style.display = 'none';
+                thankyouMessage.style.display = 'block';
+                
+                // إظهار معلومات التصحيح
+                debugInfo.style.display = 'block';
+                debugContent.innerHTML = `
+                    <p><strong>تم إرسال البيانات بنجاح!</strong></p>
+                    <p>اسم المشروع: ${document.querySelector('input[name="project_name"]').value.trim()}</p>
+                    <p>نوع الشغل: ${formData.get('work_type')}</p>
+                    <p>شكل الشعار: ${formData.get('logo_style')}</p>
+                    <p>الألوان: ${formData.get('colors')}</p>
+                    <p>نوع الشعار: ${formData.get('logo_type')}</p>
+                    <p>الإحساس المطلوب: ${formData.get('feeling')}</p>
+                    <p>هل لديك لوجو قديم: ${formData.get('old_logo')}</p>
+                    <p>الوقت: ${formData.get('timestamp')}</p>
+                `;
+                
+                // إعادة تعيين النموذج بعد 5 ثوانٍ (لأغراض العرض فقط)
+                setTimeout(() => {
+                    document.getElementById('clientForm').reset();
+                    document.getElementById('clientForm').style.display = 'block';
+                    thankyouMessage.style.display = 'none';
+                    debugInfo.style.display = 'none';
+                    currentStep = 1;
+                    updateUI();
+                }, 10000);
+                
+            } catch (error) {
+                // في حالة حدوث خطأ، إظهار رسالة خطأ
+                loadingElement.style.display = 'none';
+                document.getElementById('clientForm').style.display = 'block';
+                
+                debugInfo.style.display = 'block';
+                debugContent.innerHTML = `
+                    <p><strong>حدث خطأ أثناء الإرسال:</strong></p>
+                    <p>${error.message}</p>
+                    <p>يرجى المحاولة مرة أخرى أو التواصل مع الدعم الفني.</p>
+                `;
+                
+                console.error('Error!', error.message);
+            }
+        }
+        
+        // إعداد المستمعين للأحداث
+        function setupEventListeners() {
+            // أزرار التنقل
+            nextBtn.addEventListener('click', nextStep);
+            prevBtn.addEventListener('click', prevStep);
+            submitBtn.addEventListener('click', submitForm);
+            
+            // إدخال نصي للخطوة 1
+            document.querySelector('input[name="project_name"]').addEventListener('input', function() {
+                if (this.value.trim()) {
+                    hideError(1);
+                }
+            });
+            
+            // اختيار نوع الشغل
+            document.querySelectorAll('input[name="work_type"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(2);
+                    
+                    // إظهار/إخفاء حقل الإدخال المخصص
+                    const customInput = document.getElementById('work-custom');
+                    if (this.value === 'شيء آخر') {
+                        customInput.style.display = 'block';
+                    } else {
+                        customInput.style.display = 'none';
+                    }
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // اختيار شكل الشعار
+            document.querySelectorAll('input[name="logo_style"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(3);
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // اختيار الألوان
+            document.querySelectorAll('input[name="colors"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(4);
+                    
+                    // إظهار/إخفاء حقل الإدخال المخصص
+                    const customInput = document.getElementById('color-custom');
+                    if (this.value === 'شيء آخر') {
+                        customInput.style.display = 'block';
+                    } else {
+                        customInput.style.display = 'none';
+                    }
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // اختيار نوع الشعار
+            document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(5);
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // اختيار الإحساس المطلوب
+            document.querySelectorAll('input[name="feeling"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(6);
+                    
+                    // إظهار/إخفاء حقل الإدخال المخصص
+                    const customInput = document.getElementById('feeling-custom');
+                    if (this.value === 'شيء آخر') {
+                        customInput.style.display = 'block';
+                    } else {
+                        customInput.style.display = 'none';
+                    }
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // اختيار وجود لوجو قديم
+            document.querySelectorAll('input[name="old_logo"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    hideError(7);
+                    
+                    // إظهار/إخفاء تفاصيل اللوجو القديم
+                    const logoDetails = document.getElementById('logo-details');
+                    if (this.value === 'نعم') {
+                        logoDetails.style.display = 'block';
+                    } else {
+                        logoDetails.style.display = 'none';
+                    }
+                    
+                    // تحديث مظهر البطاقة المحددة
+                    document.querySelectorAll('.option-card').forEach(card => {
+                        card.classList.remove('selected');
+                    });
+                    this.closest('.option-card').classList.add('selected');
+                });
+            });
+            
+            // رفع الملفات
+            fileUpload.addEventListener('click', function() {
+                fileInput.click();
+            });
+            
+            fileInput.addEventListener('change', function() {
+                if (this.files.length > 0) {
+                    fileName.textContent = `تم رفع الملف: ${this.files[0].name}`;
+                } else {
+                    fileName.textContent = 'لم يتم رفع أي ملف بعد';
+                }
+            });
+            
+            // إضافة تأثير اهتزاز عند ظهور الخطأ
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                    20%, 40%, 60%, 80% { transform: translateX(5px); }
+                }
+            `;
+            document.head.appendChild(style);
+        }
+        
+        // تهيئة التطبيق
+        function init() {
+            updateUI();
+            setupEventListeners();
+        }
+        
+        // بدء التطبيق عند تحميل الصفحة
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
 </body>
 </html>
