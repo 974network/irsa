@@ -160,7 +160,7 @@ const loadingElement=document.getElementById('loading');
 const fileUpload=document.getElementById('file-upload');
 const fileInput=document.getElementById('file-input');
 const fileName=document.getElementById('file-name');
-const scriptURL="https://script.google.com/macros/s/AKfycbzQWVVAxzebHa0SB-bYypkRnQPS2-928fsVgD6olFUprsP5yNPEK5cXXZnD6b7N5p34/exec";
+const scriptURL="https://script.google.com/macros/library/d/1Py9JsCyPj53bFiOir1Fo5WGfMUQ7LbufZ8_yNmWkdTxvTjdqIDey4jll/1";
 for(let i=1;i<=totalSteps;i++){const d=document.createElement('div');d.classList.add('step-indicator');if(i===1)d.classList.add('active');stepIndicators.appendChild(d);}
 function updateUI(){progressBar.style.width=(currentStep/totalSteps*100)+'%';progressText.textContent=`السؤال ${currentStep} من ${totalSteps}`;prevBtn.style.display=currentStep===1?'none':'flex';nextBtn.style.display=currentStep===totalSteps?'none':'flex';submitBtn.style.display=currentStep===totalSteps?'flex':'none';document.querySelectorAll('.form-step').forEach(e=>e.classList.remove('active'));document.getElementById(`step-${currentStep}`).classList.add('active');document.querySelectorAll('.step-indicator').forEach((ind,i)=>ind.classList.toggle('active',i<currentStep));window.scrollTo({top:0,behavior:'smooth'});}
 function showError(s,m){const e=document.getElementById(`error-${s}`);if(e){e.textContent=m;e.style.display='block';}}
@@ -213,6 +213,7 @@ updateUI();
 </script>
 </body>
 </html>
+
 
 
 
