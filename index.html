@@ -16,6 +16,7 @@
       --text-light: #f8e9c4;
       --glass: rgba(255, 255, 255, 0.08);
       --glass-border: rgba(212, 175, 55, 0.3);
+      --error: #ff6b6b;
     }
     
     * {
@@ -225,6 +226,39 @@
       background: rgba(255, 255, 255, 0.08);
     }
     
+    .custom-input {
+      margin-top: 15px;
+      display: none;
+    }
+    
+    .file-upload {
+      margin-top: 15px;
+      padding: 15px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px dashed var(--glass-border);
+      border-radius: 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    
+    .file-upload:hover {
+      border-color: var(--gold);
+      background: rgba(255, 255, 255, 0.08);
+    }
+    
+    .file-upload i {
+      font-size: 2rem;
+      color: var(--gold);
+      margin-bottom: 10px;
+    }
+    
+    .file-name {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: var(--light-gold);
+    }
+    
     .form-navigation {
       display: flex;
       justify-content: space-between;
@@ -258,6 +292,13 @@
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
+    }
+    
+    .error-message {
+      color: var(--error);
+      font-size: 0.9rem;
+      margin-top: 10px;
+      display: none;
     }
     
     .progress-container {
@@ -305,6 +346,30 @@
       box-shadow: 0 0 10px var(--gold);
     }
     
+    .thankyou-message {
+      text-align: center;
+      padding: 40px;
+      display: none;
+    }
+    
+    .thankyou-message i {
+      font-size: 4rem;
+      color: var(--gold);
+      margin-bottom: 20px;
+    }
+    
+    .thankyou-message h2 {
+      font-size: 2.2rem;
+      color: var(--gold);
+      margin-bottom: 15px;
+    }
+    
+    .thankyou-message p {
+      font-size: 1.2rem;
+      line-height: 1.6;
+      color: var(--text-light);
+    }
+    
     @media (max-width: 768px) {
       .title {
         font-size: 2.2rem;
@@ -348,7 +413,7 @@
   <div class="container">
     <div class="header">
       <h1 class="title">استبيان العميل الفاخر</h1>
-      <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة البيانات بدقة</p>
+      <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
     </div>
     
     <div class="form-container">
@@ -369,6 +434,7 @@
           <div class="question">
             <h2 class="question-title"><i class="fas fa-signature"></i> 1️⃣ اسم الورشة أو المشروع</h2>
             <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" required>
+            <div class="error-message" id="error-1">يرجى إدخال اسم الورشة أو المشروع</div>
           </div>
         </div>
         
@@ -400,7 +466,19 @@
                   <p class="option-desc">دمج اللغتين العربية والإنجليزية في التصميم</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-language">
+                <input type="radio" name="language" value="شيء آخر" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد اللغة المفضلة الأخرى</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="language-custom">
+              <input type="text" class="text-input" name="language_custom" placeholder="أدخل اللغة المفضلة الأخرى">
+            </div>
+            <div class="error-message" id="error-2">يرجى اختيار اللغة المفضلة</div>
           </div>
         </div>
         
@@ -440,7 +518,19 @@
                   <p class="option-desc">أعمال الحفر والنقش على الخشب وغيره</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-work">
+                <input type="radio" name="work_type" value="شيء آخر" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد نوع الشغل الآخر</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="work-custom">
+              <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر">
+            </div>
+            <div class="error-message" id="error-3">يرجى اختيار نوع الشغل الأساسي</div>
           </div>
         </div>
         
@@ -480,7 +570,19 @@
                   <p class="option-desc">التعامل مع ملاك الفلل والقصور</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-client">
+                <input type="checkbox" name="clients" value="شيء آخر" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد نوع العملاء الآخرين</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="client-custom">
+              <input type="text" class="text-input" name="client_custom" placeholder="أدخل نوع العملاء الآخرين">
+            </div>
+            <div class="error-message" id="error-4">يرجى اختيار نوع العملاء على الأقل</div>
           </div>
         </div>
         
@@ -513,6 +615,7 @@
                 </div>
               </label>
             </div>
+            <div class="error-message" id="error-5">يرجى اختيار شكل الشعار المفضل</div>
           </div>
         </div>
         
@@ -552,7 +655,19 @@
                   <p class="option-desc">أبيض، أسود، رمادي وتدرجاتها</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-color">
+                <input type="radio" name="colors" value="شيء آخر" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد الألوان المفضلة الأخرى</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="color-custom">
+              <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان المفضلة الأخرى">
+            </div>
+            <div class="error-message" id="error-6">يرجى اختيار الألوان المفضلة</div>
           </div>
         </div>
         
@@ -585,6 +700,7 @@
                 </div>
               </label>
             </div>
+            <div class="error-message" id="error-7">يرجى اختيار نوع الشعار</div>
           </div>
         </div>
         
@@ -624,7 +740,19 @@
                   <p class="option-desc">إيحاء بالثقة والموثوقية</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-feeling">
+                <input type="radio" name="feeling" value="شيء آخر" class="radio">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد الإحساس المطلوب الآخر</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="feeling-custom">
+              <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس المطلوب الآخر">
+            </div>
+            <div class="error-message" id="error-8">يرجى اختيار الإحساس المطلوب</div>
           </div>
         </div>
         
@@ -658,13 +786,25 @@
               </label>
               
               <label class="option-card">
-                <input type="checkbox" name="usage" value">موقع إلكتروني" class="checkbox">
+                <input type="checkbox" name="usage" value="موقع إلكتروني" class="checkbox">
                 <div class="option-content">
                   <h3 class="option-title">موقع إلكتروني</h3>
                   <p class="option-desc">الموقع الإلكتروني للورشة</p>
                 </div>
               </label>
+              
+              <label class="option-card" id="other-usage">
+                <input type="checkbox" name="usage" value="شيء آخر" class="checkbox">
+                <div class="option-content">
+                  <h3 class="option-title">شيء آخر</h3>
+                  <p class="option-desc">حدد الاستخدامات الأخرى</p>
+                </div>
+              </label>
             </div>
+            <div class="custom-input" id="usage-custom">
+              <input type="text" class="text-input" name="usage_custom" placeholder="أدخل الاستخدامات الأخرى">
+            </div>
+            <div class="error-message" id="error-9">يرجى اختيار الاستخدام على الأقل</div>
           </div>
         </div>
         
@@ -689,11 +829,24 @@
                 </div>
               </label>
             </div>
-          </div>
-          
-          <div class="question" id="logo-details" style="display: none; margin-top: 30px;">
-            <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
-            <textarea class="text-input" name="logo_details" rows="4" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
+            
+            <div id="logo-details" style="display: none; margin-top: 30px;">
+              <div class="question">
+                <h2 class="question-title"><i class="fas fa-info-circle"></i> وصف اللوجو القديم</h2>
+                <textarea class="text-input" name="logo_details" rows="4" placeholder="إذا كان لديك لوجو قديم، يرجى وصفه أو ذكر ما يعجبك/لا يعجبك فيه..."></textarea>
+              </div>
+              
+              <div class="question">
+                <h2 class="question-title"><i class="fas fa-file-upload"></i> رفع ملفات اللوجو القديم</h2>
+                <div class="file-upload" id="file-upload">
+                  <i class="fas fa-cloud-upload-alt"></i>
+                  <p>انقر لرفع ملفات اللوجو القديم</p>
+                  <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
+                </div>
+                <input type="file" id="file-input" style="display: none;" accept="image/*,.pdf,.psd,.ai">
+              </div>
+            </div>
+            <div class="error-message" id="error-10">يرجى الإجابة على هذا السؤال</div>
           </div>
         </div>
         
@@ -709,6 +862,13 @@
           </button>
         </div>
       </form>
+      
+      <div class="thankyou-message" id="thankyou-message">
+        <i class="fas fa-check-circle"></i>
+        <h2>شكراً لك يا عميلنا العزيز</h2>
+        <p>تم استلام استبيانك بنجاح وسوف نتواصل معك قريباً</p>
+        <p>إذا احتجنا لأي معلومات إضافية</p>
+      </div>
     </div>
   </div>
 
@@ -724,7 +884,10 @@
     const prevBtn = document.getElementById('prev-btn');
     const nextBtn = document.getElementById('next-btn');
     const submitBtn = document.getElementById('submit-btn');
-    const logoDetails = document.getElementById('logo-details');
+    const thankyouMessage = document.getElementById('thankyou-message');
+    const fileUpload = document.getElementById('file-upload');
+    const fileInput = document.getElementById('file-input');
+    const fileName = document.getElementById('file-name');
     
     // إنشاء مؤشرات الخطوات
     for (let i = 1; i <= totalSteps; i++) {
@@ -760,13 +923,169 @@
         step.classList.remove('active');
       });
       document.getElementById(`step-${currentStep}`).classList.add('active');
+      
+      // إخفاء رسائل الخطأ عند تغيير الخطوة
+      hideError(currentStep);
+    }
+    
+    // التحقق من صحة الإجابة في الخطوة الحالية
+    function validateStep(step) {
+      switch(step) {
+        case 1:
+          const projectName = document.querySelector('input[name="project_name"]').value.trim();
+          if (!projectName) {
+            showError(1, "يرجى إدخال اسم الورشة أو المشروع");
+            return false;
+          }
+          return true;
+          
+        case 2:
+          const language = document.querySelector('input[name="language"]:checked');
+          if (!language) {
+            showError(2, "يرجى اختيار اللغة المفضلة");
+            return false;
+          }
+          if (language.value === "شيء آخر") {
+            const customLanguage = document.querySelector('input[name="language_custom"]').value.trim();
+            if (!customLanguage) {
+              showError(2, "يرجى تحديد اللغة المفضلة الأخرى");
+              return false;
+            }
+          }
+          return true;
+          
+        case 3:
+          const workType = document.querySelector('input[name="work_type"]:checked');
+          if (!workType) {
+            showError(3, "يرجى اختيار نوع الشغل الأساسي");
+            return false;
+          }
+          if (workType.value === "شيء آخر") {
+            const customWork = document.querySelector('input[name="work_custom"]').value.trim();
+            if (!customWork) {
+              showError(3, "يرجى تحديد نوع الشغل الآخر");
+              return false;
+            }
+          }
+          return true;
+          
+        case 4:
+          const clients = document.querySelectorAll('input[name="clients"]:checked');
+          if (clients.length === 0) {
+            showError(4, "يرجى اختيار نوع العملاء على الأقل");
+            return false;
+          }
+          let hasOtherClient = false;
+          clients.forEach(client => {
+            if (client.value === "شيء آخر") hasOtherClient = true;
+          });
+          if (hasOtherClient) {
+            const customClient = document.querySelector('input[name="client_custom"]').value.trim();
+            if (!customClient) {
+              showError(4, "يرجى تحديد نوع العملاء الآخرين");
+              return false;
+            }
+          }
+          return true;
+          
+        case 5:
+          const logoStyle = document.querySelector('input[name="logo_style"]:checked');
+          if (!logoStyle) {
+            showError(5, "يرجى اختيار شكل الشعار المفضل");
+            return false;
+          }
+          return true;
+          
+        case 6:
+          const colors = document.querySelector('input[name="colors"]:checked');
+          if (!colors) {
+            showError(6, "يرجى اختيار الألوان المفضلة");
+            return false;
+          }
+          if (colors.value === "شيء آخر") {
+            const customColor = document.querySelector('input[name="color_custom"]').value.trim();
+            if (!customColor) {
+              showError(6, "يرجى تحديد الألوان المفضلة الأخرى");
+              return false;
+            }
+          }
+          return true;
+          
+        case 7:
+          const logoType = document.querySelector('input[name="logo_type"]:checked');
+          if (!logoType) {
+            showError(7, "يرجى اختيار نوع الشعار");
+            return false;
+          }
+          return true;
+          
+        case 8:
+          const feeling = document.querySelector('input[name="feeling"]:checked');
+          if (!feeling) {
+            showError(8, "يرجى اختيار الإحساس المطلوب");
+            return false;
+          }
+          if (feeling.value === "شيء آخر") {
+            const customFeeling = document.querySelector('input[name="feeling_custom"]').value.trim();
+            if (!customFeeling) {
+              showError(8, "يرجى تحديد الإحساس المطلوب الآخر");
+              return false;
+            }
+          }
+          return true;
+          
+        case 9:
+          const usage = document.querySelectorAll('input[name="usage"]:checked');
+          if (usage.length === 0) {
+            showError(9, "يرجى اختيار الاستخدام على الأقل");
+            return false;
+          }
+          let hasOtherUsage = false;
+          usage.forEach(use => {
+            if (use.value === "شيء آخر") hasOtherUsage = true;
+          });
+          if (hasOtherUsage) {
+            const customUsage = document.querySelector('input[name="usage_custom"]').value.trim();
+            if (!customUsage) {
+              showError(9, "يرجى تحديد الاستخدامات الأخرى");
+              return false;
+            }
+          }
+          return true;
+          
+        case 10:
+          const oldLogo = document.querySelector('input[name="old_logo"]:checked');
+          if (!oldLogo) {
+            showError(10, "يرجى الإجابة على هذا السؤال");
+            return false;
+          }
+          return true;
+          
+        default:
+          return true;
+      }
+    }
+    
+    // إظهار رسالة الخطأ
+    function showError(step, message) {
+      const errorElement = document.getElementById(`error-${step}`);
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+    
+    // إخفاء رسالة الخطأ
+    function hideError(step) {
+      const errorElement = document.getElementById(`error-${step}`);
+      errorElement.style.display = 'none';
     }
     
     // الانتقال إلى الخطوة التالية
     function nextStep() {
-      if (currentStep < totalSteps) {
-        currentStep++;
-        updateUI();
+      if (validateStep(currentStep)) {
+        if (currentStep < totalSteps) {
+          currentStep++;
+          updateUI();
+        }
       }
     }
     
@@ -799,11 +1118,14 @@
           radio.checked = true;
           this.classList.add('selected');
           
+          // إظهار/إخفاء الحقول المخصصة
+          handleCustomInput(radio);
+          
           // إذا كانت الخطوة 10 وتم اختيار "نعم"، إظهار حقل التفاصيل
           if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'نعم') {
-            logoDetails.style.display = 'block';
+            document.getElementById('logo-details').style.display = 'block';
           } else if (currentStep === 10 && groupName === 'old_logo' && radio.value === 'لا') {
-            logoDetails.style.display = 'none';
+            document.getElementById('logo-details').style.display = 'none';
           }
         }
         
@@ -811,13 +1133,54 @@
           // تبديل حالة التحديد للـ checkbox
           checkbox.checked = !checkbox.checked;
           this.classList.toggle('selected', checkbox.checked);
+          
+          // إظهار/إخفاء الحقول المخصصة
+          handleCustomInput(checkbox);
         }
+        
+        // إخفاء رسالة الخطأ عند اختيار إجابة
+        hideError(currentStep);
       });
+    });
+    
+    // التعامل مع الحقول المخصصة لخيار "شيء آخر"
+    function handleCustomInput(input) {
+      const customInputIds = {
+        'language': 'language-custom',
+        'work_type': 'work-custom',
+        'clients': 'client-custom',
+        'colors': 'color-custom',
+        'feeling': 'feeling-custom',
+        'usage': 'usage-custom'
+      };
+      
+      const inputName = input.getAttribute('name');
+      if (customInputIds[inputName] && input.value === 'شيء آخر') {
+        document.getElementById(customInputIds[inputName]).style.display = 'block';
+      } else if (customInputIds[inputName]) {
+        document.getElementById(customInputIds[inputName]).style.display = 'none';
+      }
+    }
+    
+    // رفع الملفات
+    fileUpload.addEventListener('click', () => {
+      fileInput.click();
+    });
+    
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        fileName.textContent = fileInput.files[0].name;
+      } else {
+        fileName.textContent = 'لم يتم رفع أي ملف بعد';
+      }
     });
     
     // إرسال النموذج
     document.getElementById('clientForm').addEventListener('submit', function(e) {
       e.preventDefault();
+      
+      // التحقق من صحة الخطوة الأخيرة
+      if (!validateStep(10)) return;
       
       // جمع البيانات
       const formData = new FormData(this);
@@ -840,16 +1203,17 @@
         }
       });
       
-      // هنا يمكنك إرسال البيانات إلى الخادم
-      alert('شكراً لك! تم استلام استبيانك بنجاح 🌟\nسنقوم بالتواصل معك قريباً لبدء التصميم.');
+      // إضافة الملفات إذا كانت موجودة
+      if (fileInput.files.length > 0) {
+        data['logo_files'] = fileInput.files[0].name;
+      }
       
-      // إعادة تعيين النموذج
-      this.reset();
-      document.querySelectorAll('.option-card').forEach(card => {
-        card.classList.remove('selected');
-      });
-      currentStep = 1;
-      updateUI();
+      // هنا يمكنك إرسال البيانات إلى الخادم
+      console.log('بيانات الاستبيان:', data);
+      
+      // إظهار رسالة الشكر
+      document.querySelector('form').style.display = 'none';
+      thankyouMessage.style.display = 'block';
     });
     
     // التهيئة الأولية
