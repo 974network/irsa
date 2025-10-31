@@ -1011,8 +1011,8 @@
         const debugInfo = document.getElementById('debug-info');
         const debugContent = document.getElementById('debug-content');
         
-        // رابط Google Apps Script الخاص بك
-        const scriptURL = "https://script.google.com/macros/s/AKfycbzi8vVAZCpNDSPir_nFwTH9QETomyx_GpH7TtCDxVLbXgG5s-u9Bh-uN9xJ5uLQxYVF0g/exec";
+        // رابط Google Apps Script الخاص بك - استبدل هذا الرابط برابطك
+        const scriptURL = "https://script.google.com/macros/s/AKfycbway1wMQ0RQrNJBMhpGktIdbg-SkCgFy5JhqT8_HO8p3dRaQYnBgUVI3tzCAvWLTHo/exec";
         
         // إنشاء مؤشرات الخطوات
         for (let i = 1; i <= totalSteps; i++) {
@@ -1311,23 +1311,35 @@
             if (!validateStep(10)) return;
             
             // جمع البيانات
-            const formData = new FormData(this);
-            const data = {};
+            const formData = new FormData();
+            
+            // إضافة البيانات الأساسية
+            formData.append('project_name', document.querySelector('input[name="project_name"]').value.trim());
             
             // معالجة الحقول متعددة القيم (checkboxes)
-            const checkboxes = ['clients', 'usage'];
-            checkboxes.forEach(name => {
-                const values = [];
-                document.querySelectorAll(`input[name="${name}"]:checked`).forEach(checkbox => {
-                    values.push(checkbox.value);
-                });
-                data[name] = values.join(', ');
+            const clients = [];
+            document.querySelectorAll('input[name="clients"]:checked').forEach(checkbox => {
+                clients.push(checkbox.value);
             });
+            formData.append('clients', clients.join(', '));
             
-            // جمع باقي الحقول
-            formData.forEach((value, key) => {
-                if (!checkboxes.includes(key)) {
-                    data[key] = value;
+            const usage = [];
+            document.querySelectorAll('input[name="usage"]:checked').forEach(checkbox => {
+                usage.push(checkbox.value);
+            });
+            formData.append('usage', usage.join(', '));
+            
+            // إضافة الحقول الأخرى
+            const fields = [
+                'language', 'work_type', 'logo_style', 'colors', 
+                'logo_type', 'feeling', 'old_logo', 'logo_details'
+            ];
+            
+            fields.forEach(field => {
+                const element = document.querySelector(`input[name="${field}"]:checked`) || 
+                               document.querySelector(`textarea[name="${field}"]`);
+                if (element) {
+                    formData.append(field, element.value);
                 }
             });
             
@@ -1340,12 +1352,17 @@
             customFields.forEach(field => {
                 const input = document.querySelector(`[name="${field}"]`);
                 if (input && input.value.trim()) {
-                    data[field] = input.value.trim();
+                    formData.append(field, input.value.trim());
                 }
             });
             
             // إضافة طابع زمني
-            data.timestamp = new Date().toLocaleString('ar-SA');
+            formData.append('timestamp', new Date().toLocaleString('ar-SA'));
+            
+            // إضافة معلومات الملف
+            if (fileInput.files.length > 0) {
+                formData.append('file_name', fileInput.files[0].name);
+            }
             
             // عرض شاشة التحميل
             document.querySelector('form').style.display = 'none';
@@ -1353,14 +1370,15 @@
             debugInfo.style.display = 'none';
             
             try {
-                // إرسال البيانات إلى Google Sheets
+                // إرسال البيانات إلى Google Sheets باستخدام FormData
                 const response = await fetch(scriptURL, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
+                    body: formData
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
                 
                 const result = await response.json();
                 
@@ -1379,11 +1397,19 @@
                 
                 // عرض معلومات التصحيح
                 debugInfo.style.display = 'block';
+                
+                // إنشاء محتوى التصحيح
+                const debugData = {};
+                formData.forEach((value, key) => {
+                    debugData[key] = value;
+                });
+                
                 debugContent.innerHTML = `
                     <p><strong>خطأ:</strong> ${error.message}</p>
                     <p><strong>البيانات المرسلة:</strong></p>
-                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <pre>${JSON.stringify(debugData, null, 2)}</pre>
                     <p><strong>رابط السكربت:</strong> ${scriptURL}</p>
+                    <p><strong>نصيحة:</strong> تأكد من نشر السكربت كتطبيق ويب مع الصلاحيات المناسبة</p>
                 `;
                 
                 alert('حدث خطأ أثناء الإرسال. راجع معلومات التصحيح أدناه.');
