@@ -1,41 +1,59 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600&display=swap');
+
 body {
   margin: 0;
   font-family: "Cairo", sans-serif;
-  background: linear-gradient(to bottom right, #3b2f2f, #1c1a1a);
-  color: #f5e2a6;
+  background: url('https://i.ibb.co/6ZfXQ2T/wood-bg.jpg') no-repeat center center fixed;
+  background-size: cover;
+  color: #f8e9c4;
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
+  position: relative;
 }
 
-.form-container {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid #a87e2d;
-  border-radius: 15px;
+.overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+.form-wrapper {
+  position: relative;
+  z-index: 2;
+  background: rgba(20, 15, 10, 0.9);
+  border: 1px solid #d4af37;
+  border-radius: 20px;
   padding: 30px 40px;
   width: 90%;
-  max-width: 500px;
-  box-shadow: 0 0 20px rgba(168, 126, 45, 0.3);
-  backdrop-filter: blur(8px);
+  max-width: 550px;
+  box-shadow: 0 0 25px rgba(212, 175, 55, 0.3);
 }
 
-h1 {
+.title {
   text-align: center;
   color: #d4af37;
   margin-bottom: 10px;
+  font-size: 26px;
 }
 
-p {
+.subtitle {
   text-align: center;
-  color: #f0e6c5;
   font-size: 14px;
+  color: #f5e9c2;
+  margin-bottom: 25px;
+}
+
+.input-group {
+  margin-bottom: 15px;
 }
 
 label {
   display: block;
-  margin-top: 15px;
-  font-weight: bold;
+  margin-bottom: 6px;
+  font-weight: 600;
   color: #f7e7b1;
 }
 
@@ -44,12 +62,17 @@ input {
   padding: 10px;
   border: 1px solid #d4af37;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(255, 255, 255, 0.05);
   color: #fff;
-  margin-top: 5px;
+  outline: none;
 }
 
-button {
+input:focus {
+  border-color: #f1c75e;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.submit-btn {
   width: 100%;
   margin-top: 20px;
   padding: 12px;
@@ -57,21 +80,33 @@ button {
   border: none;
   color: #1c1a1a;
   font-weight: bold;
-  font-size: 16px;
+  font-size: 17px;
   border-radius: 10px;
   cursor: pointer;
   transition: 0.3s;
 }
 
-button:hover {
-  background: linear-gradient(90deg, #e7c65b, #c29b1d);
+.submit-btn:hover {
+  background: linear-gradient(90deg, #f1c75e, #c29b1d);
+  transform: translateY(-2px);
+}
+
+.thankyou {
+  text-align: center;
+  color: #f9eec9;
+  margin-top: 30px;
 }
 
 .hidden {
   display: none;
 }
 
-#message {
-  text-align: center;
-  color: #f9eec9;
+@media (max-width: 480px) {
+  .form-wrapper {
+    padding: 20px;
+  }
+
+  .title {
+    font-size: 22px;
+  }
 }
