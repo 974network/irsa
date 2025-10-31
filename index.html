@@ -1303,52 +1303,7 @@
             }
         });
         
-        // استبدل جزء الإرسال في HTML بهذا الكود:
-
-document.getElementById('clientForm').addEventListener('submit', async function(e) {
-  e.preventDefault();
-
-  // تحقق من صحة آخر خطوة قبل الإرسال
-  if (!validateStep(10)) return;
-
-  // جمع البيانات
-  const data = {};
-  data.timestamp = new Date().toLocaleString('ar-SA');
-  data.project_name = document.querySelector('input[name="project_name"]').value.trim();
-
-  const radioFields = ['language', 'work_type', 'logo_style', 'colors', 'logo_type', 'feeling', 'old_logo'];
-  radioFields.forEach(field => {
-    const selected = document.querySelector(`input[name="${field}"]:checked`);
-    data[field] = selected ? selected.value : '';
-  });
-
-  const checkboxFields = ['clients', 'usage'];
-  checkboxFields.forEach(field => {
-    const selected = Array.from(document.querySelectorAll(`input[name="${field}"]:checked`))
-      .map(cb => cb.value);
-    data[field] = selected.join(', ');
-  });
-
-  const customFields = ['language_custom', 'work_custom', 'client_custom', 'color_custom', 'feeling_custom', 'usage_custom'];
-  customFields.forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
-    data[field] = input ? input.value.trim() : '';
-  });
-
-  data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || '';
-  data.file_name = fileInput.files.length > 0 ? fileInput.files[0].name : '';
-
-  console.log('📤 البيانات الجاهزة للإرسال:', data);
-
-  // عرض حالة التحميل
-  document.querySelector('form').style.display = 'none';
-  loadingElement.style.display = 'block';
-
-  try {
-    const formData = new FormData();
-    for (let key in data) formData.append(key, data[key]);
-
-   // تحويل الملف إلى Base64 قبل الإرسال
+// تحويل الملف إلى Base64
 async function fileToBase64(file) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -1387,11 +1342,11 @@ document.getElementById("clientForm").addEventListener("submit", async function 
 
   data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || "";
 
-  // 🔹 إعداد FormData
+  // إعداد FormData
   const formData = new FormData();
   for (let key in data) formData.append(key, data[key]);
 
-  // 🔹 إضافة الملف كـBase64
+  // رفع الملف كـ Base64
   if (fileInput.files.length > 0) {
     const file = fileInput.files[0];
     formData.append("file_name", file.name);
@@ -1406,6 +1361,8 @@ document.getElementById("clientForm").addEventListener("submit", async function 
     const response = await fetch(scriptURL, { method: "POST", body: formData });
     const result = await response.json();
 
+    console.log("📥 الرد من السيرفر:", result);
+
     if (result.result === "success") {
       loadingElement.style.display = "none";
       thankyouMessage.style.display = "block";
@@ -1413,30 +1370,12 @@ document.getElementById("clientForm").addEventListener("submit", async function 
       throw new Error(result.message);
     }
   } catch (err) {
-    alert("خطأ أثناء الإرسال: " + err.message);
+    alert("حدث خطأ أثناء الإرسال: " + err.message);
     document.querySelector("form").style.display = "block";
     loadingElement.style.display = "none";
   }
 });
 
-
-
-    const result = await response.json();
-    console.log('📥 الرد من السيرفر:', result);
-
-    if (result.result === 'success') {
-      loadingElement.style.display = 'none';
-      thankyouMessage.style.display = 'block';
-    } else {
-      throw new Error(result.message || 'فشل الإرسال');
-    }
-  } catch (err) {
-    console.error('❌ خطأ في الإرسال:', err);
-    alert('حدث خطأ أثناء الإرسال: ' + err.message);
-    document.querySelector('form').style.display = 'block';
-    loadingElement.style.display = 'none';
-  }
-});
 
         
         // التهيئة الأولية
@@ -1444,6 +1383,7 @@ document.getElementById("clientForm").addEventListener("submit", async function 
     </script>
 </body>
 </html>
+
 
 
 
