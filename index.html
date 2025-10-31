@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>استبيان العميل </title>
+    <title>استبيان العميل الفاخر</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
@@ -403,6 +403,18 @@
             margin-bottom: 8px;
         }
         
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .loading i {
+            font-size: 2rem;
+            color: var(--gold);
+            margin-bottom: 10px;
+        }
+        
         /* تأثيرات اللمس للجوال */
         @media (hover: hover) {
             .option-card:hover {
@@ -491,7 +503,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1 class="title">استبيان العميل </h1>
+            <h1 class="title">استبيان العميل الفاخر</h1>
             <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
         </div>
         
@@ -942,6 +954,11 @@
                 </div>
             </form>
             
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري إرسال البيانات...</p>
+            </div>
+            
             <div class="thankyou-message" id="thankyou-message">
                 <i class="fas fa-check-circle"></i>
                 <h2>شكراً لك يا عميلنا العزيز</h2>
@@ -964,6 +981,7 @@
         const nextBtn = document.getElementById('next-btn');
         const submitBtn = document.getElementById('submit-btn');
         const thankyouMessage = document.getElementById('thankyou-message');
+        const loadingElement = document.getElementById('loading');
         const fileUpload = document.getElementById('file-upload');
         const fileInput = document.getElementById('file-input');
         const fileName = document.getElementById('file-name');
@@ -1257,7 +1275,7 @@
             }
         });
         
-        // إرسال النموذج
+        // إرسال النموذج إلى Google Sheets
         document.getElementById('clientForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
@@ -1285,17 +1303,51 @@
                 }
             });
             
-            // إضافة الملفات إذا كانت موجودة
-            if (fileInput.files.length > 0) {
-                data['logo_files'] = fileInput.files[0].name;
-            }
+            // إضافة الحقول المخصصة
+            const customFields = [
+                'language_custom', 'work_custom', 'client_custom', 
+                'color_custom', 'feeling_custom', 'usage_custom'
+            ];
             
-            // هنا يمكنك إرسال البيانات إلى الخادم
-            console.log('بيانات الاستبيان:', data);
+            customFields.forEach(field => {
+                const input = document.querySelector(`[name="${field}"]`);
+                if (input && input.value.trim()) {
+                    data[field] = input.value.trim();
+                }
+            });
             
-            // إظهار رسالة الشكر
+            // رابط Google Apps Script - ضع رابط النشر هنا بعد إنشائه
+            // استبدل هذا الرابط بالرابط الحقيقي من Google Apps Script
+            const scriptURL = "https://script.google.com/macros/s/AKfycbxwLXp_Te5PbS3q1SQn_7TYOAhK-rPMOHao4bpYVUExIjdVfmFjCbPIufUB8mxZqRft9g/exec";
+            
+            // عرض شاشة التحميل
             document.querySelector('form').style.display = 'none';
-            thankyouMessage.style.display = 'block';
+            loadingElement.style.display = 'block';
+            
+            // إرسال البيانات إلى Google Sheets
+            fetch(scriptURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.result === 'success') {
+                    // إخفاء التحميل وإظهار رسالة الشكر
+                    loadingElement.style.display = 'none';
+                    thankyouMessage.style.display = 'block';
+                } else {
+                    throw new Error(result.message);
+                }
+            })
+            .catch(error => {
+                // إخفاء التحميل وإظهار الخطأ
+                loadingElement.style.display = 'none';
+                document.querySelector('form').style.display = 'block';
+                alert('حدث خطأ أثناء الإرسال: ' + error.message);
+            });
         });
         
         // التهيئة الأولية
@@ -1303,4 +1355,3 @@
     </script>
 </body>
 </html>
-
