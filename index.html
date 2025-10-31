@@ -38,12 +38,55 @@
       align-items: center;
       padding: 20px;
       position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+    
+    /* تأثيرات الذهب التفاعلية */
+    .gold-effect {
+      position: absolute;
+      width: 150px;
+      height: 150px;
+      background: radial-gradient(circle, rgba(212, 175, 55, 0.4) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      mix-blend-mode: screen;
+      filter: blur(10px);
+    }
+    
+    .gold-particle {
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      background: var(--gold);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0;
+      box-shadow: 0 0 15px var(--gold);
+    }
+    
+    .cursor-gold {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: radial-gradient(circle, var(--gold) 0%, transparent 70%);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      mix-blend-mode: screen;
+      transition: transform 0.1s ease;
     }
     
     .container {
       width: 100%;
       max-width: 800px;
       margin: 0 auto;
+      position: relative;
+      z-index: 2;
     }
     
     .header {
@@ -278,6 +321,20 @@
       display: flex;
       align-items: center;
       gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .nav-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: translateX(-100%);
+      transition: transform 0.6s;
     }
     
     .nav-btn:hover {
@@ -286,12 +343,20 @@
       box-shadow: 0 5px 15px rgba(212, 175, 55, 0.4);
     }
     
+    .nav-btn:hover::before {
+      transform: translateX(100%);
+    }
+    
     .nav-btn:disabled {
       background: rgba(255, 255, 255, 0.1);
       color: rgba(255, 255, 255, 0.5);
       cursor: not-allowed;
       transform: none;
       box-shadow: none;
+    }
+    
+    .nav-btn:disabled::before {
+      display: none;
     }
     
     .error-message {
@@ -392,6 +457,14 @@
         width: 100%;
         justify-content: center;
       }
+      
+      body {
+        cursor: auto;
+      }
+      
+      .cursor-gold {
+        display: none;
+      }
     }
     
     @media (max-width: 480px) {
@@ -410,6 +483,9 @@
   </style>
 </head>
 <body>
+  <!-- تأثيرات الذهب التفاعلية -->
+  <div class="cursor-gold" id="cursor"></div>
+  
   <div class="container">
     <div class="header">
       <h1 class="title">استبيان العميل الفاخر</h1>
@@ -888,6 +964,7 @@
     const fileUpload = document.getElementById('file-upload');
     const fileInput = document.getElementById('file-input');
     const fileName = document.getElementById('file-name');
+    const cursor = document.getElementById('cursor');
     
     // إنشاء مؤشرات الخطوات
     for (let i = 1; i <= totalSteps; i++) {
@@ -896,6 +973,80 @@
       if (i === 1) indicator.classList.add('active');
       stepIndicators.appendChild(indicator);
     }
+    
+    // تأثيرات الذهب التفاعلية
+    document.addEventListener('mousemove', (e) => {
+      // تحديث موقع المؤشر الذهبي
+      cursor.style.left = `${e.clientX - 10}px`;
+      cursor.style.top = `${e.clientY - 10}px`;
+      
+      // إنشاء تأثيرات ذهبية عشوائية
+      if (Math.random() > 0.7) {
+        createGoldEffect(e.clientX, e.clientY);
+      }
+    });
+    
+    // إنشاء تأثير ذهبي
+    function createGoldEffect(x, y) {
+      const effect = document.createElement('div');
+      effect.classList.add('gold-effect');
+      effect.style.left = `${x - 75}px`;
+      effect.style.top = `${y - 75}px`;
+      effect.style.opacity = '0.7';
+      
+      document.body.appendChild(effect);
+      
+      // إزالة التأثير بعد فترة
+      setTimeout(() => {
+        effect.style.opacity = '0';
+        setTimeout(() => {
+          document.body.removeChild(effect);
+        }, 300);
+      }, 500);
+      
+      // إنشاء جزيئات ذهبية
+      for (let i = 0; i < 5; i++) {
+        createGoldParticle(x, y);
+      }
+    }
+    
+    // إنشاء جزيئات ذهبية
+    function createGoldParticle(x, y) {
+      const particle = document.createElement('div');
+      particle.classList.add('gold-particle');
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+      particle.style.opacity = '1';
+      
+      // حركة عشوائية للجزيئات
+      const angle = Math.random() * Math.PI * 2;
+      const distance = 20 + Math.random() * 50;
+      const targetX = x + Math.cos(angle) * distance;
+      const targetY = y + Math.sin(angle) * distance;
+      
+      document.body.appendChild(particle);
+      
+      // تحريك الجزيئات
+      setTimeout(() => {
+        particle.style.left = `${targetX}px`;
+        particle.style.top = `${targetY}px`;
+        particle.style.opacity = '0';
+        
+        // إزالة الجزيئات بعد الانتهاء
+        setTimeout(() => {
+          if (particle.parentNode) {
+            document.body.removeChild(particle);
+          }
+        }, 1000);
+      }, 10);
+    }
+    
+    // تأثيرات إضافية عند النقر
+    document.addEventListener('click', (e) => {
+      for (let i = 0; i < 10; i++) {
+        createGoldParticle(e.clientX, e.clientY);
+      }
+    });
     
     // تحديث واجهة المستخدم بناءً على الخطوة الحالية
     function updateUI() {
