@@ -17,6 +17,7 @@
             --glass: rgba(255, 255, 255, 0.08);
             --glass-border: rgba(212, 175, 55, 0.3);
             --error: #ff6b6b;
+            --success: #4CAF50;
         }
         
         * {
@@ -406,13 +407,29 @@
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 30px 20px;
         }
         
         .loading i {
-            font-size: 2rem;
+            font-size: 2.5rem;
             color: var(--gold);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .loading p {
+            font-size: 1.1rem;
+            color: var(--light-gold);
+        }
+        
+        .debug-info {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--light-gold);
+            display: none;
         }
         
         /* تأثيرات اللمس للجوال */
@@ -956,7 +973,8 @@
             
             <div class="loading" id="loading">
                 <i class="fas fa-spinner fa-spin"></i>
-                <p>جاري إرسال البيانات...</p>
+                <p>جاري إرسال البيانات إلى السيرفر...</p>
+                <p>يرجى الانتظار</p>
             </div>
             
             <div class="thankyou-message" id="thankyou-message">
@@ -964,6 +982,11 @@
                 <h2>شكراً لك يا عميلنا العزيز</h2>
                 <p>تم استلام استبيانك بنجاح وسوف نتواصل معك قريباً</p>
                 <p>إذا احتجنا لأي معلومات إضافية</p>
+            </div>
+
+            <div class="debug-info" id="debug-info">
+                <h3>معلومات التصحيح:</h3>
+                <div id="debug-content"></div>
             </div>
         </div>
     </div>
@@ -985,6 +1008,11 @@
         const fileUpload = document.getElementById('file-upload');
         const fileInput = document.getElementById('file-input');
         const fileName = document.getElementById('file-name');
+        const debugInfo = document.getElementById('debug-info');
+        const debugContent = document.getElementById('debug-content');
+        
+        // رابط Google Apps Script الخاص بك
+        const scriptURL = "https://script.google.com/macros/s/AKfycbzi8vVAZCpNDSPir_nFwTH9QETomyx_GpH7TtCDxVLbXgG5s-u9Bh-uN9xJ5uLQxYVF0g/exec";
         
         // إنشاء مؤشرات الخطوات
         for (let i = 1; i <= totalSteps; i++) {
@@ -1276,7 +1304,7 @@
         });
         
         // إرسال النموذج إلى Google Sheets
-        document.getElementById('clientForm').addEventListener('submit', function(e) {
+        document.getElementById('clientForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             // التحقق من صحة الخطوة الأخيرة
@@ -1316,42 +1344,68 @@
                 }
             });
             
-            // رابط Google Apps Script - ضع رابط النشر هنا بعد إنشائه
-            // استبدل هذا الرابط بالرابط الحقيقي من Google Apps Script
-            const scriptURL = "https://script.google.com/macros/s/AKfycbxwLXp_Te5PbS3q1SQn_7TYOAhK-rPMOHao4bpYVUExIjdVfmFjCbPIufUB8mxZqRft9g/exec";
+            // إضافة طابع زمني
+            data.timestamp = new Date().toLocaleString('ar-SA');
             
             // عرض شاشة التحميل
             document.querySelector('form').style.display = 'none';
             loadingElement.style.display = 'block';
+            debugInfo.style.display = 'none';
             
-            // إرسال البيانات إلى Google Sheets
-            fetch(scriptURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(result => {
+            try {
+                // إرسال البيانات إلى Google Sheets
+                const response = await fetch(scriptURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
                 if (result.result === 'success') {
                     // إخفاء التحميل وإظهار رسالة الشكر
                     loadingElement.style.display = 'none';
                     thankyouMessage.style.display = 'block';
                 } else {
-                    throw new Error(result.message);
+                    throw new Error(result.message || 'خطأ غير معروف من السيرفر');
                 }
-            })
-            .catch(error => {
+                
+            } catch (error) {
                 // إخفاء التحميل وإظهار الخطأ
                 loadingElement.style.display = 'none';
                 document.querySelector('form').style.display = 'block';
-                alert('حدث خطأ أثناء الإرسال: ' + error.message);
-            });
+                
+                // عرض معلومات التصحيح
+                debugInfo.style.display = 'block';
+                debugContent.innerHTML = `
+                    <p><strong>خطأ:</strong> ${error.message}</p>
+                    <p><strong>البيانات المرسلة:</strong></p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                    <p><strong>رابط السكربت:</strong> ${scriptURL}</p>
+                `;
+                
+                alert('حدث خطأ أثناء الإرسال. راجع معلومات التصحيح أدناه.');
+            }
         });
         
         // التهيئة الأولية
         updateUI();
+
+        // اختبار اتصال السكربت عند التحميل
+        async function testConnection() {
+            try {
+                const response = await fetch(scriptURL + '?test=true');
+                const result = await response.json();
+                console.log('اتصال السكربت:', result);
+            } catch (error) {
+                console.error('خطأ في اتصال السكربت:', error);
+            }
+        }
+
+        // اختبار الاتصال عند تحميل الصفحة
+        window.addEventListener('load', testConnection);
     </script>
 </body>
 </html>
