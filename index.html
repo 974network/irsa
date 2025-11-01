@@ -546,27 +546,33 @@ body {
   margin-bottom: 25px;
 }
 
+/* زر المتابعة - تم تعديل الحجم */
 .continue-btn {
-  padding: 16px 40px;
+  padding: 18px 50px; /* تم زيادة الحجم */
   background: linear-gradient(45deg, var(--dark-gold), var(--gold));
   border: none;
-  border-radius: 12px;
+  border-radius: 14px; /* زادت النعومة */
   color: #1c1a1a;
   font-weight: bold;
-  font-size: 1.2rem;
+  font-size: 1.3rem; /* تم زيادة حجم الخط */
   cursor: pointer;
   transition: var(--transition);
   box-shadow: 0 4px 12px rgba(212,175,55,0.3);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
+  gap: 12px; /* تم زيادة المسافة بين النص والأيقونة */
   margin: 0 auto;
+  min-width: 200px; /* عرض أدنى */
 }
 
 .continue-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 15px rgba(212,175,55,0.4);
+}
+
+.continue-btn:active {
+  transform: translateY(0);
 }
 
 .final-message i {
@@ -642,6 +648,13 @@ body {
     width: 10px;
     height: 10px;
   }
+  
+  /* تعديل زر المتابعة للجوال */
+  .continue-btn {
+    padding: 16px 40px;
+    font-size: 1.2rem;
+    min-width: 180px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -691,6 +704,13 @@ body {
   
   .nav-btn {
     padding: 12px 16px;
+  }
+  
+  /* تعديل زر المتابعة للشاشات الصغيرة */
+  .continue-btn {
+    padding: 14px 35px;
+    font-size: 1.1rem;
+    min-width: 160px;
   }
 }
 </style>
@@ -996,6 +1016,9 @@ body {
 </div>
 
 <script>
+// رابط السكربت - ضع رابطك الحقيقي هنا
+const scriptURL = "https://script.google.com/macros/s/AKfycbyuz8osIEGJ-bL4w1oQorscNZf6VhayyGdhHZw2q8W-gt_sKUVaqViYmTyD2bHAxeTF/exec";
+
 // عناصر شاشة الترحيب
 const welcomeScreen = document.getElementById('welcomeScreen');
 const startBtn = document.getElementById('startBtn');
@@ -1218,8 +1241,15 @@ continueBtn.addEventListener('click', () => {
   finalMessage.style.display = 'block';
 });
 
-// رابط السكربت الحقيقي - ضع رابطك هنا
-const scriptURL = "https://script.google.com/macros/s/AKfycby_kkHuiUape1IDZee_2pMhW5LDxWSzBR_CEs5Chu5koIuLjxq06mGWx1Q81jvdQoIy/exec";
+// دالة تحويل الملف إلى base64
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // إرسال النموذج
 document.getElementById('clientForm').addEventListener('submit', async (e) => {
@@ -1241,14 +1271,18 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
           if (element.checked) {
             formData.append(element.name, element.value);
           }
-        } else if (element.type !== 'file') {
+        } else if (element.type !== 'file' && element.name) {
           formData.append(element.name, element.value);
         }
       });
       
-      // إضافة الملف إذا كان موجوداً
+      // إضافة الملف إذا كان موجوداً (تحويل إلى base64)
       if (fileInput.files.length > 0) {
-        formData.append('file', fileInput.files[0]);
+        const file = fileInput.files[0];
+        const base64 = await fileToBase64(file);
+        formData.append('file_base64', base64);
+        formData.append('file_name', file.name);
+        formData.append('file_type', file.type);
       }
       
       // إرسال البيانات إلى Google Apps Script
