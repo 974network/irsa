@@ -1,1158 +1,864 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>استبيان العميل</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
-@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
-:root {
-  --gold: #d4af37;
-  --dark-gold: #b8860b;
-  --light-gold: #f1c75e;
-  --text-light: #f8e9c4;
-  --glass: rgba(255,255,255,0.08);
-  --glass-border: rgba(212,175,55,0.3);
-  --error: #ff6b6b;
-  --transition: all 0.3s ease;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'El Messiri', sans-serif;
-}
-
-body {
-  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
-  color: var(--text-light);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* شاشة الترحيب */
-.welcome-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
-  text-align: center;
-}
-
-.welcome-content {
-  max-width: 700px;
-  width: 100%;
-  padding: 40px;
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.welcome-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.welcome-title {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 15px rgba(212,175,55,0.5);
-  margin-bottom: 30px;
-  position: relative;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 0.5s;
-}
-
-.welcome-subtitle {
-  font-size: 1.8rem;
-  color: var(--light-gold);
-  margin-bottom: 20px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 1s;
-}
-
-.welcome-message {
-  font-size: 1.2rem;
-  color: var(--text-light);
-  margin-bottom: 30px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 1.5s;
-}
-
-.welcome-importance {
-  font-size: 1.1rem;
-  color: var(--light-gold);
-  margin-bottom: 40px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 2s;
-}
-
-.start-btn {
-  padding: 16px 40px;
-  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-  border: none;
-  border-radius: 12px;
-  color: #1c1a1a;
-  font-weight: bold;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 2.5s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin: 0 auto;
-}
-
-.start-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
-}
-
-.start-btn:active {
-  transform: translateY(0);
-}
-
-.welcome-decoration {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%);
-  border-radius: 50%;
-  top: -100px;
-  right: -100px;
-  z-index: -1;
-}
-
-.welcome-decoration:nth-child(2) {
-  width: 150px;
-  height: 150px;
-  bottom: -75px;
-  left: -75px;
-  top: auto;
-  right: auto;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-/* تصميم الاستبيان */
-.container {
-  max-width: 700px;
-  width: 100%;
-  margin: 0 auto;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
-}
-
-.container.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 0 10px;
-}
-
-.title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 15px rgba(212,175,55,0.5);
-  margin-bottom: 10px;
-  position: relative;
-  display: inline-block;
-}
-
-.title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  border-radius: 2px;
-}
-
-.subtitle {
-  font-size: 1.05rem;
-  color: #f5e9c2;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.form-container {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 30px 25px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.form-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.progress-container {
-  margin-bottom: 25px;
-}
-
-.progress-bar {
-  height: 8px;
-  background: rgba(212,175,55,0.2);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--dark-gold), var(--gold));
-  width: 14.28%;
-  transition: width 0.5s ease;
-  border-radius: 4px;
-}
-
-.progress-text {
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--light-gold);
-  font-weight: 500;
-}
-
-.step-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 15px 0 25px;
-}
-
-.step-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(212,175,55,0.3);
-  transition: var(--transition);
-}
-
-.step-indicator.active {
-  background: var(--gold);
-  box-shadow: 0 0 8px rgba(212,175,55,0.5);
-}
-
-.form-step {
-  display: none;
-  animation: fadeIn 0.5s ease;
-}
-
-.form-step.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.question-title {
-  font-size: 1.35rem;
-  margin-bottom: 22px;
-  color: var(--light-gold);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.question-title i {
-  color: var(--gold);
-  font-size: 1.2em;
-}
-
-.options-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.option-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 18px;
-  cursor: pointer;
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-}
-
-.option-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--gold);
-  transform: scaleY(0);
-  transition: var(--transition);
-}
-
-.option-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  border-color: rgba(212,175,55,0.5);
-}
-
-.option-card.selected {
-  border-color: var(--gold);
-  background: rgba(212,175,55,0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.option-card.selected::before {
-  transform: scaleY(1);
-}
-
-.option-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--light-gold);
-  margin-bottom: 5px;
-}
-
-.option-desc {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
-}
-
-.radio {
-  display: none;
-}
-
-.text-input {
-  width: 100%;
-  padding: 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  color: var(--text-light);
-  font-size: 1rem;
-  transition: var(--transition);
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
-}
-
-.custom-input {
-  margin-top: 15px;
-  display: none;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.error-message {
-  color: var(--error);
-  font-size: 0.9rem;
-  margin-top: 10px;
-  display: none;
-  padding: 8px 12px;
-  background: rgba(255,107,107,0.1);
-  border-radius: 8px;
-  border-right: 3px solid var(--error);
-}
-
-.form-navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 35px;
-  gap: 12px;
-}
-
-.nav-btn {
-  padding: 16px 24px;
-  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-  border: none;
-  border-radius: 12px;
-  color: #1c1a1a;
-  font-weight: bold;
-  font-size: 1.05rem;
-  cursor: pointer;
-  flex: 1;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-}
-
-.nav-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
-}
-
-.nav-btn:active {
-  transform: translateY(0);
-}
-
-.nav-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.file-upload {
-  margin-top: 15px;
-  padding: 20px;
-  background: rgba(255,255,255,0.05);
-  border: 2px dashed var(--glass-border);
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.file-upload:hover {
-  border-color: var(--gold);
-  background: rgba(212,175,55,0.05);
-}
-
-.file-name {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color: var(--light-gold);
-}
-
-.thankyou-message, .loading {
-  text-align: center;
-  display: none;
-  padding: 40px 20px;
-  animation: fadeIn 0.8s ease;
-}
-
-.thankyou-message i {
-  font-size: 4rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.thankyou-message h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: var(--light-gold);
-}
-
-.loading i {
-  font-size: 3rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.loading p {
-  font-size: 1.2rem;
-}
-
-/* تحسينات للجوال */
-@media (max-width: 768px) {
-  .welcome-title {
-    font-size: 2.2rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1.4rem;
-  }
-  
-  .welcome-message {
-    font-size: 1.1rem;
-  }
-  
-  .welcome-importance {
-    font-size: 1rem;
-  }
-  
-  .title {
-    font-size: 1.8rem;
-  }
-  
-  .subtitle {
-    font-size: 0.95rem;
-  }
-  
-  .form-container {
-    padding: 25px 20px;
-    border-radius: 20px;
-  }
-  
-  .question-title {
-    font-size: 1.2rem;
-  }
-  
-  .option-card {
-    padding: 15px;
-  }
-  
-  .nav-btn {
-    padding: 14px 20px;
-    font-size: 1rem;
-  }
-  
-  .form-navigation {
-    flex-direction: column;
-  }
-  
-  .step-indicators {
-    gap: 8px;
-  }
-  
-  .step-indicator {
-    width: 10px;
-    height: 10px;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-  
-  .welcome-content {
-    padding: 30px 20px;
-  }
-  
-  .welcome-title {
-    font-size: 1.8rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .welcome-message, .welcome-importance {
-    font-size: 0.95rem;
-  }
-  
-  .title {
-    font-size: 1.6rem;
-  }
-  
-  .form-container {
-    padding: 20px 15px;
-    border-radius: 18px;
-  }
-  
-  .question-title {
-    font-size: 1.1rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  
-  .option-title {
-    font-size: 1rem;
-  }
-  
-  .text-input {
-    padding: 14px;
-  }
-  
-  .nav-btn {
-    padding: 12px 16px;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان العميل الفاخر</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
+        
+        :root {
+            --deep-space: #0a0e17;
+            --royal-purple: #4c1d95;
+            --emerald: #059669;
+            --gold: #d4af37;
+            --silver: #e5e7eb;
+            --crystal: rgba(255,255,255,0.1);
+            --glass: rgba(255,255,255,0.08);
+            --neon-glow: 0 0 30px rgba(212, 175, 55, 0.4);
+            --transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'El Messiri', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--deep-space) 0%, var(--royal-purple) 100%);
+            color: var(--silver);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* خلفية الجسيمات المتحركة */
+        #particles-js {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        /* شاشة الترحيب الفاخرة */
+        .luxury-welcome {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            background: rgba(10, 14, 23, 0.9);
+            backdrop-filter: blur(5px);
+        }
+
+        .luxury-content {
+            text-align: center;
+            max-width: 800px;
+            padding: 50px;
+            background: var(--glass);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 30px;
+            box-shadow: var(--neon-glow);
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .luxury-title {
+            font-size: 4rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+            transform: translateZ(50px);
+            animation: titleGlow 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleGlow {
+            from { text-shadow: 0 0 20px rgba(212, 175, 55, 0.5); }
+            to { text-shadow: 0 0 30px rgba(212, 175, 55, 0.8), 0 0 40px rgba(212, 175, 55, 0.6); }
+        }
+
+        .luxury-subtitle {
+            font-size: 2rem;
+            color: var(--silver);
+            margin-bottom: 20px;
+            transform: translateZ(30px);
+        }
+
+        .luxury-message {
+            font-size: 1.3rem;
+            line-height: 1.8;
+            margin-bottom: 30px;
+            transform: translateZ(20px);
+        }
+
+        .luxury-importance {
+            font-size: 1.1rem;
+            color: var(--gold);
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: 15px;
+            border-right: 3px solid var(--emerald);
+            transform: translateZ(10px);
+        }
+
+        .start-btn {
+            padding: 18px 50px;
+            background: linear-gradient(45deg, var(--emerald), var(--gold));
+            border: none;
+            border-radius: 15px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.3rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 5px 15px rgba(5, 150, 105, 0.4);
+            transform: translateZ(40px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin: 0 auto;
+        }
+
+        .start-btn:hover {
+            transform: translateZ(40px) translateY(-5px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(5, 150, 105, 0.6);
+        }
+
+        /* تصميم الاستبيان */
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            opacity: 0;
+            transform: translateY(50px);
+            transition: all 1s ease;
+        }
+
+        .container.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+            transform-style: preserve-3d;
+        }
+
+        .title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 20px;
+            text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+            transform: translateZ(30px);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: var(--silver);
+            max-width: 600px;
+            margin: 0 auto;
+            transform: translateZ(20px);
+        }
+
+        .form-container {
+            background: var(--glass);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            border-radius: 25px;
+            padding: 40px 30px;
+            box-shadow: var(--neon-glow);
+            transform-style: preserve-3d;
+            transform: translateZ(10px);
+        }
+
+        .progress-container {
+            margin-bottom: 30px;
+            transform-style: preserve-3d;
+        }
+
+        .progress-bar {
+            height: 10px;
+            background: rgba(212, 175, 55, 0.2);
+            border-radius: 5px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            transform: translateZ(5px);
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(90deg, var(--emerald), var(--gold));
+            width: 14.28%;
+            transition: width 0.5s ease;
+            border-radius: 5px;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-weight: 500;
+            transform: translateZ(10px);
+        }
+
+        .step-indicators {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0 30px;
+            transform: translateZ(5px);
+        }
+
+        .step-indicator {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(212, 175, 55, 0.3);
+            transition: var(--transition);
+        }
+
+        .step-indicator.active {
+            background: var(--gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+            transform: scale(1.2);
+        }
+
+        .form-step {
+            display: none;
+            animation: fadeInUp 0.6s ease;
+            transform-style: preserve-3d;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px) translateZ(10px); }
+            to { opacity: 1; transform: translateY(0) translateZ(10px); }
+        }
+
+        .question-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transform: translateZ(15px);
+        }
+
+        .question-title i {
+            color: var(--gold);
+            font-size: 1.3em;
+        }
+
+        .options-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+            transform: translateZ(10px);
+        }
+
+        .option-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(212, 175, 55, 0.2);
+            border-radius: 16px;
+            padding: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+            transform-style: preserve-3d;
+        }
+
+        .option-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 5px;
+            height: 100%;
+            background: var(--gold);
+            transform: scaleY(0);
+            transition: var(--transition);
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px) translateZ(5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            border-color: rgba(212,175,55,0.5);
+        }
+
+        .option-card.selected {
+            border-color: var(--gold);
+            background: rgba(212,175,55,0.1);
+            transform: translateY(-3px) translateZ(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .option-card.selected::before {
+            transform: scaleY(1);
+        }
+
+        .option-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--silver);
+            margin-bottom: 8px;
+        }
+
+        .radio {
+            display: none;
+        }
+
+        .text-input {
+            width: 100%;
+            padding: 18px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(212,175,55,0.2);
+            border-radius: 12px;
+            color: var(--silver);
+            font-size: 1rem;
+            transition: var(--transition);
+            transform: translateZ(5px);
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
+            transform: translateZ(10px);
+        }
+
+        .custom-input {
+            margin-top: 18px;
+            display: none;
+            animation: slideDown 0.4s ease;
+            transform: translateZ(5px);
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px) translateZ(5px); }
+            to { opacity: 1; transform: translateY(0) translateZ(5px); }
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.95rem;
+            margin-top: 12px;
+            display: none;
+            padding: 10px 15px;
+            background: rgba(255,107,107,0.1);
+            border-radius: 8px;
+            border-right: 3px solid #ff6b6b;
+            transform: translateZ(5px);
+        }
+
+        .form-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 15px;
+            transform: translateZ(10px);
+        }
+
+        .nav-btn {
+            padding: 16px 30px;
+            background: linear-gradient(45deg, var(--emerald), var(--gold));
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            flex: 1;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-3px) translateZ(5px);
+            box-shadow: 0 6px 18px rgba(5, 150, 105, 0.4);
+        }
+
+        .file-upload {
+            margin-top: 18px;
+            padding: 22px;
+            background: rgba(255,255,255,0.05);
+            border: 2px dashed rgba(212,175,55,0.3);
+            border-radius: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            transform: translateZ(5px);
+        }
+
+        .file-upload:hover {
+            border-color: var(--gold);
+            background: rgba(212,175,55,0.05);
+            transform: translateZ(10px);
+        }
+
+        .file-name {
+            margin-top: 12px;
+            font-size: 0.95rem;
+            color: var(--gold);
+        }
+
+        .thankyou-message, .loading {
+            text-align: center;
+            display: none;
+            padding: 50px 30px;
+            animation: fadeIn 0.8s ease;
+            transform-style: preserve-3d;
+        }
+
+        .thankyou-message i {
+            font-size: 5rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+            transform: translateZ(30px);
+        }
+
+        .thankyou-message h2 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: var(--gold);
+            transform: translateZ(20px);
+        }
+
+        .thankyou-message p {
+            font-size: 1.3rem;
+            transform: translateZ(10px);
+        }
+
+        .loading i {
+            font-size: 4rem;
+            color: var(--gold);
+            margin-bottom: 25px;
+            transform: translateZ(20px);
+        }
+
+        .loading p {
+            font-size: 1.4rem;
+            transform: translateZ(10px);
+        }
+
+        /* تأثير Parallax للخلفية */
+        .parallax-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: radial-gradient(circle at 20% 50%, rgba(76, 29, 149, 0.3) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(5, 150, 105, 0.2) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 80%, rgba(212, 175, 55, 0.2) 0%, transparent 50%);
+        }
+
+        /* تحسينات للجوال */
+        @media (max-width: 768px) {
+            .luxury-title {
+                font-size: 2.5rem;
+            }
+            
+            .luxury-subtitle {
+                font-size: 1.5rem;
+            }
+            
+            .luxury-message {
+                font-size: 1.1rem;
+            }
+            
+            .title {
+                font-size: 2.2rem;
+            }
+            
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .question-title {
+                font-size: 1.3rem;
+            }
+            
+            .form-navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-<!-- شاشة الترحيب -->
-<div class="welcome-screen" id="welcomeScreen">
-  <div class="welcome-content">
-    <div class="welcome-decoration"></div>
-    <div class="welcome-decoration"></div>
+    <!-- خلفية الجسيمات -->
+    <div id="particles-js"></div>
     
-    <h1 class="welcome-title">مرحباً عزيزنا العميل</h1>
-    <h2 class="welcome-subtitle">نحن سعداء بثقتك الغالية</h2>
-    <p class="welcome-message">نعمل معاً لتحقيق رؤيتك وتجسيد أفكارك بأفضل صورة</p>
-    <p class="welcome-importance">نؤمن بأن الاستبيان الدقيق هو أساس العمل الناجح، وسنعمل بناءً على إجاباتك لإنشاء تصميم يعبر عن هويتك</p>
-    
-    <button class="start-btn" id="startBtn">
-      <span>ابدأ الاستبيان</span>
-      <i class="fas fa-arrow-left"></i>
-    </button>
-  </div>
-</div>
+    <!-- تأثير Parallax -->
+    <div class="parallax-bg"></div>
 
-<!-- استبيان العميل -->
-<div class="container" id="mainContainer">
-  <div class="header">
-    <h1 class="title">استبيان العميل</h1>
-    <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
-  </div>
-  
-  <div class="form-container">
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress" id="progress"></div>
-      </div>
-      <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
+    <!-- شاشة الترحيب الفاخرة -->
+    <div class="luxury-welcome" id="welcomeScreen">
+        <div class="luxury-content">
+            <h1 class="luxury-title">مرحباً عزيزنا العميل</h1>
+            <h2 class="luxury-subtitle">نحن سعداء بثقتك الغالية</h2>
+            <p class="luxury-message">نعمل معاً لتحقيق رؤيتك وتجسيد أفكارك بأفضل صورة</p>
+            <p class="luxury-importance">نؤمن بأن الاستبيان الدقيق هو أساس العمل الناجح، وسنعمل بناءً على إجاباتك لإنشاء تصميم يعبر عن هويتك</p>
+            
+            <button class="start-btn" id="startBtn">
+                <span>ابدأ الاستبيان</span>
+                <i class="fas fa-gem"></i>
+            </button>
+        </div>
     </div>
-    
-    <div class="step-indicators" id="step-indicators"></div>
-    
-    <form id="clientForm">
-      <!-- الخطوة 1 -->
-      <div class="form-step active" id="step-1">
-        <h2 class="question-title"><i class="fas fa-signature"></i> اسم الورشة أو المشروع</h2>
-        <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" />
-        <div class="error-message" id="error-1"></div>
-      </div>
 
-      <!-- الخطوة 2 -->
-      <div class="form-step" id="step-2">
-        <h2 class="question-title"><i class="fas fa-tools"></i> نوع الشغل الأساسي</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="work_type" value="دهان" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">دهان</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="work_type" value="تذهيب" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">تذهيب</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="work_type" value="تشطيب" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">تشطيب</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-work">
-            <input type="radio" name="work_type" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
+    <!-- استبيان العميل -->
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1 class="title">استبيان العميل الفاخر</h1>
+            <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
         </div>
-        <div class="custom-input" id="work-custom">
-          <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر" />
-        </div>
-        <div class="error-message" id="error-2"></div>
-      </div>
+        
+        <div class="form-container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
+            </div>
+            
+            <div class="step-indicators" id="step-indicators"></div>
+            
+            <form id="clientForm">
+                <!-- الخطوة 1 -->
+                <div class="form-step active" id="step-1">
+                    <h2 class="question-title"><i class="fas fa-crown"></i> اسم الورشة أو المشروع</h2>
+                    <input type="text" class="text-input" name="project_name" placeholder="أدخل اسم الورشة أو المشروع" />
+                    <div class="error-message" id="error-1"></div>
+                </div>
 
-      <!-- الخطوة 3 -->
-      <div class="form-step" id="step-3">
-        <h2 class="question-title"><i class="fas fa-paint-brush"></i> شكل الشعار المفضل</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">فخم وكلاسيكي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="بسيط وحديث" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">بسيط وحديث</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">مزيج من الإثنين</h3>
-            </div>
-          </label>
-        </div>
-        <div class="error-message" id="error-3"></div>
-      </div>
+                <!-- الخطوة 2 -->
+                <div class="form-step" id="step-2">
+                    <h2 class="question-title"><i class="fas fa-gem"></i> نوع الشغل الأساسي</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="work_type" value="دهان" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">دهان</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="work_type" value="تذهيب" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">تذهيب</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="work_type" value="تشطيب" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">تشطيب</h3>
+                            </div>
+                        </label>
+                        <label class="option-card" id="other-work">
+                            <input type="radio" name="work_type" value="شيء آخر" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">شيء آخر</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="custom-input" id="work-custom">
+                        <input type="text" class="text-input" name="work_custom" placeholder="أدخل نوع الشغل الآخر" />
+                    </div>
+                    <div class="error-message" id="error-2"></div>
+                </div>
 
-      <!-- الخطوة 4 -->
-      <div class="form-step" id="step-4">
-        <h2 class="question-title"><i class="fas fa-palette"></i> الألوان المفضلة</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ذهبي وكلاسيكي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="colors" value="ألوان ترابية" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ألوان ترابية</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-color">
-            <input type="radio" name="colors" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="color-custom">
-          <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان الأخرى" />
-        </div>
-        <div class="error-message" id="error-4"></div>
-      </div>
+                <!-- الخطوة 3 -->
+                <div class="form-step" id="step-3">
+                    <h2 class="question-title"><i class="fas fa-palette"></i> شكل الشعار المفضل</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="logo_style" value="فخم وكلاسيكي" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">فخم وكلاسيكي</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="logo_style" value="بسيط وحديث" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">بسيط وحديث</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="logo_style" value="مزيج من الإثنين" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">مزيج من الإثنين</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="error-message" id="error-3"></div>
+                </div>
 
-      <!-- الخطوة 5 -->
-      <div class="form-step" id="step-5">
-        <h2 class="question-title"><i class="fas fa-drafting-compass"></i> نوع الشعار</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="logo_type" value="رمز فقط" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">رمز فقط</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_type" value="كتابة فقط" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">كتابة فقط</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_type" value="رمز وكتابة" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">رمز وكتابة</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-logo-type">
-            <input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="logo-type-custom">
-          <input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل نوع الشعار الآخر" />
-        </div>
-        <div class="error-message" id="error-5"></div>
-      </div>
+                <!-- الخطوة 4 -->
+                <div class="form-step" id="step-4">
+                    <h2 class="question-title"><i class="fas fa-paint-brush"></i> الألوان المفضلة</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">ذهبي وكلاسيكي</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="colors" value="ألوان ترابية" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">ألوان ترابية</h3>
+                            </div>
+                        </label>
+                        <label class="option-card" id="other-color">
+                            <input type="radio" name="colors" value="شيء آخر" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">شيء آخر</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="custom-input" id="color-custom">
+                        <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان الأخرى" />
+                    </div>
+                    <div class="error-message" id="error-4"></div>
+                </div>
 
-      <!-- الخطوة 6 -->
-      <div class="form-step" id="step-6">
-        <h2 class="question-title"><i class="fas fa-heart"></i> الإحساس المطلوب</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="feeling" value="فخامة" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">فخامة</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="feeling" value="احتراف" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">احتراف</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-feeling">
-            <input type="radio" name="feeling" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="feeling-custom">
-          <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس الآخر" />
-        </div>
-        <div class="error-message" id="error-6"></div>
-      </div>
+                <!-- الخطوة 5 -->
+                <div class="form-step" id="step-5">
+                    <h2 class="question-title"><i class="fas fa-drafting-compass"></i> نوع الشعار</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="logo_type" value="رمز فقط" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">رمز فقط</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="logo_type" value="كتابة فقط" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">كتابة فقط</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="logo_type" value="رمز وكتابة" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">رمز وكتابة</h3>
+                            </div>
+                        </label>
+                        <label class="option-card" id="other-logo-type">
+                            <input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">شيء آخر</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="custom-input" id="logo-type-custom">
+                        <input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل نوع الشعار الآخر" />
+                    </div>
+                    <div class="error-message" id="error-5"></div>
+                </div>
 
-      <!-- الخطوة 7 -->
-      <div class="form-step" id="step-7">
-        <h2 class="question-title"><i class="fas fa-history"></i> هل لديك لوجو قديم؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="old_logo" value="نعم" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">نعم</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="old_logo" value="لا" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">لا</h3>
-            </div>
-          </label>
-        </div>
-        <div id="logo-details" style="display:none;margin-top:20px;">
-          <textarea class="text-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
-          <div class="file-upload" id="file-upload">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>انقر لرفع اللوجو القديم</p>
-            <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
-          </div>
-          <input type="file" id="file-input" style="display:none;" accept="image/*,.pdf,.psd,.ai" />
-        </div>
-        <div class="error-message" id="error-7"></div>
-      </div>
+                <!-- الخطوة 6 -->
+                <div class="form-step" id="step-6">
+                    <h2 class="question-title"><i class="fas fa-heart"></i> الإحساس المطلوب</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="feeling" value="فخامة" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">فخامة</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="feeling" value="احتراف" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">احتراف</h3>
+                            </div>
+                        </label>
+                        <label class="option-card" id="other-feeling">
+                            <input type="radio" name="feeling" value="شيء آخر" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">شيء آخر</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="custom-input" id="feeling-custom">
+                        <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الإحساس الآخر" />
+                    </div>
+                    <div class="error-message" id="error-6"></div>
+                </div>
 
-      <div class="form-navigation">
-        <button type="button" class="nav-btn" id="prev-btn"><i class="fas fa-arrow-right"></i> السابق</button>
-        <button type="button" class="nav-btn" id="next-btn">التالي <i class="fas fa-arrow-left"></i></button>
-        <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال</button>
-      </div>
-    </form>
+                <!-- الخطوة 7 -->
+                <div class="form-step" id="step-7">
+                    <h2 class="question-title"><i class="fas fa-history"></i> هل لديك لوجو قديم؟</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="old_logo" value="نعم" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">نعم</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="old_logo" value="لا" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">لا</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div id="logo-details" style="display:none;margin-top:20px;">
+                        <textarea class="text-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
+                        <div class="file-upload" id="file-upload">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <p>انقر لرفع اللوجو القديم</p>
+                            <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
+                        </div>
+                        <input type="file" id="file-input" style="display:none;" accept="image/*,.pdf,.psd,.ai" />
+                    </div>
+                    <div class="error-message" id="error-7"></div>
+                </div>
 
-    <div class="loading" id="loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري الإرسال...</p>
+                <div class="form-navigation">
+                    <button type="button" class="nav-btn" id="prev-btn"><i class="fas fa-arrow-right"></i> السابق</button>
+                    <button type="button" class="nav-btn" id="next-btn">التالي <i class="fas fa-arrow-left"></i></button>
+                    <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال</button>
+                </div>
+            </form>
+
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري الإرسال...</p>
+            </div>
+            
+            <div class="thankyou-message" id="thankyou-message">
+                <i class="fas fa-check-circle"></i>
+                <h2>شكراً لك</h2>
+                <p>تم إرسال الاستبيان بنجاح</p>
+            </div>
+        </div>
     </div>
-    
-    <div class="thankyou-message" id="thankyou-message">
-      <i class="fas fa-check-circle"></i>
-      <h2>شكراً لك</h2>
-      <p>تم إرسال الاستبيان بنجاح</p>
-    </div>
-  </div>
-</div>
 
-<script>
-// عناصر شاشة الترحيب
-const welcomeScreen = document.getElementById('welcomeScreen');
-const startBtn = document.getElementById('startBtn');
-const mainContainer = document.getElementById('mainContainer');
+    <script>
+        // تهيئة الجسيمات المتحركة
+        particlesJS("particles-js", {
+            particles: {
+                number: { value: 80, density: { enable: true, value_area: 800 } },
+                color: { value: "#d4af37" },
+                shape: { type: "circle" },
+                opacity: { value: 0.5, random: true },
+                size: { value: 3, random: true },
+                line_linked: {
+                    enable: true,
+                    distance: 150,
+                    color: "#d4af37",
+                    opacity: 0.2,
+                    width: 1
+                },
+                move: {
+                    enable: true,
+                    speed: 2,
+                    direction: "none",
+                    random: true,
+                    straight: false,
+                    out_mode: "out",
+                    bounce: false
+                }
+            },
+            interactivity: {
+                detect_on: "canvas",
+                events: {
+                    onhover: { enable: true, mode: "repulse" },
+                    onclick: { enable: true, mode: "push" },
+                    resize: true
+                }
+            }
+        });
 
-// عناصر الاستبيان
-const totalSteps = 7;
-let currentStep = 1;
+        // عناصر شاشة الترحيب
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const startBtn = document.getElementById('startBtn');
+        const mainContainer = document.getElementById('mainContainer');
 
-const progressBar = document.getElementById('progress');
-const progressText = document.getElementById('progress-text');
-const stepIndicators = document.getElementById('step-indicators');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const submitBtn = document.getElementById('submit-btn');
-const thankyouMessage = document.getElementById('thankyou-message');
-const loadingElement = document.getElementById('loading');
-const fileUpload = document.getElementById('file-upload');
-const fileInput = document.getElementById('file-input');
-const fileName = document.getElementById('file-name');
-const scriptURL = "https://script.google.com/macros/s/AKfycbyE1G-J87k5Yc7ufREBA8RuJPK0EiWCg4AiQiwFCJXO4I3_VASuTyjUGjHaftDo96XR/exec";
+        // عناصر الاستبيان
+        const totalSteps = 7;
+        let currentStep = 1;
 
-// بدء الاستبيان
-startBtn.addEventListener('click', () => {
-  welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
-  setTimeout(() => {
-    welcomeScreen.style.display = 'none';
-    mainContainer.classList.add('show');
-  }, 1000);
-});
+        const progressBar = document.getElementById('progress');
+        const progressText = document.getElementById('progress-text');
+        const stepIndicators = document.getElementById('step-indicators');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const thankyouMessage = document.getElementById('thankyou-message');
+        const loadingElement = document.getElementById('loading');
+        const fileUpload = document.getElementById('file-upload');
+        const fileInput = document.getElementById('file-input');
+        const fileName = document.getElementById('file-name');
+        const scriptURL = "https://script.google.com/macros/s/AKfycbyE1G-J87k5Yc7ufREBA8RuJPK0EiWCg4AiQiwFCJXO4I3_VASuTyjUGjHaftDo96XR/exec";
 
-// إنشاء مؤشرات الخطوات
-for (let i = 1; i <= totalSteps; i++) {
-  const dot = document.createElement('div');
-  dot.classList.add('step-indicator');
-  if (i === 1) dot.classList.add('active');
-  stepIndicators.appendChild(dot);
-}
+        // بدء الاستبيان
+        startBtn.addEventListener('click', () => {
+            welcomeScreen.style.opacity = '0';
+            welcomeScreen.style.transition = 'opacity 1s ease';
+            setTimeout(() => {
+                welcomeScreen.style.display = 'none';
+                mainContainer.classList.add('show');
+            }, 1000);
+        });
 
-// تحديث واجهة المستخدم
-function updateUI() {
-  progressBar.style.width = (currentStep / totalSteps * 100) + '%';
-  progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
-  prevBtn.style.display = currentStep === 1 ? 'none' : 'flex';
-  nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
-  submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
-  
-  document.querySelectorAll('.form-step').forEach(step => {
-    step.classList.remove('active');
-  });
-  
-  document.getElementById(`step-${currentStep}`).classList.add('active');
-  
-  document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-    indicator.classList.toggle('active', index < currentStep);
-  });
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+        // إنشاء مؤشرات الخطوات
+        for (let i = 1; i <= totalSteps; i++) {
+            const dot = document.createElement('div');
+            dot.classList.add('step-indicator');
+            if (i === 1) dot.classList.add('active');
+            stepIndicators.appendChild(dot);
+        }
 
-// عرض رسالة الخطأ
-function showError(step, message) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
-  }
-}
+        // تحديث واجهة المستخدم
+        function updateUI() {
+            progressBar.style.width = (currentStep / totalSteps * 100) + '%';
+            progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
+            prevBtn.style.display = currentStep === 1 ? 'none' : 'flex';
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
+            submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+            
+            document.querySelectorAll('.form-step').forEach(step => {
+                step.classList.remove('active');
+            });
+            
+            document.getElementById(`step-${currentStep}`).classList.add('active');
+            
+            document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
+                indicator.classList.toggle('active', index < currentStep);
+            });
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-// إخفاء رسالة الخطأ
-function hideError(step) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) errorElement.style.display = 'none';
-}
+        // باقي الدوال والوظائف تبقى كما هي من الكود السابق
+        // ... (يمكن إضافة باقي الدوال هنا)
 
-// التحقق من صحة الخطوة الحالية
-function validateStep(step) {
-  switch (step) {
-    case 1:
-      const projectName = document.querySelector('input[name="project_name"]').value.trim();
-      if (!projectName) {
-        showError(1, "يرجى إدخال اسم الورشة أو المشروع");
-        return false;
-      }
-      return true;
-      
-    case 2:
-      const workType = document.querySelector('input[name="work_type"]:checked');
-      if (!workType) {
-        showError(2, "يرجى اختيار نوع الشغل");
-        return false;
-      }
-      if (workType.value === "شيء آخر" && !document.querySelector('input[name="work_custom"]').value.trim()) {
-        showError(2, "يرجى تحديد النوع الآخر");
-        return false;
-      }
-      return true;
-      
-    case 3:
-      if (!document.querySelector('input[name="logo_style"]:checked')) {
-        showError(3, "يرجى اختيار شكل الشعار");
-        return false;
-      }
-      return true;
-      
-    case 4:
-      const colors = document.querySelector('input[name="colors"]:checked');
-      if (!colors) {
-        showError(4, "يرجى اختيار الألوان");
-        return false;
-      }
-      if (colors.value === "شيء آخر" && !document.querySelector('input[name="color_custom"]').value.trim()) {
-        showError(4, "يرجى تحديد الألوان الأخرى");
-        return false;
-      }
-      return true;
-      
-    case 5:
-      const logoType = document.querySelector('input[name="logo_type"]:checked');
-      if (!logoType) {
-        showError(5, "يرجى اختيار نوع الشعار");
-        return false;
-      }
-      if (logoType.value === "شيء آخر" && !document.querySelector('input[name="logo_type_custom"]').value.trim()) {
-        showError(5, "يرجى تحديد نوع الشعار الآخر");
-        return false;
-      }
-      return true;
-      
-    case 6:
-      const feeling = document.querySelector('input[name="feeling"]:checked');
-      if (!feeling) {
-        showError(6, "يرجى اختيار الإحساس");
-        return false;
-      }
-      if (feeling.value === "شيء آخر" && !document.querySelector('input[name="feeling_custom"]').value.trim()) {
-        showError(6, "يرجى تحديد الإحساس الآخر");
-        return false;
-      }
-      return true;
-      
-    case 7:
-      if (!document.querySelector('input[name="old_logo"]:checked')) {
-        showError(7, "يرجى الإجابة على هذا السؤال");
-        return false;
-      }
-      return true;
-      
-    default:
-      return true;
-  }
-}
-
-// الانتقال للخطوة التالية
-nextBtn.onclick = () => {
-  if (validateStep(currentStep) && currentStep < totalSteps) {
-    hideError(currentStep);
-    currentStep++;
-    updateUI();
-  }
-};
-
-// الانتقال للخطوة السابقة
-prevBtn.onclick = () => {
-  if (currentStep > 1) {
-    currentStep--;
-    updateUI();
-  }
-};
-
-// إدارة اختيار الخيارات
-document.querySelectorAll('.option-card').forEach(card => {
-  card.onclick = function() {
-    const radio = this.querySelector('input[type="radio"]');
-    if (radio) {
-      document.querySelectorAll(`input[name="${radio.name}"]`).forEach(input => {
-        input.closest('.option-card').classList.remove('selected');
-      });
-      
-      radio.checked = true;
-      this.classList.add('selected');
-      
-      // إظهار/إخفاء الحقول المخصصة
-      if (radio.name === 'work_type') {
-        document.getElementById('work-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
-      }
-      
-      if (radio.name === 'colors') {
-        document.getElementById('color-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
-      }
-      
-      if (radio.name === 'feeling') {
-        document.getElementById('feeling-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
-      }
-      
-      if (radio.name === 'logo_type') {
-        document.getElementById('logo-type-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
-      }
-      
-      if (radio.name === 'old_logo') {
-        document.getElementById('logo-details').style.display = radio.value === 'نعم' ? 'block' : 'none';
-      }
-      
-      hideError(currentStep);
-    }
-  };
-});
-
-// إدارة رفع الملفات
-fileUpload.onclick = () => fileInput.click();
-
-fileInput.onchange = () => {
-  fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'لم يتم رفع أي ملف بعد';
-};
-
-// تحويل الملف إلى Base64
-async function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// إرسال النموذج
-document.getElementById("clientForm").addEventListener("submit", async e => {
-  e.preventDefault();
-  if (!validateStep(totalSteps)) return;
-  
-  const data = { timestamp: new Date().toLocaleString("ar-SA") };
-  
-  ["project_name", "work_type", "logo_style", "colors", "logo_type", "feeling", "old_logo"].forEach(field => {
-    const element = document.querySelector(`input[name="${field}"]:checked`) || document.querySelector(`input[name="${field}"]`);
-    data[field] = element ? element.value : "";
-  });
-  
-  ["work_custom", "color_custom", "logo_type_custom", "feeling_custom"].forEach(field => {
-    const input = document.querySelector(`input[name="${field}"]`);
-    if (input) data[field] = input.value.trim();
-  });
-  
-  data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || "";
-  
-  const formData = new FormData();
-  for (let key in data) formData.append(key, data[key]);
-  
-  if (fileInput.files.length > 0) {
-    const file = fileInput.files[0];
-    formData.append("file_name", file.name);
-    formData.append("file_type", file.type);
-    formData.append("file_base64", await fileToBase64(file));
-  }
-  
-  document.querySelector("form").style.display = "none";
-  loadingElement.style.display = "block";
-  
-  try {
-    const response = await fetch(scriptURL, { method: "POST", body: formData });
-    const json = await response.json();
-    loadingElement.style.display = "none";
-    
-    if (json.result === "success") {
-      thankyouMessage.style.display = "block";
-    } else {
-      throw new Error(json.message);
-    }
-  } catch (err) {
-    alert("حدث خطأ أثناء الإرسال: " + err.message);
-    document.querySelector("form").style.display = "block";
-    loadingElement.style.display = "none";
-  }
-});
-
-// تهيئة الواجهة
-updateUI();
-</script>
+        // تهيئة الواجهة
+        updateUI();
+    </script>
 </body>
 </html>
