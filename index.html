@@ -35,12 +35,165 @@ body {
   align-items: center;
   padding: 15px;
   line-height: 1.6;
+  overflow-x: hidden;
 }
 
+/* شاشة الترحيب */
+.welcome-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  text-align: center;
+}
+
+.welcome-content {
+  max-width: 700px;
+  width: 100%;
+  padding: 40px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+
+.welcome-content::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
+}
+
+.welcome-title {
+  font-size: 3rem;
+  font-weight: 700;
+  color: var(--gold);
+  text-shadow: 0 0 15px rgba(212,175,55,0.5);
+  margin-bottom: 30px;
+  position: relative;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards 0.5s;
+}
+
+.welcome-subtitle {
+  font-size: 1.8rem;
+  color: var(--light-gold);
+  margin-bottom: 20px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards 1s;
+}
+
+.welcome-message {
+  font-size: 1.2rem;
+  color: var(--text-light);
+  margin-bottom: 30px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards 1.5s;
+}
+
+.welcome-importance {
+  font-size: 1.1rem;
+  color: var(--light-gold);
+  margin-bottom: 40px;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards 2s;
+}
+
+.start-btn {
+  padding: 16px 40px;
+  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
+  border: none;
+  border-radius: 12px;
+  color: #1c1a1a;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInUp 1s ease forwards 2.5s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+.start-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
+}
+
+.start-btn:active {
+  transform: translateY(0);
+}
+
+.welcome-decoration {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  top: -100px;
+  right: -100px;
+  z-index: -1;
+}
+
+.welcome-decoration:nth-child(2) {
+  width: 150px;
+  height: 150px;
+  bottom: -75px;
+  left: -75px;
+  top: auto;
+  right: auto;
+}
+
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeOut {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
+
+/* تصميم الاستبيان */
 .container {
   max-width: 700px;
   width: 100%;
   margin: 0 auto;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.8s ease;
+}
+
+.container.show {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .header {
@@ -369,6 +522,22 @@ body {
 
 /* تحسينات للجوال */
 @media (max-width: 768px) {
+  .welcome-title {
+    font-size: 2.2rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1.4rem;
+  }
+  
+  .welcome-message {
+    font-size: 1.1rem;
+  }
+  
+  .welcome-importance {
+    font-size: 1rem;
+  }
+  
   .title {
     font-size: 1.8rem;
   }
@@ -414,6 +583,22 @@ body {
     padding: 10px;
   }
   
+  .welcome-content {
+    padding: 30px 20px;
+  }
+  
+  .welcome-title {
+    font-size: 1.8rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .welcome-message, .welcome-importance {
+    font-size: 0.95rem;
+  }
+  
   .title {
     font-size: 1.6rem;
   }
@@ -445,7 +630,26 @@ body {
 </style>
 </head>
 <body>
-<div class="container">
+<!-- شاشة الترحيب -->
+<div class="welcome-screen" id="welcomeScreen">
+  <div class="welcome-content">
+    <div class="welcome-decoration"></div>
+    <div class="welcome-decoration"></div>
+    
+    <h1 class="welcome-title">مرحباً عزيزنا العميل</h1>
+    <h2 class="welcome-subtitle">نحن سعداء بثقتك الغالية</h2>
+    <p class="welcome-message">نعمل معاً لتحقيق رؤيتك وتجسيد أفكارك بأفضل صورة</p>
+    <p class="welcome-importance">نؤمن بأن الاستبيان الدقيق هو أساس العمل الناجح، وسنعمل بناءً على إجاباتك لإنشاء تصميم يعبر عن هويتك</p>
+    
+    <button class="start-btn" id="startBtn">
+      <span>ابدأ الاستبيان</span>
+      <i class="fas fa-arrow-left"></i>
+    </button>
+  </div>
+</div>
+
+<!-- استبيان العميل -->
+<div class="container" id="mainContainer">
   <div class="header">
     <h1 class="title">استبيان العميل</h1>
     <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
@@ -673,6 +877,12 @@ body {
 </div>
 
 <script>
+// عناصر شاشة الترحيب
+const welcomeScreen = document.getElementById('welcomeScreen');
+const startBtn = document.getElementById('startBtn');
+const mainContainer = document.getElementById('mainContainer');
+
+// عناصر الاستبيان
 const totalSteps = 7;
 let currentStep = 1;
 
@@ -688,6 +898,15 @@ const fileUpload = document.getElementById('file-upload');
 const fileInput = document.getElementById('file-input');
 const fileName = document.getElementById('file-name');
 const scriptURL = "https://script.google.com/macros/s/AKfycbyE1G-J87k5Yc7ufREBA8RuJPK0EiWCg4AiQiwFCJXO4I3_VASuTyjUGjHaftDo96XR/exec";
+
+// بدء الاستبيان
+startBtn.addEventListener('click', () => {
+  welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
+  setTimeout(() => {
+    welcomeScreen.style.display = 'none';
+    mainContainer.classList.add('show');
+  }, 1000);
+});
 
 // إنشاء مؤشرات الخطوات
 for (let i = 1; i <= totalSteps; i++) {
