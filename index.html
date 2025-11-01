@@ -511,23 +511,12 @@ body {
   color: var(--light-gold);
 }
 
-.thankyou-message, .loading {
+/* شاشات التحميل والنتائج */
+.loading, .success-message, .final-message {
   text-align: center;
   display: none;
   padding: 40px 20px;
   animation: fadeIn 0.8s ease;
-}
-
-.thankyou-message i {
-  font-size: 4rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.thankyou-message h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: var(--light-gold);
 }
 
 .loading i {
@@ -538,6 +527,63 @@ body {
 
 .loading p {
   font-size: 1.2rem;
+}
+
+.success-message i {
+  font-size: 4rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.success-message h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: var(--light-gold);
+}
+
+.success-message p {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
+}
+
+.continue-btn {
+  padding: 16px 40px;
+  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
+  border: none;
+  border-radius: 12px;
+  color: #1c1a1a;
+  font-weight: bold;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin: 0 auto;
+}
+
+.continue-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
+}
+
+.final-message i {
+  font-size: 4rem;
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.final-message h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: var(--light-gold);
+}
+
+.final-message p {
+  font-size: 1.1rem;
+  margin-bottom: 25px;
 }
 
 /* تحسينات للجوال */
@@ -923,15 +969,28 @@ body {
       </div>
     </form>
 
+    <!-- شاشة التحميل -->
     <div class="loading" id="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري الإرسال...</p>
+      <p>جاري إرسال الاستبيان...</p>
     </div>
     
-    <div class="thankyou-message" id="thankyou-message">
+    <!-- شاشة النجاح -->
+    <div class="success-message" id="success-message">
       <i class="fas fa-check-circle"></i>
-      <h2>شكراً لك</h2>
-      <p>تم إرسال الاستبيان بنجاح</p>
+      <h2>تم إرسال الاستبيان بنجاح</h2>
+      <p>شكراً لك على تعبئة الاستبيان</p>
+      <button class="continue-btn" id="continue-btn">
+        <span>متابعة</span>
+        <i class="fas fa-arrow-left"></i>
+      </button>
+    </div>
+    
+    <!-- الشاشة النهائية -->
+    <div class="final-message" id="final-message">
+      <i class="fas fa-heart"></i>
+      <h2>شكراً لك يا عميلنا العزيز</h2>
+      <p>سوف نتواصل معك إن احتجنا أي استفسار آخر</p>
     </div>
   </div>
 </div>
@@ -952,12 +1011,17 @@ const stepIndicators = document.getElementById('step-indicators');
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const submitBtn = document.getElementById('submit-btn');
-const thankyouMessage = document.getElementById('thankyou-message');
+
+// عناصر الرسائل
 const loadingElement = document.getElementById('loading');
+const successMessage = document.getElementById('success-message');
+const finalMessage = document.getElementById('final-message');
+const continueBtn = document.getElementById('continue-btn');
+
+// عناصر الملفات
 const fileUpload = document.getElementById('file-upload');
 const fileInput = document.getElementById('file-input');
 const fileName = document.getElementById('file-name');
-const scriptURL = "https://script.google.com/macros/s/AKfycbyE1G-J87k5Yc7ufREBA8RuJPK0EiWCg4AiQiwFCJXO4I3_VASuTyjUGjHaftDo96XR/exec";
 
 // بدء الاستبيان
 startBtn.addEventListener('click', () => {
@@ -1148,71 +1212,63 @@ prevBtn.addEventListener('click', () => {
   updateUI();
 });
 
+// زر المتابعة
+continueBtn.addEventListener('click', () => {
+  successMessage.style.display = 'none';
+  finalMessage.style.display = 'block';
+});
+
+// رابط السكربت الحقيقي - ضع رابطك هنا
+const scriptURL = "https://script.google.com/macros/s/AKfycby_kkHuiUape1IDZee_2pMhW5LDxWSzBR_CEs5Chu5koIuLjxq06mGWx1Q81jvdQoIy/exec";
+
 // إرسال النموذج
-document.getElementById('clientForm').addEventListener('submit', (e) => {
+document.getElementById('clientForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
   if (validateStep(currentStep)) {
+    // إخفاء النموذج وإظهار شاشة التحميل
+    document.querySelector('form').style.display = 'none';
     loadingElement.style.display = 'block';
-    document.querySelector('.form-navigation').style.display = 'none';
     
-    // جمع البيانات
-    const formData = new FormData();
-    formData.append('brand_name', document.querySelector('input[name="brand_name"]').value);
-    
-    const businessField = document.querySelector('input[name="business_field"]:checked');
-    formData.append('business_field', businessField.value);
-    if (businessField.value === 'شيء آخر') {
-      formData.append('business_custom', document.querySelector('input[name="business_custom"]').value);
-    }
-    
-    const logoType = document.querySelector('input[name="logo_type"]:checked');
-    formData.append('logo_type', logoType.value);
-    if (logoType.value === 'شيء آخر') {
-      formData.append('logo_type_custom', document.querySelector('input[name="logo_type_custom"]').value);
-    }
-    
-    const logoStyle = document.querySelector('input[name="logo_style"]:checked');
-    formData.append('logo_style', logoStyle.value);
-    if (logoStyle.value === 'شيء آخر') {
-      formData.append('style_custom', document.querySelector('input[name="style_custom"]').value);
-    }
-    
-    const colors = document.querySelector('input[name="colors"]:checked');
-    formData.append('colors', colors.value);
-    if (colors.value === 'شيء آخر') {
-      formData.append('color_custom', document.querySelector('input[name="color_custom"]').value);
-    }
-    
-    formData.append('logo_examples', document.querySelector('textarea[name="logo_examples"]').value);
-    
-    const feeling = document.querySelector('input[name="feeling"]:checked');
-    formData.append('feeling', feeling.value);
-    if (feeling.value === 'شيء آخر') {
-      formData.append('feeling_custom', document.querySelector('input[name="feeling_custom"]').value);
-    }
-    
-    const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-    formData.append('old_logo', oldLogo.value);
-    if (oldLogo.value === 'نعم') {
-      formData.append('logo_details', document.querySelector('textarea[name="logo_details"]').value);
-      if (fileInput.files.length > 0) {
-        formData.append('logo_file', fileInput.files[0]);
-      }
-    }
-    
-    // إرسال البيانات
-    fetch(scriptURL, { method: 'POST', body: formData })
-      .then(response => {
-        loadingElement.style.display = 'none';
-        thankyouMessage.style.display = 'block';
-        console.log('تم الإرسال بنجاح!', response);
-      })
-      .catch(error => {
-        loadingElement.style.display = 'none';
-        console.error('حدث خطأ!', error.message);
-        alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
+    try {
+      // جمع البيانات
+      const formData = new FormData();
+      
+      // إضافة جميع البيانات إلى formData
+      const formElements = document.querySelectorAll('input, textarea');
+      formElements.forEach(element => {
+        if (element.type === 'radio') {
+          if (element.checked) {
+            formData.append(element.name, element.value);
+          }
+        } else if (element.type !== 'file') {
+          formData.append(element.name, element.value);
+        }
       });
+      
+      // إضافة الملف إذا كان موجوداً
+      if (fileInput.files.length > 0) {
+        formData.append('file', fileInput.files[0]);
+      }
+      
+      // إرسال البيانات إلى Google Apps Script
+      const response = await fetch(scriptURL, {
+        method: 'POST',
+        body: formData
+      });
+      
+      const result = await response.json();
+      
+      // إخفاء التحميل وإظهار النجاح
+      loadingElement.style.display = 'none';
+      successMessage.style.display = 'block';
+      
+    } catch (error) {
+      // في حالة الخطأ
+      loadingElement.style.display = 'none';
+      alert('حدث خطأ في الإرسال: ' + error.message);
+      document.querySelector('form').style.display = 'block';
+    }
   }
 });
 
