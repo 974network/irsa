@@ -3,42 +3,37 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>استبيان العميل الفاخر</title>
+<title>استبيان العميل</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
 :root {
-  --primary: #8B4513;
-  --primary-dark: #654321;
-  --primary-light: #A0522D;
-  --accent: #D4AF37;
-  --accent-dark: #B8860B;
-  --text: #2C1810;
-  --text-light: #5D4037;
-  --bg: #FDF6E3;
-  --bg-light: #FFF9E6;
-  --bg-dark: #F5EBD8;
-  --card-bg: rgba(255, 255, 255, 0.85);
-  --shadow: 0 10px 30px rgba(139, 69, 19, 0.15);
-  --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-  --border-radius: 16px;
+  --gold: #d4af37;
+  --dark-gold: #b8860b;
+  --light-gold: #f1c75e;
+  --text-light: #f8e9c4;
+  --glass: rgba(255,255,255,0.08);
+  --glass-border: rgba(212,175,55,0.3);
+  --error: #ff6b6b;
+  --transition: all 0.3s ease;
+  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Tajawal', sans-serif;
+  font-family: 'El Messiri', sans-serif;
 }
 
 body {
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-light) 50%, var(--bg-dark) 100%);
-  color: var(--text);
+  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
+  color: var(--text-light);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: 15px;
   line-height: 1.6;
   overflow-x: hidden;
 }
@@ -50,7 +45,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, var(--bg) 0%, var(--bg-light) 50%, var(--bg-dark) 100%);
+  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -61,16 +56,16 @@ body {
 }
 
 .welcome-content {
-  max-width: 800px;
+  max-width: 700px;
   width: 100%;
-  padding: 50px;
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border-radius: var(--border-radius);
+  padding: 40px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .welcome-content::before {
@@ -79,91 +74,73 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
 .welcome-title {
-  font-size: 3.5rem;
+  font-size: 3rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 20px;
+  color: var(--gold);
+  text-shadow: 0 0 15px rgba(212,175,55,0.5);
+  margin-bottom: 30px;
   position: relative;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: fadeInUp 1s ease forwards 0.5s;
 }
 
 .welcome-subtitle {
-  font-size: 2rem;
-  color: var(--primary);
+  font-size: 1.8rem;
+  color: var(--light-gold);
   margin-bottom: 20px;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: fadeInUp 1s ease forwards 1s;
 }
 
 .welcome-message {
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   color: var(--text-light);
   margin-bottom: 30px;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: fadeInUp 1s ease forwards 1.5s;
 }
 
 .welcome-importance {
   font-size: 1.1rem;
-  color: var(--accent-dark);
+  color: var(--light-gold);
   margin-bottom: 40px;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: fadeInUp 1s ease forwards 2s;
 }
 
 .start-btn {
-  padding: 18px 45px;
-  background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+  padding: 16px 40px;
+  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
   border: none;
-  border-radius: 50px;
-  color: white;
+  border-radius: 12px;
+  color: #1c1a1a;
   font-weight: bold;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: var(--transition);
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.3);
+  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   animation: fadeInUp 1s ease forwards 2.5s;
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
   margin: 0 auto;
-  position: relative;
-  overflow: hidden;
-}
-
-.start-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-  transition: 0.5s;
-}
-
-.start-btn:hover::before {
-  left: 100%;
 }
 
 .start-btn:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 25px rgba(139, 69, 19, 0.4);
+  transform: translateY(-3px);
+  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
 }
 
 .start-btn:active {
@@ -172,23 +149,22 @@ body {
 
 .welcome-decoration {
   position: absolute;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(139, 69, 19, 0.1) 0%, transparent 70%);
+  width: 200px;
+  height: 200px;
+  background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%);
   border-radius: 50%;
-  top: -150px;
-  right: -150px;
+  top: -100px;
+  right: -100px;
   z-index: -1;
 }
 
 .welcome-decoration:nth-child(2) {
-  width: 200px;
-  height: 200px;
-  bottom: -100px;
-  left: -100px;
+  width: 150px;
+  height: 150px;
+  bottom: -75px;
+  left: -75px;
   top: auto;
   right: auto;
-  background: radial-gradient(circle, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
 }
 
 @keyframes fadeInUp {
@@ -207,11 +183,11 @@ body {
 
 /* تصميم الاستبيان */
 .container {
-  max-width: 800px;
+  max-width: 700px;
   width: 100%;
   margin: 0 auto;
   opacity: 0;
-  transform: translateY(30px);
+  transform: translateY(20px);
   transition: all 0.8s ease;
 }
 
@@ -222,17 +198,16 @@ body {
 
 .header {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 30px;
   padding: 0 10px;
 }
 
 .title {
-  font-size: 2.8rem;
+  font-size: 2.2rem;
   font-weight: 700;
-  background: linear-gradient(135deg, var(--primary), var(--accent));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 15px;
+  color: var(--gold);
+  text-shadow: 0 0 15px rgba(212,175,55,0.5);
+  margin-bottom: 10px;
   position: relative;
   display: inline-block;
 }
@@ -240,31 +215,31 @@ body {
 .title::after {
   content: '';
   position: absolute;
-  bottom: -12px;
+  bottom: -8px;
   left: 50%;
   transform: translateX(-50%);
-  width: 120px;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
+  width: 80px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
   border-radius: 2px;
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  color: var(--text-light);
-  max-width: 600px;
+  font-size: 1.05rem;
+  color: #f5e9c2;
+  max-width: 500px;
   margin: 0 auto;
 }
 
 .form-container {
-  background: var(--card-bg);
-  backdrop-filter: blur(10px);
-  border-radius: var(--border-radius);
-  padding: 40px 35px;
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 30px 25px;
   box-shadow: var(--shadow);
   position: relative;
   overflow: hidden;
-  border: 1px solid rgba(212, 175, 55, 0.2);
 }
 
 .form-container::before {
@@ -273,105 +248,55 @@ body {
   top: 0;
   left: 0;
   right: 0;
-  height: 5px;
-  background: linear-gradient(90deg, var(--primary), var(--accent), var(--primary));
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--gold), transparent);
 }
 
 .progress-container {
-  margin-bottom: 30px;
+  margin-bottom: 25px;
 }
 
 .progress-bar {
-  height: 10px;
-  background: rgba(139, 69, 19, 0.1);
-  border-radius: 5px;
+  height: 8px;
+  background: rgba(212,175,55,0.2);
+  border-radius: 4px;
   overflow: hidden;
-  margin-bottom: 15px;
+  margin-bottom: 10px;
 }
 
 .progress {
   height: 100%;
-  background: linear-gradient(90deg, var(--primary), var(--accent));
+  background: linear-gradient(90deg, var(--dark-gold), var(--gold));
   width: 14.28%;
   transition: width 0.5s ease;
-  border-radius: 5px;
-  position: relative;
-  overflow: hidden;
-}
-
-.progress::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  background-image: linear-gradient(
-    -45deg,
-    rgba(255, 255, 255, 0.2) 25%,
-    transparent 25%,
-    transparent 50%,
-    rgba(255, 255, 255, 0.2) 50%,
-    rgba(255, 255, 255, 0.2) 75%,
-    transparent 75%,
-    transparent
-  );
-  z-index: 1;
-  background-size: 20px 20px;
-  animation: move 1s linear infinite;
-}
-
-@keyframes move {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 20px 0;
-  }
+  border-radius: 4px;
 }
 
 .progress-text {
   text-align: center;
-  font-size: 1.1rem;
-  color: var(--primary);
+  font-size: 0.95rem;
+  color: var(--light-gold);
   font-weight: 500;
 }
 
 .step-indicators {
   display: flex;
   justify-content: center;
-  gap: 12px;
-  margin: 20px 0 30px;
+  gap: 10px;
+  margin: 15px 0 25px;
 }
 
 .step-indicator {
-  width: 16px;
-  height: 16px;
+  width: 12px;
+  height: 12px;
   border-radius: 50%;
-  background: rgba(139, 69, 19, 0.2);
+  background: rgba(212,175,55,0.3);
   transition: var(--transition);
-  position: relative;
 }
 
 .step-indicator.active {
-  background: var(--accent);
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
-  transform: scale(1.2);
-}
-
-.step-indicator.completed {
-  background: var(--primary);
-}
-
-.step-indicator.completed::after {
-  content: '✓';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
+  background: var(--gold);
+  box-shadow: 0 0 8px rgba(212,175,55,0.5);
 }
 
 .form-step {
@@ -384,37 +309,35 @@ body {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(15px); }
+  from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .question-title {
-  font-size: 1.5rem;
-  margin-bottom: 25px;
-  color: var(--primary);
+  font-size: 1.35rem;
+  margin-bottom: 22px;
+  color: var(--light-gold);
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid rgba(139, 69, 19, 0.1);
+  gap: 10px;
 }
 
 .question-title i {
-  color: var(--accent);
-  font-size: 1.3em;
+  color: var(--gold);
+  font-size: 1.2em;
 }
 
 .options-grid {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 15px;
 }
 
 .option-card {
-  background: white;
-  border: 2px solid rgba(139, 69, 19, 0.1);
-  border-radius: 12px;
-  padding: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 18px;
   cursor: pointer;
   transition: var(--transition);
   position: relative;
@@ -426,53 +349,40 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  width: 0;
+  width: 4px;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(139, 69, 19, 0.05), transparent);
+  background: var(--gold);
+  transform: scaleY(0);
   transition: var(--transition);
 }
 
 .option-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(139, 69, 19, 0.15);
-  border-color: rgba(139, 69, 19, 0.3);
-}
-
-.option-card:hover::before {
-  width: 100%;
+  transform: translateY(-3px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+  border-color: rgba(212,175,55,0.5);
 }
 
 .option-card.selected {
-  border-color: var(--accent);
-  background: linear-gradient(135deg, rgba(212, 175, 55, 0.05), rgba(139, 69, 19, 0.05));
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
-.option-card.selected::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 5px;
-  height: 100%;
-  background: var(--accent);
+.option-card.selected::before {
+  transform: scaleY(1);
 }
 
 .option-title {
-  font-size: 1.15rem;
+  font-size: 1.05rem;
   font-weight: 600;
-  color: var(--primary);
-  margin-bottom: 8px;
-  position: relative;
-  z-index: 1;
+  color: var(--light-gold);
+  margin-bottom: 5px;
 }
 
 .option-desc {
-  font-size: 0.95rem;
-  color: var(--text-light);
-  position: relative;
-  z-index: 1;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.7);
 }
 
 .radio {
@@ -481,88 +391,71 @@ body {
 
 .text-input {
   width: 100%;
-  padding: 18px;
-  background: white;
-  border: 2px solid rgba(139, 69, 19, 0.1);
+  padding: 16px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
   border-radius: 12px;
-  color: var(--text);
-  font-size: 1.05rem;
+  color: var(--text-light);
+  font-size: 1rem;
   transition: var(--transition);
 }
 
 .text-input:focus {
   outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
 }
 
 .custom-input {
-  margin-top: 20px;
+  margin-top: 15px;
   display: none;
   animation: slideDown 0.3s ease;
 }
 
 @keyframes slideDown {
-  from { opacity: 0; transform: translateY(-15px); }
+  from { opacity: 0; transform: translateY(-10px); }
   to { opacity: 1; transform: translateY(0); }
 }
 
 .error-message {
-  color: #D32F2F;
-  font-size: 0.95rem;
-  margin-top: 12px;
+  color: var(--error);
+  font-size: 0.9rem;
+  margin-top: 10px;
   display: none;
-  padding: 10px 15px;
-  background: rgba(211, 47, 47, 0.05);
+  padding: 8px 12px;
+  background: rgba(255,107,107,0.1);
   border-radius: 8px;
-  border-right: 3px solid #D32F2F;
+  border-right: 3px solid var(--error);
 }
 
 .form-navigation {
   display: flex;
   justify-content: space-between;
-  margin-top: 40px;
-  gap: 15px;
+  margin-top: 35px;
+  gap: 12px;
 }
 
 .nav-btn {
-  padding: 18px 28px;
-  background: linear-gradient(45deg, var(--primary), var(--primary-dark));
+  padding: 16px 24px;
+  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
   border: none;
   border-radius: 12px;
-  color: white;
+  color: #1c1a1a;
   font-weight: bold;
-  font-size: 1.1rem;
+  font-size: 1.05rem;
   cursor: pointer;
   flex: 1;
   transition: var(--transition);
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  box-shadow: 0 4px 15px rgba(139, 69, 19, 0.3);
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-  transition: 0.5s;
-}
-
-.nav-btn:hover::before {
-  left: 100%;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
 }
 
 .nav-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(139, 69, 19, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
 }
 
 .nav-btn:active {
@@ -576,15 +469,11 @@ body {
   box-shadow: none;
 }
 
-.nav-btn:disabled::before {
-  display: none;
-}
-
 .file-upload {
-  margin-top: 20px;
-  padding: 25px;
-  background: white;
-  border: 2px dashed rgba(139, 69, 19, 0.3);
+  margin-top: 15px;
+  padding: 20px;
+  background: rgba(255,255,255,0.05);
+  border: 2px dashed var(--glass-border);
   border-radius: 12px;
   text-align: center;
   cursor: pointer;
@@ -592,60 +481,53 @@ body {
 }
 
 .file-upload:hover {
-  border-color: var(--accent);
-  background: rgba(212, 175, 55, 0.05);
+  border-color: var(--gold);
+  background: rgba(212,175,55,0.05);
 }
 
 .file-name {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  color: var(--primary);
-  font-weight: 500;
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: var(--light-gold);
 }
 
 .thankyou-message, .loading {
   text-align: center;
   display: none;
-  padding: 50px 20px;
+  padding: 40px 20px;
   animation: fadeIn 0.8s ease;
 }
 
 .thankyou-message i {
-  font-size: 5rem;
-  color: var(--accent);
-  margin-bottom: 25px;
+  font-size: 4rem;
+  color: var(--gold);
+  margin-bottom: 20px;
 }
 
 .thankyou-message h2 {
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  color: var(--primary);
-}
-
-.thankyou-message p {
-  font-size: 1.3rem;
-  color: var(--text-light);
+  font-size: 2rem;
+  margin-bottom: 15px;
+  color: var(--light-gold);
 }
 
 .loading i {
-  font-size: 4rem;
-  color: var(--accent);
-  margin-bottom: 25px;
+  font-size: 3rem;
+  color: var(--gold);
+  margin-bottom: 20px;
 }
 
 .loading p {
-  font-size: 1.4rem;
-  color: var(--primary);
+  font-size: 1.2rem;
 }
 
 /* تحسينات للجوال */
 @media (max-width: 768px) {
   .welcome-title {
-    font-size: 2.5rem;
+    font-size: 2.2rem;
   }
   
   .welcome-subtitle {
-    font-size: 1.6rem;
+    font-size: 1.4rem;
   }
   
   .welcome-message {
@@ -657,27 +539,28 @@ body {
   }
   
   .title {
-    font-size: 2.2rem;
+    font-size: 1.8rem;
   }
   
   .subtitle {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
   }
   
   .form-container {
-    padding: 30px 25px;
+    padding: 25px 20px;
+    border-radius: 20px;
   }
   
   .question-title {
-    font-size: 1.3rem;
+    font-size: 1.2rem;
   }
   
   .option-card {
-    padding: 18px;
+    padding: 15px;
   }
   
   .nav-btn {
-    padding: 16px 22px;
+    padding: 14px 20px;
     font-size: 1rem;
   }
   
@@ -686,61 +569,62 @@ body {
   }
   
   .step-indicators {
-    gap: 10px;
+    gap: 8px;
   }
   
   .step-indicator {
-    width: 14px;
-    height: 14px;
+    width: 10px;
+    height: 10px;
   }
 }
 
 @media (max-width: 480px) {
   body {
-    padding: 15px;
+    padding: 10px;
   }
   
   .welcome-content {
-    padding: 35px 25px;
+    padding: 30px 20px;
   }
   
   .welcome-title {
-    font-size: 2rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1.4rem;
-  }
-  
-  .welcome-message, .welcome-importance {
-    font-size: 1rem;
-  }
-  
-  .title {
     font-size: 1.8rem;
   }
   
+  .welcome-subtitle {
+    font-size: 1.2rem;
+  }
+  
+  .welcome-message, .welcome-importance {
+    font-size: 0.95rem;
+  }
+  
+  .title {
+    font-size: 1.6rem;
+  }
+  
   .form-container {
-    padding: 25px 20px;
+    padding: 20px 15px;
+    border-radius: 18px;
   }
   
   .question-title {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     flex-direction: column;
     align-items: flex-start;
-    gap: 8px;
+    gap: 5px;
   }
   
   .option-title {
-    font-size: 1.05rem;
+    font-size: 1rem;
   }
   
   .text-input {
-    padding: 16px;
+    padding: 14px;
   }
   
   .nav-btn {
-    padding: 14px 18px;
+    padding: 12px 16px;
   }
 }
 </style>
@@ -960,7 +844,7 @@ body {
             </div>
           </label>
         </div>
-        <div id="logo-details" style="display:none;margin-top:25px;">
+        <div id="logo-details" style="display:none;margin-top:20px;">
           <textarea class="text-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
           <div class="file-upload" id="file-upload">
             <i class="fas fa-cloud-upload-alt"></i>
@@ -1047,253 +931,224 @@ function updateUI() {
   document.getElementById(`step-${currentStep}`).classList.add('active');
   
   document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-    if (index < currentStep - 1) {
-      indicator.classList.remove('active');
-      indicator.classList.add('completed');
-    } else if (index === currentStep - 1) {
-      indicator.classList.add('active');
-      indicator.classList.remove('completed');
-    } else {
-      indicator.classList.remove('active', 'completed');
-    }
+    indicator.classList.toggle('active', index < currentStep);
   });
+  
+  window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// التحقق من صحة البيانات
-function validateStep(step) {
-  let isValid = true;
+// عرض رسالة الخطأ
+function showError(step, message) {
   const errorElement = document.getElementById(`error-${step}`);
-  errorElement.style.display = 'none';
-  
-  switch(step) {
+  if (errorElement) {
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+  }
+}
+
+// إخفاء رسالة الخطأ
+function hideError(step) {
+  const errorElement = document.getElementById(`error-${step}`);
+  if (errorElement) errorElement.style.display = 'none';
+}
+
+// التحقق من صحة الخطوة الحالية
+function validateStep(step) {
+  switch (step) {
     case 1:
       const projectName = document.querySelector('input[name="project_name"]').value.trim();
       if (!projectName) {
-        errorElement.textContent = 'يرجى إدخال اسم المشروع';
-        errorElement.style.display = 'block';
-        isValid = false;
+        showError(1, "يرجى إدخال اسم الورشة أو المشروع");
+        return false;
       }
-      break;
+      return true;
       
     case 2:
       const workType = document.querySelector('input[name="work_type"]:checked');
       if (!workType) {
-        errorElement.textContent = 'يرجى اختيار نوع الشغل';
-        errorElement.style.display = 'block';
-        isValid = false;
+        showError(2, "يرجى اختيار نوع الشغل");
+        return false;
       }
-      break;
+      if (workType.value === "شيء آخر" && !document.querySelector('input[name="work_custom"]').value.trim()) {
+        showError(2, "يرجى تحديد النوع الآخر");
+        return false;
+      }
+      return true;
       
     case 3:
-      const logoStyle = document.querySelector('input[name="logo_style"]:checked');
-      if (!logoStyle) {
-        errorElement.textContent = 'يرجى اختيار شكل الشعار';
-        errorElement.style.display = 'block';
-        isValid = false;
+      if (!document.querySelector('input[name="logo_style"]:checked')) {
+        showError(3, "يرجى اختيار شكل الشعار");
+        return false;
       }
-      break;
+      return true;
       
     case 4:
       const colors = document.querySelector('input[name="colors"]:checked');
       if (!colors) {
-        errorElement.textContent = 'يرجى اختيار الألوان';
-        errorElement.style.display = 'block';
-        isValid = false;
+        showError(4, "يرجى اختيار الألوان");
+        return false;
       }
-      break;
+      if (colors.value === "شيء آخر" && !document.querySelector('input[name="color_custom"]').value.trim()) {
+        showError(4, "يرجى تحديد الألوان الأخرى");
+        return false;
+      }
+      return true;
       
     case 5:
       const logoType = document.querySelector('input[name="logo_type"]:checked');
       if (!logoType) {
-        errorElement.textContent = 'يرجى اختيار نوع الشعار';
-        errorElement.style.display = 'block';
-        isValid = false;
+        showError(5, "يرجى اختيار نوع الشعار");
+        return false;
       }
-      break;
+      if (logoType.value === "شيء آخر" && !document.querySelector('input[name="logo_type_custom"]').value.trim()) {
+        showError(5, "يرجى تحديد نوع الشعار الآخر");
+        return false;
+      }
+      return true;
       
     case 6:
       const feeling = document.querySelector('input[name="feeling"]:checked');
       if (!feeling) {
-        errorElement.textContent = 'يرجى اختيار الإحساس المطلوب';
-        errorElement.style.display = 'block';
-        isValid = false;
+        showError(6, "يرجى اختيار الإحساس");
+        return false;
       }
-      break;
+      if (feeling.value === "شيء آخر" && !document.querySelector('input[name="feeling_custom"]').value.trim()) {
+        showError(6, "يرجى تحديد الإحساس الآخر");
+        return false;
+      }
+      return true;
       
     case 7:
-      const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-      if (!oldLogo) {
-        errorElement.textContent = 'يرجى اختيار إذا كان لديك لوجو قديم';
-        errorElement.style.display = 'block';
-        isValid = false;
+      if (!document.querySelector('input[name="old_logo"]:checked')) {
+        showError(7, "يرجى الإجابة على هذا السؤال");
+        return false;
       }
-      break;
+      return true;
+      
+    default:
+      return true;
   }
-  
-  return isValid;
 }
 
-// التنقل بين الخطوات
-nextBtn.addEventListener('click', () => {
-  if (validateStep(currentStep)) {
+// الانتقال للخطوة التالية
+nextBtn.onclick = () => {
+  if (validateStep(currentStep) && currentStep < totalSteps) {
+    hideError(currentStep);
     currentStep++;
     updateUI();
   }
-});
+};
 
-prevBtn.addEventListener('click', () => {
-  currentStep--;
-  updateUI();
-});
-
-// إظهار الحقول المخصصة عند اختيار "شيء آخر"
-document.getElementById('other-work').addEventListener('click', () => {
-  document.getElementById('work-custom').style.display = 'block';
-});
-
-document.getElementById('other-color').addEventListener('click', () => {
-  document.getElementById('color-custom').style.display = 'block';
-});
-
-document.getElementById('other-logo-type').addEventListener('click', () => {
-  document.getElementById('logo-type-custom').style.display = 'block';
-});
-
-document.getElementById('other-feeling').addEventListener('click', () => {
-  document.getElementById('feeling-custom').style.display = 'block';
-});
-
-// إخفاء الحقول المخصصة عند اختيار خيار آخر
-document.querySelectorAll('input[name="work_type"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value !== 'شيء آخر') {
-      document.getElementById('work-custom').style.display = 'none';
-    }
-  });
-});
-
-document.querySelectorAll('input[name="colors"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value !== 'شيء آخر') {
-      document.getElementById('color-custom').style.display = 'none';
-    }
-  });
-});
-
-document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value !== 'شيء آخر') {
-      document.getElementById('logo-type-custom').style.display = 'none';
-    }
-  });
-});
-
-document.querySelectorAll('input[name="feeling"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value !== 'شيء آخر') {
-      document.getElementById('feeling-custom').style.display = 'none';
-    }
-  });
-});
-
-// التحكم في عرض تفاصيل اللوجو القديم
-document.querySelectorAll('input[name="old_logo"]').forEach(radio => {
-  radio.addEventListener('change', () => {
-    if (radio.value === 'نعم') {
-      document.getElementById('logo-details').style.display = 'block';
-    } else {
-      document.getElementById('logo-details').style.display = 'none';
-    }
-  });
-});
-
-// رفع الملفات
-fileUpload.addEventListener('click', () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', () => {
-  if (fileInput.files.length > 0) {
-    fileName.textContent = fileInput.files[0].name;
-  } else {
-    fileName.textContent = 'لم يتم رفع أي ملف بعد';
+// الانتقال للخطوة السابقة
+prevBtn.onclick = () => {
+  if (currentStep > 1) {
+    currentStep--;
+    updateUI();
   }
+};
+
+// إدارة اختيار الخيارات
+document.querySelectorAll('.option-card').forEach(card => {
+  card.onclick = function() {
+    const radio = this.querySelector('input[type="radio"]');
+    if (radio) {
+      document.querySelectorAll(`input[name="${radio.name}"]`).forEach(input => {
+        input.closest('.option-card').classList.remove('selected');
+      });
+      
+      radio.checked = true;
+      this.classList.add('selected');
+      
+      // إظهار/إخفاء الحقول المخصصة
+      if (radio.name === 'work_type') {
+        document.getElementById('work-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
+      }
+      
+      if (radio.name === 'colors') {
+        document.getElementById('color-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
+      }
+      
+      if (radio.name === 'feeling') {
+        document.getElementById('feeling-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
+      }
+      
+      if (radio.name === 'logo_type') {
+        document.getElementById('logo-type-custom').style.display = radio.value === 'شيء آخر' ? 'block' : 'none';
+      }
+      
+      if (radio.name === 'old_logo') {
+        document.getElementById('logo-details').style.display = radio.value === 'نعم' ? 'block' : 'none';
+      }
+      
+      hideError(currentStep);
+    }
+  };
 });
+
+// إدارة رفع الملفات
+fileUpload.onclick = () => fileInput.click();
+
+fileInput.onchange = () => {
+  fileName.textContent = fileInput.files.length > 0 ? fileInput.files[0].name : 'لم يتم رفع أي ملف بعد';
+};
+
+// تحويل الملف إلى Base64
+async function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result.split(",")[1]);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
 
 // إرسال النموذج
-document.getElementById('clientForm').addEventListener('submit', (e) => {
+document.getElementById("clientForm").addEventListener("submit", async e => {
   e.preventDefault();
+  if (!validateStep(totalSteps)) return;
   
-  if (validateStep(currentStep)) {
-    loadingElement.style.display = 'block';
-    document.querySelector('.form-navigation').style.display = 'none';
-    
-    // جمع البيانات
-    const formData = new FormData();
-    formData.append('project_name', document.querySelector('input[name="project_name"]').value);
-    
-    const workType = document.querySelector('input[name="work_type"]:checked');
-    formData.append('work_type', workType.value);
-    if (workType.value === 'شيء آخر') {
-      formData.append('work_custom', document.querySelector('input[name="work_custom"]').value);
-    }
-    
-    formData.append('logo_style', document.querySelector('input[name="logo_style"]:checked').value);
-    
-    const colors = document.querySelector('input[name="colors"]:checked');
-    formData.append('colors', colors.value);
-    if (colors.value === 'شيء آخر') {
-      formData.append('color_custom', document.querySelector('input[name="color_custom"]').value);
-    }
-    
-    const logoType = document.querySelector('input[name="logo_type"]:checked');
-    formData.append('logo_type', logoType.value);
-    if (logoType.value === 'شيء آخر') {
-      formData.append('logo_type_custom', document.querySelector('input[name="logo_type_custom"]').value);
-    }
-    
-    const feeling = document.querySelector('input[name="feeling"]:checked');
-    formData.append('feeling', feeling.value);
-    if (feeling.value === 'شيء آخر') {
-      formData.append('feeling_custom', document.querySelector('input[name="feeling_custom"]').value);
-    }
-    
-    const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-    formData.append('old_logo', oldLogo.value);
-    if (oldLogo.value === 'نعم') {
-      formData.append('logo_details', document.querySelector('textarea[name="logo_details"]').value);
-      if (fileInput.files.length > 0) {
-        formData.append('file', fileInput.files[0]);
-      }
-    }
-    
-    // إرسال البيانات
-    fetch(scriptURL, { method: 'POST', body: formData })
-      .then(response => {
-        loadingElement.style.display = 'none';
-        thankyouMessage.style.display = 'block';
-      })
-      .catch(error => {
-        console.error('Error!', error.message);
-        loadingElement.style.display = 'none';
-        alert('حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.');
-        document.querySelector('.form-navigation').style.display = 'flex';
-      });
-  }
-});
-
-// إضافة تأثيرات على الخيارات
-document.querySelectorAll('.option-card').forEach(card => {
-  card.addEventListener('click', function() {
-    const radio = this.querySelector('input[type="radio"]');
-    radio.checked = true;
-    
-    document.querySelectorAll('.option-card').forEach(c => {
-      c.classList.remove('selected');
-    });
-    
-    this.classList.add('selected');
+  const data = { timestamp: new Date().toLocaleString("ar-SA") };
+  
+  ["project_name", "work_type", "logo_style", "colors", "logo_type", "feeling", "old_logo"].forEach(field => {
+    const element = document.querySelector(`input[name="${field}"]:checked`) || document.querySelector(`input[name="${field}"]`);
+    data[field] = element ? element.value : "";
   });
+  
+  ["work_custom", "color_custom", "logo_type_custom", "feeling_custom"].forEach(field => {
+    const input = document.querySelector(`input[name="${field}"]`);
+    if (input) data[field] = input.value.trim();
+  });
+  
+  data.logo_details = document.querySelector('textarea[name="logo_details"]')?.value.trim() || "";
+  
+  const formData = new FormData();
+  for (let key in data) formData.append(key, data[key]);
+  
+  if (fileInput.files.length > 0) {
+    const file = fileInput.files[0];
+    formData.append("file_name", file.name);
+    formData.append("file_type", file.type);
+    formData.append("file_base64", await fileToBase64(file));
+  }
+  
+  document.querySelector("form").style.display = "none";
+  loadingElement.style.display = "block";
+  
+  try {
+    const response = await fetch(scriptURL, { method: "POST", body: formData });
+    const json = await response.json();
+    loadingElement.style.display = "none";
+    
+    if (json.result === "success") {
+      thankyouMessage.style.display = "block";
+    } else {
+      throw new Error(json.message);
+    }
+  } catch (err) {
+    alert("حدث خطأ أثناء الإرسال: " + err.message);
+    document.querySelector("form").style.display = "block";
+    loadingElement.style.display = "none";
+  }
 });
 
 // تهيئة الواجهة
