@@ -15,6 +15,7 @@
   --glass: rgba(255,255,255,0.08);
   --glass-border: rgba(212,175,55,0.3);
   --error: #ff6b6b;
+  --success: #4CAF50;
   --transition: all 0.3s ease;
   --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
@@ -448,6 +449,17 @@ body {
   border-right: 3px solid var(--error);
 }
 
+.success-message {
+  color: var(--success);
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: none;
+  padding: 8px 12px;
+  background: rgba(76,175,80,0.1);
+  border-radius: 8px;
+  border-right: 3px solid var(--success);
+}
+
 .form-navigation {
   display: flex;
   justify-content: space-between;
@@ -606,6 +618,7 @@ body {
   border-radius: 8px;
   padding: 10px 15px;
   margin-bottom: 8px;
+  animation: slideDown 0.3s ease;
 }
 
 .file-item:last-child {
@@ -619,6 +632,19 @@ body {
   flex: 1;
 }
 
+.file-number {
+  background: var(--gold);
+  color: #1a1208;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
 .remove-file {
   background: var(--error);
   color: white;
@@ -630,6 +656,11 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: var(--transition);
+}
+
+.remove-file:hover {
+  transform: scale(1.1);
 }
 
 .add-more-btn {
@@ -642,6 +673,10 @@ body {
   text-align: center;
   margin-top: 10px;
   transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .add-more-btn:hover {
@@ -673,6 +708,10 @@ body {
   margin-top: 10px;
   transition: var(--transition);
   width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
 }
 
 .add-link-btn:hover {
@@ -691,6 +730,31 @@ body {
   align-items: center;
   justify-content: center;
   margin-right: 10px;
+  transition: var(--transition);
+}
+
+.remove-link:hover {
+  transform: scale(1.1);
+}
+
+.optional-badge {
+  background: rgba(212,175,55,0.3);
+  color: var(--light-gold);
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-right: 10px;
+}
+
+.file-counter {
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-top: 10px;
+  display: inline-block;
 }
 
 /* تحسينات للجوال */
@@ -905,10 +969,10 @@ body {
 
       <!-- الخطوة 5 -->
       <div class="form-step" id="step-5">
-        <h2 class="question-title"><i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟</h2>
-        <p style="color: var(--light-gold); margin-bottom: 15px; font-size: 0.95rem;">
-          <i class="fas fa-info-circle"></i> هذا الحقل اختياري - يمكنك تخطيه إذا لم يكن لديك أمثلة
-        </p>
+        <h2 class="question-title">
+          <i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟
+          <span class="optional-badge">اختياري</span>
+        </h2>
         
         <!-- قسم الروابط -->
         <div style="margin-bottom: 25px;">
@@ -934,6 +998,7 @@ body {
             <div class="file-upload" id="file-upload">
               <i class="fas fa-cloud-upload-alt"></i>
               <p>انقر لرفع الصور أو الفيديوهات (JPG, PNG, GIF, MP4, MOV)</p>
+              <p class="file-counter" id="file-counter">0/6 ملفات مرفوعة</p>
             </div>
             <div id="file-list"></div>
             <button type="button" class="add-more-btn" id="add-more-files" style="display:none;">
@@ -955,10 +1020,10 @@ body {
 
       <!-- الخطوة 7 -->
       <div class="form-step" id="step-7">
-        <h2 class="question-title"><i class="fas fa-history"></i> هل لديك شعار قديم تريد تطويره أو تعديله؟</h2>
-        <p style="color: var(--light-gold); margin-bottom: 15px; font-size: 0.95rem;">
-          <i class="fas fa-info-circle"></i> هذا الحقل اختياري - يمكنك تخطيه إذا لم يكن لديك شعار قديم
-        </p>
+        <h2 class="question-title">
+          <i class="fas fa-history"></i> هل لديك شعار قديم تريد تطويره أو تعديله؟
+          <span class="optional-badge">اختياري</span>
+        </h2>
         
         <!-- قسم رفع الملفات -->
         <div style="margin-bottom: 25px;">
@@ -969,6 +1034,7 @@ body {
             <div class="file-upload" id="old-file-upload">
               <i class="fas fa-cloud-upload-alt"></i>
               <p>انقر لرفع الشعارات القديمة (صور، فيديو، PDF، PSD، AI)</p>
+              <p class="file-counter" id="old-file-counter">0/6 ملفات مرفوعة</p>
             </div>
             <div id="old-file-list"></div>
             <button type="button" class="add-more-btn" id="add-more-old-files" style="display:none;">
@@ -999,7 +1065,7 @@ body {
       <div class="form-navigation">
         <button type="button" class="nav-btn" id="prev-btn"><i class="fas fa-arrow-right"></i> السابق</button>
         <button type="button" class="nav-btn" id="next-btn">التالي <i class="fas fa-arrow-left"></i></button>
-        <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال</button>
+        <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال الاستبيان</button>
       </div>
     </form>
 
@@ -1031,7 +1097,7 @@ body {
 
 <script>
 // رابط السكربت - ضع رابطك الحقيقي هنا
-const scriptURL = "https://script.google.com/macros/s/AKfycbxCgLGbdh8WH160Nf7v427vo3nNXiHqUnX-DXnFA9PArm63KjnG1CIzaLuhZC9xXDuu/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbyuz8osIEGJ-bL4w1oQorscNZf6VhayyGdhHZw2q8W-gt_sKUVaqViYmTyD2bHAxeTF/exec";
 
 // عناصر شاشة الترحيب
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -1062,6 +1128,7 @@ const fileList = document.getElementById('file-list');
 const addMoreFilesBtn = document.getElementById('add-more-files');
 const addLinkBtn = document.getElementById('add-link-btn');
 const linksContainer = document.getElementById('links-container');
+const fileCounter = document.getElementById('file-counter');
 
 // عناصر الملفات القديمة
 const oldFileUpload = document.getElementById('old-file-upload');
@@ -1070,6 +1137,7 @@ const oldFileList = document.getElementById('old-file-list');
 const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
 const addOldLinkBtn = document.getElementById('add-old-link-btn');
 const oldLinksContainer = document.getElementById('old-links-container');
+const oldFileCounter = document.getElementById('old-file-counter');
 
 // حقول الإدخال
 const brandNameInput = document.getElementById('brand-name-input');
@@ -1398,6 +1466,12 @@ addOldLinkBtn.addEventListener('click', function() {
   }
 });
 
+// تحديث عداد الملفات
+function updateFileCounter(fileInput, counterElement) {
+  const fileCount = fileInput.files.length;
+  counterElement.textContent = `${fileCount}/6 ملفات مرفوعة`;
+}
+
 // رفع الملفات المتعددة للشعارات
 fileUpload.addEventListener('click', () => {
   fileInput.click();
@@ -1405,13 +1479,16 @@ fileUpload.addEventListener('click', () => {
 
 fileInput.addEventListener('change', () => {
   fileList.innerHTML = '';
-  if (fileInput.files.length > 0) {
-    Array.from(fileInput.files).forEach((file, index) => {
+  const files = fileInput.files;
+  
+  if (files.length > 0) {
+    Array.from(files).forEach((file, index) => {
       if (index < 6) {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
         fileItem.innerHTML = `
           <div class="file-info">
+            <div class="file-number">${index + 1}</div>
             <i class="fas fa-file"></i>
             <span>${file.name}</span>
           </div>
@@ -1420,16 +1497,36 @@ fileInput.addEventListener('change', () => {
           </button>
         `;
         fileList.appendChild(fileItem);
+        
+        // إضافة مستمع حدث لزر الحذف
+        fileItem.querySelector('.remove-file').addEventListener('click', function() {
+          // إنشاء DataTransfer جديد لإزالة الملف
+          const dt = new DataTransfer();
+          Array.from(files).forEach((f, i) => {
+            if (i !== index) {
+              dt.items.add(f);
+            }
+          });
+          fileInput.files = dt.files;
+          fileItem.remove();
+          updateFileCounter(fileInput, fileCounter);
+          if (fileInput.files.length === 0) {
+            addMoreFilesBtn.style.display = 'none';
+          }
+        });
       }
     });
     
-    if (fileInput.files.length < 6) {
+    updateFileCounter(fileInput, fileCounter);
+    
+    if (files.length < 6) {
       addMoreFilesBtn.style.display = 'block';
     } else {
       addMoreFilesBtn.style.display = 'none';
     }
   } else {
     addMoreFilesBtn.style.display = 'none';
+    updateFileCounter(fileInput, fileCounter);
   }
 });
 
@@ -1445,13 +1542,16 @@ oldFileUpload.addEventListener('click', () => {
 
 oldFileInput.addEventListener('change', () => {
   oldFileList.innerHTML = '';
-  if (oldFileInput.files.length > 0) {
-    Array.from(oldFileInput.files).forEach((file, index) => {
+  const files = oldFileInput.files;
+  
+  if (files.length > 0) {
+    Array.from(files).forEach((file, index) => {
       if (index < 6) {
         const fileItem = document.createElement('div');
         fileItem.className = 'file-item';
         fileItem.innerHTML = `
           <div class="file-info">
+            <div class="file-number">${index + 1}</div>
             <i class="fas fa-file"></i>
             <span>${file.name}</span>
           </div>
@@ -1460,16 +1560,36 @@ oldFileInput.addEventListener('change', () => {
           </button>
         `;
         oldFileList.appendChild(fileItem);
+        
+        // إضافة مستمع حدث لزر الحذف
+        fileItem.querySelector('.remove-file').addEventListener('click', function() {
+          // إنشاء DataTransfer جديد لإزالة الملف
+          const dt = new DataTransfer();
+          Array.from(files).forEach((f, i) => {
+            if (i !== index) {
+              dt.items.add(f);
+            }
+          });
+          oldFileInput.files = dt.files;
+          fileItem.remove();
+          updateFileCounter(oldFileInput, oldFileCounter);
+          if (oldFileInput.files.length === 0) {
+            addMoreOldFilesBtn.style.display = 'none';
+          }
+        });
       }
     });
     
-    if (oldFileInput.files.length < 6) {
+    updateFileCounter(oldFileInput, oldFileCounter);
+    
+    if (files.length < 6) {
       addMoreOldFilesBtn.style.display = 'block';
     } else {
       addMoreOldFilesBtn.style.display = 'none';
     }
   } else {
     addMoreOldFilesBtn.style.display = 'none';
+    updateFileCounter(oldFileInput, oldFileCounter);
   }
 });
 
@@ -1505,5 +1625,3 @@ updateUI();
 </script>
 </body>
 </html>
-
-
