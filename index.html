@@ -592,6 +592,107 @@ body {
   margin-bottom: 25px;
 }
 
+/* أنماط جديدة للملفات المتعددة والروابط */
+.multi-file-upload {
+  margin-top: 15px;
+}
+
+.file-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 8px;
+}
+
+.file-item:last-child {
+  margin-bottom: 0;
+}
+
+.file-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+
+.remove-file {
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-more-btn {
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  border: 1px dashed var(--gold);
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  transition: var(--transition);
+}
+
+.add-more-btn:hover {
+  background: rgba(212,175,55,0.3);
+}
+
+.link-input-container {
+  margin-bottom: 10px;
+}
+
+.link-input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.add-link-btn {
+  background: rgba(212,175,55,0.2);
+  color: var(--gold);
+  border: 1px dashed var(--gold);
+  border-radius: 8px;
+  padding: 10px 15px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  transition: var(--transition);
+  width: 100%;
+}
+
+.add-link-btn:hover {
+  background: rgba(212,175,55,0.3);
+}
+
+.remove-link {
+  background: var(--error);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 25px;
+  height: 25px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 10px;
+}
+
 /* تحسينات للجوال */
 @media (max-width: 768px) {
   .welcome-title {
@@ -755,7 +856,7 @@ body {
       <!-- الخطوة 1 -->
       <div class="form-step active" id="step-1">
         <h2 class="question-title"><i class="fas fa-signature"></i> ما اسم العلامة التجارية كما تريد ظهوره في الشعار؟</h2>
-        <input type="text" class="text-input" name="brand_name" placeholder="أدخل اسم العلامة التجارية" />
+        <input type="text" class="text-input" name="brand_name" placeholder="أدخل اسم العلامة التجارية" id="brand-name-input" />
         <div class="error-message" id="error-1"></div>
       </div>
 
@@ -764,21 +865,33 @@ body {
         <h2 class="question-title"><i class="fas fa-briefcase"></i> ما هو نشاط الشركة أو مجالها الأساسي؟</h2>
         <div class="options-grid">
           <label class="option-card">
-            <input type="radio" name="business_field" value="دهان" class="radio"/>
+            <input type="radio" name="business_field" value="تجاري" class="radio"/>
             <div class="option-content">
-              <h3 class="option-title">دهان</h3>
+              <h3 class="option-title">تجاري</h3>
             </div>
           </label>
           <label class="option-card">
-            <input type="radio" name="business_field" value="تذهيب" class="radio"/>
+            <input type="radio" name="business_field" value="خدمي" class="radio"/>
             <div class="option-content">
-              <h3 class="option-title">تذهيب</h3>
+              <h3 class="option-title">خدمي</h3>
             </div>
           </label>
           <label class="option-card">
-            <input type="radio" name="business_field" value="تشطيب" class="radio"/>
+            <input type="radio" name="business_field" value="صناعي" class="radio"/>
             <div class="option-content">
-              <h3 class="option-title">تشطيب</h3>
+              <h3 class="option-title">صناعي</h3>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="business_field" value="تعليمي" class="radio"/>
+            <div class="option-content">
+              <h3 class="option-title">تعليمي</h3>
+            </div>
+          </label>
+          <label class="option-card">
+            <input type="radio" name="business_field" value="طبي" class="radio"/>
+            <div class="option-content">
+              <h3 class="option-title">طبي</h3>
             </div>
           </label>
           <label class="option-card" id="other-business">
@@ -908,7 +1021,14 @@ body {
       <!-- الخطوة 6 -->
       <div class="form-step" id="step-6">
         <h2 class="question-title"><i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟</h2>
-        <textarea class="textarea-input" name="logo_examples" placeholder="يمكنك وصف الشعارات التي تعجبك أو ذكر مواقعها"></textarea>
+        <div id="links-container">
+          <div class="link-input-container">
+            <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
+          </div>
+        </div>
+        <button type="button" class="add-link-btn" id="add-link-btn">
+          <i class="fas fa-plus"></i> إضافة رابط آخر
+        </button>
         <div class="error-message" id="error-6"></div>
       </div>
 
@@ -972,12 +1092,33 @@ body {
         </div>
         <div id="logo-details" style="display:none;margin-top:20px;">
           <textarea class="textarea-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
-          <div class="file-upload" id="file-upload">
-            <i class="fas fa-cloud-upload-alt"></i>
-            <p>انقر لرفع اللوجو القديم</p>
-            <p class="file-name" id="file-name">لم يتم رفع أي ملف بعد</p>
+          
+          <!-- رفع ملفات متعددة -->
+          <div class="multi-file-upload">
+            <div class="file-upload" id="file-upload">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>انقر لرفع اللوجو القديم (صور، فيديو، PDF، PSD، AI)</p>
+            </div>
+            <div id="file-list"></div>
+            <button type="button" class="add-more-btn" id="add-more-files" style="display:none;">
+              <i class="fas fa-plus"></i> إضافة ملف آخر
+            </button>
           </div>
-          <input type="file" id="file-input" style="display:none;" accept="image/*,.pdf,.psd,.ai" />
+          
+          <!-- إضافة روابط -->
+          <div style="margin-top: 20px;">
+            <h3 style="color: var(--light-gold); margin-bottom: 10px;">أو إضافة روابط:</h3>
+            <div id="old-logo-links-container">
+              <div class="link-input-container">
+                <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط اللوجو القديم" />
+              </div>
+            </div>
+            <button type="button" class="add-link-btn" id="add-old-logo-link-btn">
+              <i class="fas fa-plus"></i> إضافة رابط آخر
+            </button>
+          </div>
+          
+          <input type="file" id="file-input" style="display:none;" accept="image/*,video/*,.pdf,.psd,.ai" multiple />
         </div>
         <div class="error-message" id="error-8"></div>
       </div>
@@ -1041,10 +1182,16 @@ const successMessage = document.getElementById('success-message');
 const finalMessage = document.getElementById('final-message');
 const continueBtn = document.getElementById('continue-btn');
 
-// عناصر الملفات
+// عناصر الملفات والروابط
 const fileUpload = document.getElementById('file-upload');
 const fileInput = document.getElementById('file-input');
-const fileName = document.getElementById('file-name');
+const fileList = document.getElementById('file-list');
+const addMoreFilesBtn = document.getElementById('add-more-files');
+const addLinkBtn = document.getElementById('add-link-btn');
+const linksContainer = document.getElementById('links-container');
+const addOldLogoLinkBtn = document.getElementById('add-old-logo-link-btn');
+const oldLogoLinksContainer = document.getElementById('old-logo-links-container');
+const brandNameInput = document.getElementById('brand-name-input');
 
 // بدء الاستبيان
 startBtn.addEventListener('click', () => {
@@ -1176,9 +1323,15 @@ function validateStep(step) {
       return true;
       
     case 6:
-      const logoExamples = document.querySelector('textarea[name="logo_examples"]').value.trim();
-      if (!logoExamples) {
-        showError(6, 'يرجى إدخال أمثلة الشعارات');
+      const logoLinks = document.querySelectorAll('input[name="logo_links[]"]');
+      let hasValidLink = false;
+      logoLinks.forEach(link => {
+        if (link.value.trim() !== '') {
+          hasValidLink = true;
+        }
+      });
+      if (!hasValidLink) {
+        showError(6, 'يرجى إدخال رابط واحد على الأقل');
         return false;
       }
       hideError(6);
@@ -1208,8 +1361,17 @@ function validateStep(step) {
       }
       if (oldLogo.value === 'نعم') {
         const logoDetails = document.querySelector('textarea[name="logo_details"]').value.trim();
-        if (!logoDetails) {
-          showError(8, 'يرجى وصف اللوجو القديم');
+        const hasFiles = fileList.children.length > 0;
+        const oldLogoLinks = document.querySelectorAll('input[name="old_logo_links[]"]');
+        let hasOldLogoLinks = false;
+        oldLogoLinks.forEach(link => {
+          if (link.value.trim() !== '') {
+            hasOldLogoLinks = true;
+          }
+        });
+        
+        if (!logoDetails && !hasFiles && !hasOldLogoLinks) {
+          showError(8, 'يرجى وصف اللوجو القديم أو رفع ملفات أو إضافة روابط');
           return false;
         }
       }
@@ -1239,6 +1401,36 @@ prevBtn.addEventListener('click', () => {
 continueBtn.addEventListener('click', () => {
   successMessage.style.display = 'none';
   finalMessage.style.display = 'block';
+});
+
+// التعامل مع ضغط Enter في حقول الإدخال
+function handleEnterKey(event) {
+  if (event.key === 'Enter') {
+    event.preventDefault();
+    if (validateStep(currentStep)) {
+      currentStep++;
+      updateUI();
+    }
+  }
+}
+
+// إضافة مستمعي الأحداث لحقول الإدخال
+brandNameInput.addEventListener('keypress', handleEnterKey);
+
+// إضافة مستمعي الأحداث للحقول النصية الأخرى
+document.addEventListener('DOMContentLoaded', function() {
+  const textInputs = document.querySelectorAll('.text-input, .textarea-input, .link-input');
+  textInputs.forEach(input => {
+    input.addEventListener('keypress', function(event) {
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        if (validateStep(currentStep)) {
+          currentStep++;
+          updateUI();
+        }
+      }
+    });
+  });
 });
 
 // دالة تحويل الملف إلى base64
@@ -1272,18 +1464,27 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
             formData.append(element.name, element.value);
           }
         } else if (element.type !== 'file' && element.name) {
-          formData.append(element.name, element.value);
+          if (element.name.endsWith('[]')) {
+            // معالجة المدخلات المتعددة (الروابط)
+            if (element.value.trim() !== '') {
+              formData.append(element.name, element.value);
+            }
+          } else {
+            formData.append(element.name, element.value);
+          }
         }
       });
       
-      // إضافة الملف إذا كان موجوداً (تحويل إلى base64)
-      if (fileInput.files.length > 0) {
-        const file = fileInput.files[0];
+      // إضافة الملفات إذا كانت موجودة (تحويل إلى base64)
+      const files = fileInput.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
         const base64 = await fileToBase64(file);
-        formData.append('file_base64', base64);
-        formData.append('file_name', file.name);
-        formData.append('file_type', file.type);
+        formData.append(`file_base64_${i}`, base64);
+        formData.append(`file_name_${i}`, file.name);
+        formData.append(`file_type_${i}`, file.type);
       }
+      formData.append('file_count', files.length);
       
       // إرسال البيانات إلى Google Apps Script
       const response = await fetch(scriptURL, {
@@ -1349,17 +1550,86 @@ document.querySelectorAll('input[type="radio"]').forEach(radio => {
   });
 });
 
-// رفع الملفات
+// إضافة روابط للشعارات
+addLinkBtn.addEventListener('click', function() {
+  const linkCount = linksContainer.children.length;
+  if (linkCount < 5) {
+    const newLink = document.createElement('div');
+    newLink.className = 'link-input-container';
+    newLink.innerHTML = `
+      <div style="display: flex; align-items: center;">
+        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
+        <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار ${linkCount + 1}" />
+      </div>
+    `;
+    linksContainer.appendChild(newLink);
+    
+    // إضافة مستمع حدث لحقل الإدخال الجديد
+    newLink.querySelector('.link-input').addEventListener('keypress', handleEnterKey);
+    
+    // إضافة مستمع حدث لزر الحذف
+    newLink.querySelector('.remove-link').addEventListener('click', function() {
+      newLink.remove();
+    });
+  } else {
+    alert('يمكنك إضافة最多 5 روابط فقط');
+  }
+});
+
+// إضافة روابط للوجو القديم
+addOldLogoLinkBtn.addEventListener('click', function() {
+  const linkCount = oldLogoLinksContainer.children.length;
+  if (linkCount < 5) {
+    const newLink = document.createElement('div');
+    newLink.className = 'link-input-container';
+    newLink.innerHTML = `
+      <div style="display: flex; align-items: center;">
+        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
+        <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط اللوجو القديم ${linkCount + 1}" />
+      </div>
+    `;
+    oldLogoLinksContainer.appendChild(newLink);
+    
+    // إضافة مستمع حدث لزر الحذف
+    newLink.querySelector('.remove-link').addEventListener('click', function() {
+      newLink.remove();
+    });
+  } else {
+    alert('يمكنك إضافة最多 5 روابط فقط');
+  }
+});
+
+// رفع الملفات المتعددة
 fileUpload.addEventListener('click', () => {
   fileInput.click();
 });
 
 fileInput.addEventListener('change', () => {
+  fileList.innerHTML = '';
   if (fileInput.files.length > 0) {
-    fileName.textContent = fileInput.files[0].name;
+    Array.from(fileInput.files).forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+        <div class="file-info">
+          <i class="fas fa-file"></i>
+          <span>${file.name}</span>
+        </div>
+        <button type="button" class="remove-file" data-index="${index}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      fileList.appendChild(fileItem);
+    });
+    addMoreFilesBtn.style.display = 'block';
   } else {
-    fileName.textContent = 'لم يتم رفع أي ملف بعد';
+    addMoreFilesBtn.style.display = 'none';
   }
+});
+
+// إضافة المزيد من الملفات
+addMoreFilesBtn.addEventListener('click', () => {
+  fileInput.click();
 });
 
 // تحديد العناصر المحددة عند النقر على البطاقات
