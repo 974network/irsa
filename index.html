@@ -863,47 +863,7 @@ body {
       <!-- الخطوة 2 -->
       <div class="form-step" id="step-2">
         <h2 class="question-title"><i class="fas fa-briefcase"></i> ما هو نشاط الشركة أو مجالها الأساسي؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="business_field" value="تجاري" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">تجاري</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="business_field" value="خدمي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">خدمي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="business_field" value="صناعي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">صناعي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="business_field" value="تعليمي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">تعليمي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="business_field" value="طبي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">طبي</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-business">
-            <input type="radio" name="business_field" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="business-custom">
-          <input type="text" class="text-input" name="business_custom" placeholder="أدخل مجال العمل الآخر" />
-        </div>
+        <input type="text" class="text-input" name="business_field" placeholder="أدخل مجال العمل (مثال: تجارة الملابس، خدمات تقنية، مطعم، إلخ)" id="business-field-input" />
         <div class="error-message" id="error-2"></div>
       </div>
 
@@ -1192,6 +1152,7 @@ const linksContainer = document.getElementById('links-container');
 const addOldLogoLinkBtn = document.getElementById('add-old-logo-link-btn');
 const oldLogoLinksContainer = document.getElementById('old-logo-links-container');
 const brandNameInput = document.getElementById('brand-name-input');
+const businessFieldInput = document.getElementById('business-field-input');
 
 // بدء الاستبيان
 startBtn.addEventListener('click', () => {
@@ -1259,17 +1220,10 @@ function validateStep(step) {
       return true;
       
     case 2:
-      const businessField = document.querySelector('input[name="business_field"]:checked');
+      const businessField = document.querySelector('input[name="business_field"]').value.trim();
       if (!businessField) {
-        showError(2, 'يرجى اختيار مجال العمل');
+        showError(2, 'يرجى إدخال مجال العمل');
         return false;
-      }
-      if (businessField.value === 'شيء آخر') {
-        const businessCustom = document.querySelector('input[name="business_custom"]').value.trim();
-        if (!businessCustom) {
-          showError(2, 'يرجى إدخال مجال العمل الآخر');
-          return false;
-        }
       }
       hideError(2);
       return true;
@@ -1416,6 +1370,7 @@ function handleEnterKey(event) {
 
 // إضافة مستمعي الأحداث لحقول الإدخال
 brandNameInput.addEventListener('keypress', handleEnterKey);
+businessFieldInput.addEventListener('keypress', handleEnterKey);
 
 // إضافة مستمعي الأحداث للحقول النصية الأخرى
 document.addEventListener('DOMContentLoaded', function() {
@@ -1510,12 +1465,6 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
 // إظهار الحقول المخصصة عند اختيار "شيء آخر"
 document.querySelectorAll('input[type="radio"]').forEach(radio => {
   radio.addEventListener('change', function() {
-    if (this.name === 'business_field' && this.value === 'شيء آخر') {
-      document.getElementById('business-custom').style.display = 'block';
-    } else if (this.name === 'business_field') {
-      document.getElementById('business-custom').style.display = 'none';
-    }
-    
     if (this.name === 'logo_type' && this.value === 'شيء آخر') {
       document.getElementById('logo-type-custom').style.display = 'block';
     } else if (this.name === 'logo_type') {
