@@ -6,7 +6,6 @@
 <title>استبيان العميل</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-/* جميع الأنماط السابقة تبقى كما هي */
 @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
 :root {
   --gold: #d4af37;
@@ -1073,14 +1072,14 @@ body {
     <!-- شاشة التحميل -->
     <div class="loading" id="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري معالجة بياناتك...</p>
+      <p>جاري إرسال الاستبيان...</p>
     </div>
 
     <!-- شاشة النجاح -->
     <div class="success-message" id="success-message">
       <i class="fas fa-check-circle"></i>
       <h2>تم إرسال الاستبيان بنجاح!</h2>
-      <p>شكراً لك على وقتك الثمين. سنراجع إجاباتك بعناية ونعود إليك خلال 24-48 ساعة.</p>
+      <p>سنراجع إجاباتك بعناية ونعود إليك خلال 24-48 ساعة</p>
       <button class="continue-btn" id="continue-btn">
         <span>متابعة</span>
         <i class="fas fa-arrow-left"></i>
@@ -1093,8 +1092,8 @@ body {
 document.addEventListener('DOMContentLoaded', function() {
   // عناصر DOM
   const welcomeScreen = document.getElementById('welcomeScreen');
-  const startBtn = document.getElementById('startBtn');
   const mainContainer = document.getElementById('mainContainer');
+  const startBtn = document.getElementById('startBtn');
   const form = document.getElementById('clientForm');
   const steps = document.querySelectorAll('.form-step');
   const prevBtn = document.getElementById('prev-btn');
@@ -1107,15 +1106,15 @@ document.addEventListener('DOMContentLoaded', function() {
   const successMessage = document.getElementById('success-message');
   const continueBtn = document.getElementById('continue-btn');
   
-  // متغيرات إدارة الخطوات
+  // متغيرات التحكم
   let currentStep = 0;
-  const totalSteps = steps.length;
+  const maxSteps = steps.length;
   
   // تهيئة مؤشرات الخطوات
-  function initStepIndicators() {
-    for (let i = 0; i < totalSteps; i++) {
+  function initializeStepIndicators() {
+    for (let i = 0; i < maxSteps; i++) {
       const indicator = document.createElement('div');
-      indicator.classList.add('step-indicator');
+      indicator.className = 'step-indicator';
       if (i === 0) indicator.classList.add('active');
       stepIndicators.appendChild(indicator);
     }
@@ -1135,12 +1134,12 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // تحديث شريط التقدم
   function updateProgress() {
-    const progressPercent = ((currentStep + 1) / totalSteps) * 100;
+    const progressPercent = ((currentStep + 1) / maxSteps) * 100;
     progress.style.width = `${progressPercent}%`;
-    progressText.textContent = `السؤال ${currentStep + 1} من ${totalSteps}`;
+    progressText.textContent = `السؤال ${currentStep + 1} من ${maxSteps}`;
   }
   
-  // إظهار الخطوة الحالية
+  // الانتقال بين الخطوات
   function showStep(stepIndex) {
     steps.forEach((step, index) => {
       step.classList.toggle('active', index === stepIndex);
@@ -1148,326 +1147,366 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // إظهار/إخفاء أزرار التنقل
     prevBtn.style.display = stepIndex === 0 ? 'none' : 'flex';
-    nextBtn.style.display = stepIndex === totalSteps - 1 ? 'none' : 'flex';
-    submitBtn.style.display = stepIndex === totalSteps - 1 ? 'flex' : 'none';
+    nextBtn.style.display = stepIndex === maxSteps - 1 ? 'none' : 'flex';
+    submitBtn.style.display = stepIndex === maxSteps - 1 ? 'flex' : 'none';
     
+    // تحديث التقدم والمؤشرات
     updateProgress();
     updateStepIndicators();
+    
+    // حفظ الخطوة الحالية
+    currentStep = stepIndex;
   }
   
   // التحقق من صحة البيانات في الخطوة الحالية
-  function validateStep(stepIndex) {
-    const errorElement = document.getElementById(`error-${stepIndex + 1}`);
-    let isValid = true;
+  function validateStep() {
+    const currentStepElement = steps[currentStep];
+    const errorElement = document.getElementById(`error-${currentStep + 1}`);
     
     // إخفاء رسالة الخطأ
     errorElement.style.display = 'none';
     
-    switch(stepIndex) {
-      case 0: // اسم العلامة التجارية
-        const brandName = document.getElementById('brand-name-input').value.trim();
-        if (!brandName) {
-          errorElement.textContent = 'يرجى إدخال اسم العلامة التجارية';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 1: // مجال العمل
-        const businessField = document.getElementById('business-field-input').value.trim();
-        if (!businessField) {
-          errorElement.textContent = 'يرجى إدخال مجال العمل';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 2: // نوع الشعار
-        const logoType = document.querySelector('input[name="logo_type"]:checked');
-        if (!logoType) {
-          errorElement.textContent = 'يرجى اختيار نوع الشعار المفضل';
-          errorElement.style.display = 'block';
-          isValid = false;
-        } else if (logoType.value === 'شيء آخر') {
-          const customInput = document.querySelector('input[name="logo_type_custom"]');
-          if (!customInput.value.trim()) {
-            errorElement.textContent = 'يرجى توضيح التفضيل الآخر';
-            errorElement.style.display = 'block';
-            isValid = false;
-          }
-        }
-        break;
-        
-      case 3: // الألوان
-        const colors = document.getElementById('colors-input').value.trim();
-        if (!colors) {
-          errorElement.textContent = 'يرجى وصف تفضيلات الألوان';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 4: // أمثلة الشعارات
-        // هذه الخطوة اختيارية، لذلك لا توجد تحقق إلزامي
-        break;
-        
-      case 5: // الشعور والقيمة
-        const feeling = document.getElementById('feeling-input').value.trim();
-        if (!feeling) {
-          errorElement.textContent = 'يرجى وصف المشاعر والقيم التي تريد أن يوصلها الشعار';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 6: // الشعارات القديمة
-        // هذه الخطوة اختيارية، لذلك لا توجد تحقق إلزامي
-        break;
+    // التحقق من الحقول النصية
+    const textInput = currentStepElement.querySelector('input[type="text"]');
+    if (textInput && !textInput.value.trim()) {
+      errorElement.textContent = 'هذا الحقل مطلوب';
+      errorElement.style.display = 'block';
+      return false;
     }
     
-    return isValid;
+    // التحقق من الحقول النصية الطويلة
+    const textareaInput = currentStepElement.querySelector('textarea');
+    if (textareaInput && !textareaInput.value.trim()) {
+      errorElement.textContent = 'هذا الحقل مطلوب';
+      errorElement.style.display = 'block';
+      return false;
+    }
+    
+    // التحقق من خيارات الراديو
+    const radioInputs = currentStepElement.querySelectorAll('input[type="radio"]');
+    if (radioInputs.length > 0) {
+      const isChecked = Array.from(radioInputs).some(radio => radio.checked);
+      if (!isChecked) {
+        errorElement.textContent = 'يرجى اختيار أحد الخيارات';
+        errorElement.style.display = 'block';
+        return false;
+      }
+    }
+    
+    return true;
   }
   
-  // التالي
-  nextBtn.addEventListener('click', function() {
-    if (validateStep(currentStep)) {
-      currentStep++;
-      showStep(currentStep);
+  // الانتقال للخطوة التالية
+  function nextStep() {
+    if (validateStep()) {
+      if (currentStep < maxSteps - 1) {
+        showStep(currentStep + 1);
+      }
     }
-  });
+  }
   
-  // السابق
-  prevBtn.addEventListener('click', function() {
-    currentStep--;
-    showStep(currentStep);
-  });
+  // الانتقال للخطوة السابقة
+  function prevStep() {
+    if (currentStep > 0) {
+      showStep(currentStep - 1);
+    }
+  }
   
   // إرسال النموذج
-  form.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (validateStep(currentStep)) {
-      // إظهار شاشة التحميل
+  function submitForm() {
+    if (validateStep()) {
+      // إخفاء النموذج وإظهار شاشة التحميل
       form.style.display = 'none';
       loading.style.display = 'block';
       
-      // محاكاة إرسال البيانات
-      setTimeout(function() {
+      // محاكاة إرسال البيانات (في التطبيق الحقيقي، هنا سيتم إرسال البيانات للخادم)
+      setTimeout(() => {
         loading.style.display = 'none';
         successMessage.style.display = 'block';
       }, 2000);
     }
-  });
+  }
   
-  // زر المتابعة بعد الإرسال الناجح
-  continueBtn.addEventListener('click', function() {
-    // يمكن إضافة إعادة التوجيه إلى صفحة أخرى أو إعادة تعيين النموذج
-    alert('شكراً لك! سنتواصل معك قريباً.');
-    // إعادة تعيين النموذج
-    form.reset();
-    currentStep = 0;
-    showStep(currentStep);
-    form.style.display = 'block';
-    successMessage.style.display = 'none';
-    // إعادة تعيين الملفات والروابط
-    resetFilesAndLinks();
-  });
-  
-  // بدء الاستبيان
-  startBtn.addEventListener('click', function() {
-    welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
-    setTimeout(function() {
-      welcomeScreen.style.display = 'none';
-      mainContainer.classList.add('show');
-    }, 1000);
-  });
-  
-  // إظهار/إخفاء الحقل المخصص لنوع الشعار
-  const otherLogoType = document.getElementById('other-logo-type');
-  const logoTypeCustom = document.getElementById('logo-type-custom');
-  
-  otherLogoType.addEventListener('click', function() {
-    logoTypeCustom.style.display = 'block';
-  });
-  
-  document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      if (this.value !== 'شيء آخر') {
-        logoTypeCustom.style.display = 'none';
-      }
+  // تهيئة النظام
+  function initialize() {
+    // إخفاء الاستبيان الرئيسي في البداية
+    mainContainer.style.opacity = '0';
+    mainContainer.style.display = 'none';
+    
+    // إعداد مؤشرات الخطوات
+    initializeStepIndicators();
+    
+    // إعداد مستمعي الأحداث
+    startBtn.addEventListener('click', function() {
+      welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
+      setTimeout(() => {
+        welcomeScreen.style.display = 'none';
+        mainContainer.style.display = 'block';
+        setTimeout(() => {
+          mainContainer.classList.add('show');
+        }, 50);
+      }, 1000);
     });
-  });
+    
+    prevBtn.addEventListener('click', prevStep);
+    nextBtn.addEventListener('click', nextStep);
+    submitBtn.addEventListener('click', submitForm);
+    
+    continueBtn.addEventListener('click', function() {
+      // إعادة تعيين النموذج
+      form.reset();
+      form.style.display = 'block';
+      loading.style.display = 'none';
+      successMessage.style.display = 'none';
+      showStep(0);
+      
+      // إعادة تعيين الملفات والروابط
+      resetFilesAndLinks();
+      
+      // العودة لشاشة الترحيب
+      mainContainer.classList.remove('show');
+      setTimeout(() => {
+        mainContainer.style.display = 'none';
+        welcomeScreen.style.display = 'flex';
+        welcomeScreen.style.animation = 'none';
+        setTimeout(() => {
+          welcomeScreen.style.opacity = '1';
+        }, 50);
+      }, 800);
+    });
+    
+    // إعداد خيار "شيء آخر" في الخطوة 3
+    const otherLogoType = document.getElementById('other-logo-type');
+    const logoTypeCustom = document.getElementById('logo-type-custom');
+    
+    otherLogoType.addEventListener('click', function() {
+      logoTypeCustom.style.display = 'block';
+    });
+    
+    // إخفاء الحقل المخصص عند اختيار خيار آخر
+    const logoTypeRadios = document.querySelectorAll('input[name="logo_type"]');
+    logoTypeRadios.forEach(radio => {
+      radio.addEventListener('change', function() {
+        if (this.value !== 'شيء آخر') {
+          logoTypeCustom.style.display = 'none';
+        }
+      });
+    });
+    
+    // إعداد نظام رفع الملفات المتعددة
+    setupFileUpload();
+    
+    // إعداد نظام إضافة الروابط
+    setupLinks();
+  }
   
-  // إدارة الملفات المتعددة - الخطوة 5
-  const fileUpload = document.getElementById('file-upload');
-  const fileInput = document.getElementById('file-input');
-  const fileList = document.getElementById('file-list');
-  const addMoreFilesBtn = document.getElementById('add-more-files');
-  const fileCounter = document.getElementById('file-counter');
-  
-  let selectedFiles = [];
-  const maxFiles = 6;
-  
-  // إدارة الملفات المتعددة - الخطوة 7
-  const oldFileUpload = document.getElementById('old-file-upload');
-  const oldFileInput = document.getElementById('old-file-input');
-  const oldFileList = document.getElementById('old-file-list');
-  const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
-  const oldFileCounter = document.getElementById('old-file-counter');
-  
-  let selectedOldFiles = [];
-  
-  // تهيئة إدارة الملفات
-  function initFileManagement() {
-    // إدارة الملفات للخطوة 5
+  // إعداد نظام رفع الملفات المتعددة
+  function setupFileUpload() {
+    const fileUpload = document.getElementById('file-upload');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const addMoreFilesBtn = document.getElementById('add-more-files');
+    const fileCounter = document.getElementById('file-counter');
+    
+    const oldFileUpload = document.getElementById('old-file-upload');
+    const oldFileInput = document.getElementById('old-file-input');
+    const oldFileList = document.getElementById('old-file-list');
+    const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
+    const oldFileCounter = document.getElementById('old-file-counter');
+    
+    // مصفوفات لتخزين الملفات
+    let uploadedFiles = [];
+    let uploadedOldFiles = [];
+    const maxFiles = 6;
+    
+    // تحديث عداد الملفات
+    function updateFileCounter() {
+      fileCounter.textContent = `${uploadedFiles.length}/${maxFiles} ملفات مرفوعة`;
+      oldFileCounter.textContent = `${uploadedOldFiles.length}/${maxFiles} ملفات مرفوعة`;
+    }
+    
+    // إضافة ملفات جديدة
+    function addFiles(files, isOldFiles = false) {
+      const targetArray = isOldFiles ? uploadedOldFiles : uploadedFiles;
+      const targetList = isOldFiles ? oldFileList : fileList;
+      const targetAddBtn = isOldFiles ? addMoreOldFilesBtn : addMoreFilesBtn;
+      
+      // التحقق من عدم تجاوز الحد الأقصى
+      if (targetArray.length + files.length > maxFiles) {
+        alert(`يمكنك رفع ${maxFiles} ملفات كحد أقصى`);
+        return;
+      }
+      
+      // إضافة الملفات للمصفوفة
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        targetArray.push(file);
+        
+        // إنصراف عنصر الملف في القائمة
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <div class="file-number">${targetArray.length}</div>
+            <span>${file.name}</span>
+          </div>
+          <button type="button" class="remove-file" data-index="${targetArray.length - 1}" data-old="${isOldFiles}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        targetList.appendChild(fileItem);
+      }
+      
+      // تحديث العداد وإظهار زر إضافة المزيد إذا لزم الأمر
+      updateFileCounter();
+      if (targetArray.length > 0 && targetArray.length < maxFiles) {
+        targetAddBtn.style.display = 'flex';
+      } else {
+        targetAddBtn.style.display = 'none';
+      }
+    }
+    
+    // إزالة ملف من القائمة
+    function removeFile(index, isOldFiles = false) {
+      const targetArray = isOldFiles ? uploadedOldFiles : uploadedFiles;
+      const targetList = isOldFiles ? oldFileList : fileList;
+      const targetAddBtn = isOldFiles ? addMoreOldFilesBtn : addMoreFilesBtn;
+      
+      // إزالة الملف من المصفوفة
+      targetArray.splice(index, 1);
+      
+      // إعادة بناء قائمة الملفات
+      targetList.innerHTML = '';
+      targetArray.forEach((file, i) => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <div class="file-number">${i + 1}</div>
+            <span>${file.name}</span>
+          </div>
+          <button type="button" class="remove-file" data-index="${i}" data-old="${isOldFiles}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        targetList.appendChild(fileItem);
+      });
+      
+      // تحديث العداد وإظهار زر إضافة المزيد إذا لزم الأمر
+      updateFileCounter();
+      if (targetArray.length > 0 && targetArray.length < maxFiles) {
+        targetAddBtn.style.display = 'flex';
+      } else {
+        targetAddBtn.style.display = 'none';
+      }
+    }
+    
+    // إعداد مستمعي الأحداث للملفات العادية
     fileUpload.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', (e) => addFiles(Array.from(e.target.files)));
     addMoreFilesBtn.addEventListener('click', () => fileInput.click());
     
-    fileInput.addEventListener('change', (e) => {
-      handleFileSelection(e.target.files, selectedFiles, fileList, fileCounter, addMoreFilesBtn, maxFiles);
-      fileInput.value = ''; // إعادة تعيين الإدخال للسماح باختيار نفس الملفات مرة أخرى
-    });
-    
-    // إدارة الملفات للخطوة 7
+    // إعداد مستمعي الأحداث للملفات القديمة
     oldFileUpload.addEventListener('click', () => oldFileInput.click());
+    oldFileInput.addEventListener('change', (e) => addFiles(Array.from(e.target.files), true));
     addMoreOldFilesBtn.addEventListener('click', () => oldFileInput.click());
     
-    oldFileInput.addEventListener('change', (e) => {
-      handleFileSelection(e.target.files, selectedOldFiles, oldFileList, oldFileCounter, addMoreOldFilesBtn, maxFiles);
-      oldFileInput.value = ''; // إعادة تعيين الإدخال للسماح باختيار نفس الملفات مرة أخرى
+    // إعداد مستمعي الأحداث لإزالة الملفات
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-file')) {
+        const button = e.target.closest('.remove-file');
+        const index = parseInt(button.getAttribute('data-index'));
+        const isOld = button.getAttribute('data-old') === 'true';
+        removeFile(index, isOld);
+      }
     });
     
-    // إدارة الروابط للخطوة 5
-    const addLinkBtn = document.getElementById('add-link-btn');
+    // تحديث العداد في البداية
+    updateFileCounter();
+  }
+  
+  // إعداد نظام إضافة الروابط
+  function setupLinks() {
     const linksContainer = document.getElementById('links-container');
-    let linkCount = 1;
-    
-    addLinkBtn.addEventListener('click', () => {
-      if (linkCount < maxFiles) {
-        const newLinkInput = document.createElement('div');
-        newLinkInput.className = 'link-input-container';
-        newLinkInput.innerHTML = `
-          <div style="display: flex; align-items: center;">
-            <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-            <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
-          </div>
-        `;
-        linksContainer.appendChild(newLinkInput);
-        linkCount++;
-        
-        // إضافة حدث إزالة للرابط الجديد
-        newLinkInput.querySelector('.remove-link').addEventListener('click', function() {
-          newLinkInput.remove();
-          linkCount--;
-        });
-        
-        // إخفاء زر الإضافة إذا وصلنا إلى الحد الأقصى
-        if (linkCount >= maxFiles) {
-          addLinkBtn.style.display = 'none';
-        }
-      }
-    });
-    
-    // إدارة الروابط للخطوة 7
-    const addOldLinkBtn = document.getElementById('add-old-link-btn');
+    const addLinkBtn = document.getElementById('add-link-btn');
     const oldLinksContainer = document.getElementById('old-links-container');
-    let oldLinkCount = 1;
+    const addOldLinkBtn = document.getElementById('add-old-link-btn');
     
-    addOldLinkBtn.addEventListener('click', () => {
-      if (oldLinkCount < maxFiles) {
-        const newLinkInput = document.createElement('div');
-        newLinkInput.className = 'link-input-container';
-        newLinkInput.innerHTML = `
-          <div style="display: flex; align-items: center;">
-            <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-            <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
-          </div>
-        `;
-        oldLinksContainer.appendChild(newLinkInput);
-        oldLinkCount++;
-        
-        // إضافة حدث إزالة للرابط الجديد
-        newLinkInput.querySelector('.remove-link').addEventListener('click', function() {
-          newLinkInput.remove();
-          oldLinkCount--;
-          addOldLinkBtn.style.display = 'block';
-        });
-        
-        // إخفاء زر الإضافة إذا وصلنا إلى الحد الأقصى
-        if (oldLinkCount >= maxFiles) {
-          addOldLinkBtn.style.display = 'none';
-        }
+    const maxLinks = 6;
+    
+    // إضافة رابط جديد
+    function addLink(isOldLink = false) {
+      const targetContainer = isOldLink ? oldLinksContainer : linksContainer;
+      const currentLinks = targetContainer.querySelectorAll('.link-input-container');
+      
+      // التحقق من عدم تجاوز الحد الأقصى
+      if (currentLinks.length >= maxLinks) {
+        alert(`يمكنك إضافة ${maxLinks} روابط كحد أقصى`);
+        return;
+      }
+      
+      // إنشاء حقل الرابط الجديد
+      const linkInputContainer = document.createElement('div');
+      linkInputContainer.className = 'link-input-container';
+      linkInputContainer.innerHTML = `
+        <div style="display: flex; align-items: center;">
+          <button type="button" class="remove-link">
+            <i class="fas fa-times"></i>
+          </button>
+          <input type="url" class="link-input" name="${isOldLink ? 'old_logo_links[]' : 'logo_links[]'}" placeholder="أدخل رابط الشعار${isOldLink ? ' القديم' : ''}" />
+        </div>
+      `;
+      targetContainer.appendChild(linkInputContainer);
+      
+      // إخفاء زر الإضافة إذا وصلنا للحد الأقصى
+      const addBtn = isOldLink ? addOldLinkBtn : addLinkBtn;
+      if (currentLinks.length + 1 >= maxLinks) {
+        addBtn.style.display = 'none';
+      }
+    }
+    
+    // إزالة رابط
+    function removeLink(container, isOldLink = false) {
+      const addBtn = isOldLink ? addOldLinkBtn : addLinkBtn;
+      container.remove();
+      
+      // إظهار زر الإضافة إذا قل عدد الروابط عن الحد الأقصى
+      const targetContainer = isOldLink ? oldLinksContainer : linksContainer;
+      const currentLinks = targetContainer.querySelectorAll('.link-input-container');
+      if (currentLinks.length < maxLinks) {
+        addBtn.style.display = 'flex';
+      }
+    }
+    
+    // إعداد مستمعي الأحداث للروابط العادية
+    addLinkBtn.addEventListener('click', () => addLink());
+    
+    // إعداد مستمعي الأحداث للروابط القديمة
+    addOldLinkBtn.addEventListener('click', () => addLink(true));
+    
+    // إعداد مستمعي الأحداث لإزالة الروابط
+    document.addEventListener('click', (e) => {
+      if (e.target.closest('.remove-link')) {
+        const button = e.target.closest('.remove-link');
+        const container = button.closest('.link-input-container');
+        const isOldLink = container.parentElement.id === 'old-links-container';
+        removeLink(container, isOldLink);
       }
     });
-    
-    // إضافة أحداث إزالة للروابط الموجودة
-    document.querySelectorAll('.remove-link').forEach(btn => {
-      btn.addEventListener('click', function() {
-        this.closest('.link-input-container').remove();
-        linkCount--;
-        addLinkBtn.style.display = 'block';
-      });
-    });
-  }
-  
-  // معالجة اختيار الملفات
-  function handleFileSelection(files, fileArray, listElement, counterElement, addButton, max) {
-    // إضافة الملفات الجديدة إلى المصفوفة (مع مراعاة الحد الأقصى)
-    for (let i = 0; i < files.length && fileArray.length < max; i++) {
-      fileArray.push(files[i]);
-    }
-    
-    // تحديث واجهة المستخدم
-    updateFileList(fileArray, listElement, counterElement, addButton, max);
-  }
-  
-  // تحديث قائمة الملفات المعروضة
-  function updateFileList(fileArray, listElement, counterElement, addButton, max) {
-    // مسح القائمة الحالية
-    listElement.innerHTML = '';
-    
-    // إضافة كل ملف إلى القائمة
-    fileArray.forEach((file, index) => {
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file-item';
-      fileItem.innerHTML = `
-        <div class="file-info">
-          <div class="file-number">${index + 1}</div>
-          <div>${file.name}</div>
-        </div>
-        <button type="button" class="remove-file" data-index="${index}">
-          <i class="fas fa-times"></i>
-        </button>
-      `;
-      listElement.appendChild(fileItem);
-      
-      // إضافة حدث إزالة للملف
-      fileItem.querySelector('.remove-file').addEventListener('click', function() {
-        const removeIndex = parseInt(this.getAttribute('data-index'));
-        fileArray.splice(removeIndex, 1);
-        updateFileList(fileArray, listElement, counterElement, addButton, max);
-      });
-    });
-    
-    // تحديث العداد
-    counterElement.textContent = `${fileArray.length}/${max} ملفات مرفوعة`;
-    
-    // إظهار/إخفاء زر "إضافة ملف آخر"
-    if (fileArray.length > 0 && fileArray.length < max) {
-      addButton.style.display = 'flex';
-    } else {
-      addButton.style.display = 'none';
-    }
   }
   
   // إعادة تعيين الملفات والروابط
   function resetFilesAndLinks() {
-    selectedFiles = [];
-    selectedOldFiles = [];
-    
-    // إعادة تعيين واجهة المستخدم للملفات
-    updateFileList(selectedFiles, fileList, fileCounter, addMoreFilesBtn, maxFiles);
-    updateFileList(selectedOldFiles, oldFileList, oldFileCounter, addMoreOldFilesBtn, maxFiles);
+    // إعادة تعيين الملفات
+    uploadedFiles = [];
+    uploadedOldFiles = [];
+    document.getElementById('file-list').innerHTML = '';
+    document.getElementById('old-file-list').innerHTML = '';
+    document.getElementById('file-input').value = '';
+    document.getElementById('old-file-input').value = '';
+    document.getElementById('add-more-files').style.display = 'none';
+    document.getElementById('add-more-old-files').style.display = 'none';
+    updateFileCounter();
     
     // إعادة تعيين الروابط
     document.getElementById('links-container').innerHTML = `
@@ -1475,22 +1514,17 @@ document.addEventListener('DOMContentLoaded', function() {
         <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
       </div>
     `;
-    
     document.getElementById('old-links-container').innerHTML = `
       <div class="link-input-container">
         <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
       </div>
     `;
-    
-    // إعادة تعيين أزرار الإضافة
-    document.getElementById('add-link-btn').style.display = 'block';
-    document.getElementById('add-old-link-btn').style.display = 'block';
+    document.getElementById('add-link-btn').style.display = 'flex';
+    document.getElementById('add-old-link-btn').style.display = 'flex';
   }
   
-  // تهيئة التطبيق
-  initStepIndicators();
-  showStep(currentStep);
-  initFileManagement();
+  // بدء التطبيق
+  initialize();
 });
 </script>
 </body>
