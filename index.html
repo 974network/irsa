@@ -6,7 +6,6 @@
 <title>استبيان العميل</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
-/* جميع الأنماط الأصلية تبقى كما هي */
 @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
 :root {
   --gold: #d4af37;
@@ -1002,7 +1001,7 @@ body {
               <p class="file-counter" id="file-counter">0/6 ملفات مرفوعة</p>
             </div>
             <div id="file-list"></div>
-            <button type="button" class="add-more-btn" id="add-more-files" style="display:none;">
+            <button type="button" class="add-more-btn" id="add-more-files">
               <i class="fas fa-plus"></i> إضافة ملف آخر
             </button>
           </div>
@@ -1038,7 +1037,7 @@ body {
               <p class="file-counter" id="old-file-counter">0/6 ملفات مرفوعة</p>
             </div>
             <div id="old-file-list"></div>
-            <button type="button" class="add-more-btn" id="add-more-old-files" style="display:none;">
+            <button type="button" class="add-more-btn" id="add-more-old-files">
               <i class="fas fa-plus"></i> إضافة ملف آخر
             </button>
           </div>
@@ -1140,11 +1139,9 @@ const addOldLinkBtn = document.getElementById('add-old-link-btn');
 const oldLinksContainer = document.getElementById('old-links-container');
 const oldFileCounter = document.getElementById('old-file-counter');
 
-// حقول الإدخال
-const brandNameInput = document.getElementById('brand-name-input');
-const businessFieldInput = document.getElementById('business-field-input');
-const colorsInput = document.getElementById('colors-input');
-const feelingInput = document.getElementById('feeling-input');
+// متغيرات لتخزين الملفات
+let selectedFiles = [];
+let selectedOldFiles = [];
 
 // بدء الاستبيان
 startBtn.addEventListener('click', () => {
@@ -1306,22 +1303,6 @@ businessFieldInput.addEventListener('keypress', handleEnterKey);
 colorsInput.addEventListener('keypress', handleEnterKey);
 feelingInput.addEventListener('keypress', handleEnterKey);
 
-// إضافة مستمعي الأحداث للحقول النصية الأخرى
-document.addEventListener('DOMContentLoaded', function() {
-  const textInputs = document.querySelectorAll('.text-input, .textarea-input, .link-input');
-  textInputs.forEach(input => {
-    input.addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        if (validateStep(currentStep)) {
-          currentStep++;
-          updateUI();
-        }
-      }
-    });
-  });
-});
-
 // دالة تحويل الملف إلى base64
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -1365,26 +1346,24 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
       });
       
       // إضافة ملفات الشعارات
-      const files = fileInput.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
         const base64 = await fileToBase64(file);
         formData.append(`file_base64_${i}`, base64);
         formData.append(`file_name_${i}`, file.name);
         formData.append(`file_type_${i}`, file.type);
       }
-      formData.append('file_count', files.length);
+      formData.append('file_count', selectedFiles.length);
       
       // إضافة ملفات الشعارات القديمة
-      const oldFiles = oldFileInput.files;
-      for (let i = 0; i < oldFiles.length; i++) {
-        const file = oldFiles[i];
+      for (let i = 0; i < selectedOldFiles.length; i++) {
+        const file = selectedOldFiles[i];
         const base64 = await fileToBase64(file);
         formData.append(`old_file_base64_${i}`, base64);
         formData.append(`old_file_name_${i}`, file.name);
         formData.append(`old_file_type_${i}`, file.type);
       }
-      formData.append('old_file_count', oldFiles.length);
+      formData.append('old_file_count', selectedOldFiles.length);
       
       // إرسال البيانات إلى Google Apps Script
       const response = await fetch(scriptURL, {
@@ -1432,9 +1411,6 @@ addLinkBtn.addEventListener('click', function() {
     `;
     linksContainer.appendChild(newLink);
     
-    // إضافة مستمع حدث لحقل الإدخال الجديد
-    newLink.querySelector('.link-input').addEventListener('keypress', handleEnterKey);
-    
     // إضافة مستمع حدث لزر الحذف
     newLink.querySelector('.remove-link').addEventListener('click', function() {
       newLink.remove();
@@ -1468,63 +1444,57 @@ addOldLinkBtn.addEventListener('click', function() {
 });
 
 // تحديث عداد الملفات
-function updateFileCounter(fileInput, counterElement) {
-  const fileCount = fileInput.files.length;
+function updateFileCounter(filesArray, counterElement) {
+  const fileCount = filesArray.length;
   counterElement.textContent = `${fileCount}/6 ملفات مرفوعة`;
 }
 
-// إدارة الملفات المرفوعة
-function handleFileSelection(fileInput, fileList, counterElement, addMoreBtn) {
-  const files = fileInput.files;
+// إدارة الملفات المرفوعة للشعارات
+function handleFileSelection(files, filesArray, fileList, counterElement) {
+  const newFiles = Array.from(files);
+  
+  // التحقق من عدم تجاوز الحد الأقصى
+  if (filesArray.length + newFiles.length > 6) {
+    alert('يمكنك رفع最多 6 ملفات فقط');
+    return;
+  }
+  
+  // إضافة الملفات الجديدة
+  newFiles.forEach(file => {
+    filesArray.push(file);
+  });
+  
+  // تحديث العرض
+  updateFileDisplay(filesArray, fileList, counterElement);
+}
+
+// تحديث عرض الملفات
+function updateFileDisplay(filesArray, fileList, counterElement) {
   fileList.innerHTML = '';
   
-  if (files.length > 0) {
-    Array.from(files).forEach((file, index) => {
-      if (index < 6) {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-          <div class="file-info">
-            <div class="file-number">${index + 1}</div>
-            <i class="fas fa-file"></i>
-            <span>${file.name}</span>
-          </div>
-          <button type="button" class="remove-file" data-index="${index}">
-            <i class="fas fa-times"></i>
-          </button>
-        `;
-        fileList.appendChild(fileItem);
-        
-        // إضافة مستمع حدث لزر الحذف
-        fileItem.querySelector('.remove-file').addEventListener('click', function() {
-          // إنشاء DataTransfer جديد لإزالة الملف
-          const dt = new DataTransfer();
-          Array.from(files).forEach((f, i) => {
-            if (i !== index) {
-              dt.items.add(f);
-            }
-          });
-          fileInput.files = dt.files;
-          fileItem.remove();
-          updateFileCounter(fileInput, counterElement);
-          if (fileInput.files.length === 0) {
-            addMoreBtn.style.display = 'none';
-          }
-        });
-      }
+  filesArray.forEach((file, index) => {
+    const fileItem = document.createElement('div');
+    fileItem.className = 'file-item';
+    fileItem.innerHTML = `
+      <div class="file-info">
+        <div class="file-number">${index + 1}</div>
+        <i class="fas fa-file"></i>
+        <span>${file.name}</span>
+      </div>
+      <button type="button" class="remove-file" data-index="${index}">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    fileList.appendChild(fileItem);
+    
+    // إضافة مستمع حدث لزر الحذف
+    fileItem.querySelector('.remove-file').addEventListener('click', function() {
+      filesArray.splice(index, 1);
+      updateFileDisplay(filesArray, fileList, counterElement);
     });
-    
-    updateFileCounter(fileInput, counterElement);
-    
-    if (files.length < 6) {
-      addMoreBtn.style.display = 'block';
-    } else {
-      addMoreBtn.style.display = 'none';
-    }
-  } else {
-    addMoreBtn.style.display = 'none';
-    updateFileCounter(fileInput, counterElement);
-  }
+  });
+  
+  updateFileCounter(filesArray, counterElement);
 }
 
 // رفع الملفات المتعددة للشعارات
@@ -1532,8 +1502,9 @@ fileUpload.addEventListener('click', () => {
   fileInput.click();
 });
 
-fileInput.addEventListener('change', () => {
-  handleFileSelection(fileInput, fileList, fileCounter, addMoreFilesBtn);
+fileInput.addEventListener('change', (e) => {
+  handleFileSelection(e.target.files, selectedFiles, fileList, fileCounter);
+  fileInput.value = ''; // إعادة تعيين حقل الإدخال للسماح باختيار نفس الملفات مرة أخرى
 });
 
 // إضافة المزيد من الملفات للشعارات
@@ -1546,8 +1517,9 @@ oldFileUpload.addEventListener('click', () => {
   oldFileInput.click();
 });
 
-oldFileInput.addEventListener('change', () => {
-  handleFileSelection(oldFileInput, oldFileList, oldFileCounter, addMoreOldFilesBtn);
+oldFileInput.addEventListener('change', (e) => {
+  handleFileSelection(e.target.files, selectedOldFiles, oldFileList, oldFileCounter);
+  oldFileInput.value = ''; // إعادة تعيين حقل الإدخال للسماح باختيار نفس الملفات مرة أخرى
 });
 
 // إضافة المزيد من الملفات للشعارات القديمة
