@@ -6,6 +6,7 @@
 <title>استبيان العميل</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 <style>
+/* جميع الأنماط السابقة تبقى كما هي */
 @import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
 :root {
   --gold: #d4af37;
@@ -1072,557 +1073,425 @@ body {
     <!-- شاشة التحميل -->
     <div class="loading" id="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري إرسال الاستبيان...</p>
+      <p>جاري معالجة بياناتك...</p>
     </div>
-    
+
     <!-- شاشة النجاح -->
     <div class="success-message" id="success-message">
       <i class="fas fa-check-circle"></i>
-      <h2>تم إرسال الاستبيان بنجاح</h2>
-      <p>شكراً لك على تعبئة الاستبيان</p>
+      <h2>تم إرسال الاستبيان بنجاح!</h2>
+      <p>شكراً لك على وقتك الثمين. سنراجع إجاباتك بعناية ونعود إليك خلال 24-48 ساعة.</p>
       <button class="continue-btn" id="continue-btn">
         <span>متابعة</span>
         <i class="fas fa-arrow-left"></i>
       </button>
     </div>
-    
-    <!-- الشاشة النهائية -->
-    <div class="final-message" id="final-message">
-      <i class="fas fa-heart"></i>
-      <h2>شكراً لك يا عميلنا العزيز</h2>
-      <p>سوف نتواصل معك إن احتجنا أي استفسار آخر</p>
-    </div>
   </div>
 </div>
 
 <script>
-// رابط السكربت - ضع رابطك الحقيقي هنا
-const scriptURL = "https://script.google.com/macros/s/AKfycbyuz8osIEGJ-bL4w1oQorscNZf6VhayyGdhHZw2q8W-gt_sKUVaqViYmTyD2bHAxeTF/exec";
-
-// عناصر شاشة الترحيب
-const welcomeScreen = document.getElementById('welcomeScreen');
-const startBtn = document.getElementById('startBtn');
-const mainContainer = document.getElementById('mainContainer');
-
-// عناصر الاستبيان
-const totalSteps = 7;
-let currentStep = 1;
-
-const progressBar = document.getElementById('progress');
-const progressText = document.getElementById('progress-text');
-const stepIndicators = document.getElementById('step-indicators');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const submitBtn = document.getElementById('submit-btn');
-
-// عناصر الرسائل
-const loadingElement = document.getElementById('loading');
-const successMessage = document.getElementById('success-message');
-const finalMessage = document.getElementById('final-message');
-const continueBtn = document.getElementById('continue-btn');
-
-// عناصر الملفات والروابط
-const fileUpload = document.getElementById('file-upload');
-const fileInput = document.getElementById('file-input');
-const fileList = document.getElementById('file-list');
-const addMoreFilesBtn = document.getElementById('add-more-files');
-const addLinkBtn = document.getElementById('add-link-btn');
-const linksContainer = document.getElementById('links-container');
-const fileCounter = document.getElementById('file-counter');
-
-// عناصر الملفات القديمة
-const oldFileUpload = document.getElementById('old-file-upload');
-const oldFileInput = document.getElementById('old-file-input');
-const oldFileList = document.getElementById('old-file-list');
-const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
-const addOldLinkBtn = document.getElementById('add-old-link-btn');
-const oldLinksContainer = document.getElementById('old-links-container');
-const oldFileCounter = document.getElementById('old-file-counter');
-
-// حقول الإدخال
-const brandNameInput = document.getElementById('brand-name-input');
-const businessFieldInput = document.getElementById('business-field-input');
-const colorsInput = document.getElementById('colors-input');
-const feelingInput = document.getElementById('feeling-input');
-
-// بدء الاستبيان
-startBtn.addEventListener('click', () => {
-  welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
-  setTimeout(() => {
-    welcomeScreen.style.display = 'none';
-    mainContainer.classList.add('show');
-  }, 1000);
-});
-
-// إنشاء مؤشرات الخطوات
-for (let i = 1; i <= totalSteps; i++) {
-  const dot = document.createElement('div');
-  dot.classList.add('step-indicator');
-  if (i === 1) dot.classList.add('active');
-  stepIndicators.appendChild(dot);
-}
-
-// تحديث واجهة المستخدم
-function updateUI() {
-  progressBar.style.width = (currentStep / totalSteps * 100) + '%';
-  progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
-  prevBtn.style.display = currentStep === 1 ? 'none' : 'flex';
-  nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
-  submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+document.addEventListener('DOMContentLoaded', function() {
+  // عناصر DOM
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const startBtn = document.getElementById('startBtn');
+  const mainContainer = document.getElementById('mainContainer');
+  const form = document.getElementById('clientForm');
+  const steps = document.querySelectorAll('.form-step');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const submitBtn = document.getElementById('submit-btn');
+  const progress = document.getElementById('progress');
+  const progressText = document.getElementById('progress-text');
+  const stepIndicators = document.getElementById('step-indicators');
+  const loading = document.getElementById('loading');
+  const successMessage = document.getElementById('success-message');
+  const continueBtn = document.getElementById('continue-btn');
   
-  document.querySelectorAll('.form-step').forEach(step => {
-    step.classList.remove('active');
-  });
+  // متغيرات إدارة الخطوات
+  let currentStep = 0;
+  const totalSteps = steps.length;
   
-  document.getElementById(`step-${currentStep}`).classList.add('active');
-  
-  document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-    indicator.classList.toggle('active', index < currentStep);
-  });
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// عرض رسالة الخطأ
-function showError(step, message) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
+  // تهيئة مؤشرات الخطوات
+  function initStepIndicators() {
+    for (let i = 0; i < totalSteps; i++) {
+      const indicator = document.createElement('div');
+      indicator.classList.add('step-indicator');
+      if (i === 0) indicator.classList.add('active');
+      stepIndicators.appendChild(indicator);
+    }
   }
-}
-
-// إخفاء رسالة الخطأ
-function hideError(step) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) errorElement.style.display = 'none';
-}
-
-// التحقق من صحة الخطوة الحالية
-function validateStep(step) {
-  switch (step) {
-    case 1:
-      const brandName = document.querySelector('input[name="brand_name"]').value.trim();
-      if (!brandName) {
-        showError(1, 'يرجى إدخال اسم العلامة التجارية');
-        return false;
+  
+  // تحديث مؤشرات الخطوات
+  function updateStepIndicators() {
+    const indicators = document.querySelectorAll('.step-indicator');
+    indicators.forEach((indicator, index) => {
+      if (index === currentStep) {
+        indicator.classList.add('active');
+      } else {
+        indicator.classList.remove('active');
       }
-      hideError(1);
-      return true;
-      
-    case 2:
-      const businessField = document.querySelector('input[name="business_field"]').value.trim();
-      if (!businessField) {
-        showError(2, 'يرجى إدخال مجال العمل');
-        return false;
-      }
-      hideError(2);
-      return true;
-      
-    case 3:
-      const logoType = document.querySelector('input[name="logo_type"]:checked');
-      if (!logoType) {
-        showError(3, 'يرجى اختيار نوع الشعار');
-        return false;
-      }
-      if (logoType.value === 'شيء آخر') {
-        const logoTypeCustom = document.querySelector('input[name="logo_type_custom"]').value.trim();
-        if (!logoTypeCustom) {
-          showError(3, 'يرجى إدخال التفضيل الآخر');
-          return false;
+    });
+  }
+  
+  // تحديث شريط التقدم
+  function updateProgress() {
+    const progressPercent = ((currentStep + 1) / totalSteps) * 100;
+    progress.style.width = `${progressPercent}%`;
+    progressText.textContent = `السؤال ${currentStep + 1} من ${totalSteps}`;
+  }
+  
+  // إظهار الخطوة الحالية
+  function showStep(stepIndex) {
+    steps.forEach((step, index) => {
+      step.classList.toggle('active', index === stepIndex);
+    });
+    
+    // إظهار/إخفاء أزرار التنقل
+    prevBtn.style.display = stepIndex === 0 ? 'none' : 'flex';
+    nextBtn.style.display = stepIndex === totalSteps - 1 ? 'none' : 'flex';
+    submitBtn.style.display = stepIndex === totalSteps - 1 ? 'flex' : 'none';
+    
+    updateProgress();
+    updateStepIndicators();
+  }
+  
+  // التحقق من صحة البيانات في الخطوة الحالية
+  function validateStep(stepIndex) {
+    const errorElement = document.getElementById(`error-${stepIndex + 1}`);
+    let isValid = true;
+    
+    // إخفاء رسالة الخطأ
+    errorElement.style.display = 'none';
+    
+    switch(stepIndex) {
+      case 0: // اسم العلامة التجارية
+        const brandName = document.getElementById('brand-name-input').value.trim();
+        if (!brandName) {
+          errorElement.textContent = 'يرجى إدخال اسم العلامة التجارية';
+          errorElement.style.display = 'block';
+          isValid = false;
         }
-      }
-      hideError(3);
-      return true;
-      
-    case 4:
-      const colors = document.querySelector('textarea[name="colors"]').value.trim();
-      if (!colors) {
-        showError(4, 'يرجى وصف الألوان المفضلة');
-        return false;
-      }
-      hideError(4);
-      return true;
-      
-    case 5:
-      // هذا الحقل اختياري - دائماً يعتبر صحيح
-      hideError(5);
-      return true;
-      
-    case 6:
-      const feeling = document.querySelector('textarea[name="feeling"]').value.trim();
-      if (!feeling) {
-        showError(6, 'يرجى وصف المشاعر والقيم المطلوبة');
-        return false;
-      }
-      hideError(6);
-      return true;
-      
-    case 7:
-      // هذا الحقل اختياري - دائماً يعتبر صحيح
-      hideError(7);
-      return true;
-      
-    default:
-      return true;
+        break;
+        
+      case 1: // مجال العمل
+        const businessField = document.getElementById('business-field-input').value.trim();
+        if (!businessField) {
+          errorElement.textContent = 'يرجى إدخال مجال العمل';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+        
+      case 2: // نوع الشعار
+        const logoType = document.querySelector('input[name="logo_type"]:checked');
+        if (!logoType) {
+          errorElement.textContent = 'يرجى اختيار نوع الشعار المفضل';
+          errorElement.style.display = 'block';
+          isValid = false;
+        } else if (logoType.value === 'شيء آخر') {
+          const customInput = document.querySelector('input[name="logo_type_custom"]');
+          if (!customInput.value.trim()) {
+            errorElement.textContent = 'يرجى توضيح التفضيل الآخر';
+            errorElement.style.display = 'block';
+            isValid = false;
+          }
+        }
+        break;
+        
+      case 3: // الألوان
+        const colors = document.getElementById('colors-input').value.trim();
+        if (!colors) {
+          errorElement.textContent = 'يرجى وصف تفضيلات الألوان';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+        
+      case 4: // أمثلة الشعارات
+        // هذه الخطوة اختيارية، لذلك لا توجد تحقق إلزامي
+        break;
+        
+      case 5: // الشعور والقيمة
+        const feeling = document.getElementById('feeling-input').value.trim();
+        if (!feeling) {
+          errorElement.textContent = 'يرجى وصف المشاعر والقيم التي تريد أن يوصلها الشعار';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+        
+      case 6: // الشعارات القديمة
+        // هذه الخطوة اختيارية، لذلك لا توجد تحقق إلزامي
+        break;
+    }
+    
+    return isValid;
   }
-}
-
-// الانتقال للخطوة التالية
-nextBtn.addEventListener('click', () => {
-  if (validateStep(currentStep)) {
-    currentStep++;
-    updateUI();
-  }
-});
-
-// الانتقال للخطوة السابقة
-prevBtn.addEventListener('click', () => {
-  currentStep--;
-  updateUI();
-});
-
-// زر المتابعة
-continueBtn.addEventListener('click', () => {
-  successMessage.style.display = 'none';
-  finalMessage.style.display = 'block';
-});
-
-// التعامل مع ضغط Enter في حقول الإدخال
-function handleEnterKey(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
+  
+  // التالي
+  nextBtn.addEventListener('click', function() {
     if (validateStep(currentStep)) {
       currentStep++;
-      updateUI();
+      showStep(currentStep);
     }
-  }
-}
-
-// إضافة مستمعي الأحداث لحقول الإدخال
-brandNameInput.addEventListener('keypress', handleEnterKey);
-businessFieldInput.addEventListener('keypress', handleEnterKey);
-colorsInput.addEventListener('keypress', handleEnterKey);
-feelingInput.addEventListener('keypress', handleEnterKey);
-
-// إضافة مستمعي الأحداث للحقول النصية الأخرى
-document.addEventListener('DOMContentLoaded', function() {
-  const textInputs = document.querySelectorAll('.text-input, .textarea-input, .link-input');
-  textInputs.forEach(input => {
-    input.addEventListener('keypress', function(event) {
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        if (validateStep(currentStep)) {
-          currentStep++;
-          updateUI();
+  });
+  
+  // السابق
+  prevBtn.addEventListener('click', function() {
+    currentStep--;
+    showStep(currentStep);
+  });
+  
+  // إرسال النموذج
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    if (validateStep(currentStep)) {
+      // إظهار شاشة التحميل
+      form.style.display = 'none';
+      loading.style.display = 'block';
+      
+      // محاكاة إرسال البيانات
+      setTimeout(function() {
+        loading.style.display = 'none';
+        successMessage.style.display = 'block';
+      }, 2000);
+    }
+  });
+  
+  // زر المتابعة بعد الإرسال الناجح
+  continueBtn.addEventListener('click', function() {
+    // يمكن إضافة إعادة التوجيه إلى صفحة أخرى أو إعادة تعيين النموذج
+    alert('شكراً لك! سنتواصل معك قريباً.');
+    // إعادة تعيين النموذج
+    form.reset();
+    currentStep = 0;
+    showStep(currentStep);
+    form.style.display = 'block';
+    successMessage.style.display = 'none';
+    // إعادة تعيين الملفات والروابط
+    resetFilesAndLinks();
+  });
+  
+  // بدء الاستبيان
+  startBtn.addEventListener('click', function() {
+    welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
+    setTimeout(function() {
+      welcomeScreen.style.display = 'none';
+      mainContainer.classList.add('show');
+    }, 1000);
+  });
+  
+  // إظهار/إخفاء الحقل المخصص لنوع الشعار
+  const otherLogoType = document.getElementById('other-logo-type');
+  const logoTypeCustom = document.getElementById('logo-type-custom');
+  
+  otherLogoType.addEventListener('click', function() {
+    logoTypeCustom.style.display = 'block';
+  });
+  
+  document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      if (this.value !== 'شيء آخر') {
+        logoTypeCustom.style.display = 'none';
+      }
+    });
+  });
+  
+  // إدارة الملفات المتعددة - الخطوة 5
+  const fileUpload = document.getElementById('file-upload');
+  const fileInput = document.getElementById('file-input');
+  const fileList = document.getElementById('file-list');
+  const addMoreFilesBtn = document.getElementById('add-more-files');
+  const fileCounter = document.getElementById('file-counter');
+  
+  let selectedFiles = [];
+  const maxFiles = 6;
+  
+  // إدارة الملفات المتعددة - الخطوة 7
+  const oldFileUpload = document.getElementById('old-file-upload');
+  const oldFileInput = document.getElementById('old-file-input');
+  const oldFileList = document.getElementById('old-file-list');
+  const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
+  const oldFileCounter = document.getElementById('old-file-counter');
+  
+  let selectedOldFiles = [];
+  
+  // تهيئة إدارة الملفات
+  function initFileManagement() {
+    // إدارة الملفات للخطوة 5
+    fileUpload.addEventListener('click', () => fileInput.click());
+    addMoreFilesBtn.addEventListener('click', () => fileInput.click());
+    
+    fileInput.addEventListener('change', (e) => {
+      handleFileSelection(e.target.files, selectedFiles, fileList, fileCounter, addMoreFilesBtn, maxFiles);
+      fileInput.value = ''; // إعادة تعيين الإدخال للسماح باختيار نفس الملفات مرة أخرى
+    });
+    
+    // إدارة الملفات للخطوة 7
+    oldFileUpload.addEventListener('click', () => oldFileInput.click());
+    addMoreOldFilesBtn.addEventListener('click', () => oldFileInput.click());
+    
+    oldFileInput.addEventListener('change', (e) => {
+      handleFileSelection(e.target.files, selectedOldFiles, oldFileList, oldFileCounter, addMoreOldFilesBtn, maxFiles);
+      oldFileInput.value = ''; // إعادة تعيين الإدخال للسماح باختيار نفس الملفات مرة أخرى
+    });
+    
+    // إدارة الروابط للخطوة 5
+    const addLinkBtn = document.getElementById('add-link-btn');
+    const linksContainer = document.getElementById('links-container');
+    let linkCount = 1;
+    
+    addLinkBtn.addEventListener('click', () => {
+      if (linkCount < maxFiles) {
+        const newLinkInput = document.createElement('div');
+        newLinkInput.className = 'link-input-container';
+        newLinkInput.innerHTML = `
+          <div style="display: flex; align-items: center;">
+            <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
+            <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
+          </div>
+        `;
+        linksContainer.appendChild(newLinkInput);
+        linkCount++;
+        
+        // إضافة حدث إزالة للرابط الجديد
+        newLinkInput.querySelector('.remove-link').addEventListener('click', function() {
+          newLinkInput.remove();
+          linkCount--;
+        });
+        
+        // إخفاء زر الإضافة إذا وصلنا إلى الحد الأقصى
+        if (linkCount >= maxFiles) {
+          addLinkBtn.style.display = 'none';
         }
       }
     });
-  });
-});
-
-// دالة تحويل الملف إلى base64
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// إرسال النموذج
-document.getElementById('clientForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  if (validateStep(currentStep)) {
-    // إخفاء النموذج وإظهار شاشة التحميل
-    document.querySelector('form').style.display = 'none';
-    loadingElement.style.display = 'block';
     
-    try {
-      // جمع البيانات
-      const formData = new FormData();
-      
-      // إضافة جميع البيانات إلى formData
-      const formElements = document.querySelectorAll('input, textarea');
-      formElements.forEach(element => {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            formData.append(element.name, element.value);
-          }
-        } else if (element.type !== 'file' && element.name) {
-          if (element.name.endsWith('[]')) {
-            // معالجة المدخلات المتعددة (الروابط)
-            if (element.value.trim() !== '') {
-              formData.append(element.name, element.value);
-            }
-          } else {
-            formData.append(element.name, element.value);
-          }
+    // إدارة الروابط للخطوة 7
+    const addOldLinkBtn = document.getElementById('add-old-link-btn');
+    const oldLinksContainer = document.getElementById('old-links-container');
+    let oldLinkCount = 1;
+    
+    addOldLinkBtn.addEventListener('click', () => {
+      if (oldLinkCount < maxFiles) {
+        const newLinkInput = document.createElement('div');
+        newLinkInput.className = 'link-input-container';
+        newLinkInput.innerHTML = `
+          <div style="display: flex; align-items: center;">
+            <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
+            <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
+          </div>
+        `;
+        oldLinksContainer.appendChild(newLinkInput);
+        oldLinkCount++;
+        
+        // إضافة حدث إزالة للرابط الجديد
+        newLinkInput.querySelector('.remove-link').addEventListener('click', function() {
+          newLinkInput.remove();
+          oldLinkCount--;
+          addOldLinkBtn.style.display = 'block';
+        });
+        
+        // إخفاء زر الإضافة إذا وصلنا إلى الحد الأقصى
+        if (oldLinkCount >= maxFiles) {
+          addOldLinkBtn.style.display = 'none';
         }
-      });
-      
-      // إضافة ملفات الشعارات
-      const files = fileInput.files;
-      for (let i = 0; i < files.length; i++) {
-        const file = files[i];
-        const base64 = await fileToBase64(file);
-        formData.append(`file_base64_${i}`, base64);
-        formData.append(`file_name_${i}`, file.name);
-        formData.append(`file_type_${i}`, file.type);
       }
-      formData.append('file_count', files.length);
-      
-      // إضافة ملفات الشعارات القديمة
-      const oldFiles = oldFileInput.files;
-      for (let i = 0; i < oldFiles.length; i++) {
-        const file = oldFiles[i];
-        const base64 = await fileToBase64(file);
-        formData.append(`old_file_base64_${i}`, base64);
-        formData.append(`old_file_name_${i}`, file.name);
-        formData.append(`old_file_type_${i}`, file.type);
-      }
-      formData.append('old_file_count', oldFiles.length);
-      
-      // إرسال البيانات إلى Google Apps Script
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        body: formData
+    });
+    
+    // إضافة أحداث إزالة للروابط الموجودة
+    document.querySelectorAll('.remove-link').forEach(btn => {
+      btn.addEventListener('click', function() {
+        this.closest('.link-input-container').remove();
+        linkCount--;
+        addLinkBtn.style.display = 'block';
       });
+    });
+  }
+  
+  // معالجة اختيار الملفات
+  function handleFileSelection(files, fileArray, listElement, counterElement, addButton, max) {
+    // إضافة الملفات الجديدة إلى المصفوفة (مع مراعاة الحد الأقصى)
+    for (let i = 0; i < files.length && fileArray.length < max; i++) {
+      fileArray.push(files[i]);
+    }
+    
+    // تحديث واجهة المستخدم
+    updateFileList(fileArray, listElement, counterElement, addButton, max);
+  }
+  
+  // تحديث قائمة الملفات المعروضة
+  function updateFileList(fileArray, listElement, counterElement, addButton, max) {
+    // مسح القائمة الحالية
+    listElement.innerHTML = '';
+    
+    // إضافة كل ملف إلى القائمة
+    fileArray.forEach((file, index) => {
+      const fileItem = document.createElement('div');
+      fileItem.className = 'file-item';
+      fileItem.innerHTML = `
+        <div class="file-info">
+          <div class="file-number">${index + 1}</div>
+          <div>${file.name}</div>
+        </div>
+        <button type="button" class="remove-file" data-index="${index}">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      listElement.appendChild(fileItem);
       
-      const result = await response.json();
-      
-      // إخفاء التحميل وإظهار النجاح
-      loadingElement.style.display = 'none';
-      successMessage.style.display = 'block';
-      
-    } catch (error) {
-      // في حالة الخطأ
-      loadingElement.style.display = 'none';
-      alert('حدث خطأ في الإرسال: ' + error.message);
-      document.querySelector('form').style.display = 'block';
+      // إضافة حدث إزالة للملف
+      fileItem.querySelector('.remove-file').addEventListener('click', function() {
+        const removeIndex = parseInt(this.getAttribute('data-index'));
+        fileArray.splice(removeIndex, 1);
+        updateFileList(fileArray, listElement, counterElement, addButton, max);
+      });
+    });
+    
+    // تحديث العداد
+    counterElement.textContent = `${fileArray.length}/${max} ملفات مرفوعة`;
+    
+    // إظهار/إخفاء زر "إضافة ملف آخر"
+    if (fileArray.length > 0 && fileArray.length < max) {
+      addButton.style.display = 'flex';
+    } else {
+      addButton.style.display = 'none';
     }
   }
-});
-
-// إظهار/إخفاء الحقل المخصص لـ "شيء آخر"
-document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    if (this.value === 'شيء آخر') {
-      document.getElementById('logo-type-custom').style.display = 'block';
-    } else {
-      document.getElementById('logo-type-custom').style.display = 'none';
-    }
-  });
-});
-
-// إضافة روابط للشعارات
-addLinkBtn.addEventListener('click', function() {
-  const linkCount = linksContainer.children.length;
-  if (linkCount < 6) {
-    const newLink = document.createElement('div');
-    newLink.className = 'link-input-container';
-    newLink.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-        <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار ${linkCount + 1}" />
+  
+  // إعادة تعيين الملفات والروابط
+  function resetFilesAndLinks() {
+    selectedFiles = [];
+    selectedOldFiles = [];
+    
+    // إعادة تعيين واجهة المستخدم للملفات
+    updateFileList(selectedFiles, fileList, fileCounter, addMoreFilesBtn, maxFiles);
+    updateFileList(selectedOldFiles, oldFileList, oldFileCounter, addMoreOldFilesBtn, maxFiles);
+    
+    // إعادة تعيين الروابط
+    document.getElementById('links-container').innerHTML = `
+      <div class="link-input-container">
+        <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
       </div>
     `;
-    linksContainer.appendChild(newLink);
     
-    // إضافة مستمع حدث لحقل الإدخال الجديد
-    newLink.querySelector('.link-input').addEventListener('keypress', handleEnterKey);
-    
-    // إضافة مستمع حدث لزر الحذف
-    newLink.querySelector('.remove-link').addEventListener('click', function() {
-      newLink.remove();
-    });
-  } else {
-    alert('يمكنك إضافة最多 6 روابط فقط');
-  }
-});
-
-// إضافة روابط للشعارات القديمة
-addOldLinkBtn.addEventListener('click', function() {
-  const linkCount = oldLinksContainer.children.length;
-  if (linkCount < 6) {
-    const newLink = document.createElement('div');
-    newLink.className = 'link-input-container';
-    newLink.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-        <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم ${linkCount + 1}" />
+    document.getElementById('old-links-container').innerHTML = `
+      <div class="link-input-container">
+        <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
       </div>
     `;
-    oldLinksContainer.appendChild(newLink);
     
-    // إضافة مستمع حدث لزر الحذف
-    newLink.querySelector('.remove-link').addEventListener('click', function() {
-      newLink.remove();
-    });
-  } else {
-    alert('يمكنك إضافة最多 6 روابط فقط');
+    // إعادة تعيين أزرار الإضافة
+    document.getElementById('add-link-btn').style.display = 'block';
+    document.getElementById('add-old-link-btn').style.display = 'block';
   }
-});
-
-// تحديث عداد الملفات
-function updateFileCounter(fileInput, counterElement) {
-  const fileCount = fileInput.files.length;
-  counterElement.textContent = `${fileCount}/6 ملفات مرفوعة`;
-}
-
-// رفع الملفات المتعددة للشعارات
-fileUpload.addEventListener('click', () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', () => {
-  fileList.innerHTML = '';
-  const files = fileInput.files;
   
-  if (files.length > 0) {
-    Array.from(files).forEach((file, index) => {
-      if (index < 6) {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-          <div class="file-info">
-            <div class="file-number">${index + 1}</div>
-            <i class="fas fa-file"></i>
-            <span>${file.name}</span>
-          </div>
-          <button type="button" class="remove-file" data-index="${index}">
-            <i class="fas fa-times"></i>
-          </button>
-        `;
-        fileList.appendChild(fileItem);
-        
-        // إضافة مستمع حدث لزر الحذف
-        fileItem.querySelector('.remove-file').addEventListener('click', function() {
-          // إنشاء DataTransfer جديد لإزالة الملف
-          const dt = new DataTransfer();
-          Array.from(files).forEach((f, i) => {
-            if (i !== index) {
-              dt.items.add(f);
-            }
-          });
-          fileInput.files = dt.files;
-          fileItem.remove();
-          updateFileCounter(fileInput, fileCounter);
-          if (fileInput.files.length === 0) {
-            addMoreFilesBtn.style.display = 'none';
-          }
-        });
-      }
-    });
-    
-    updateFileCounter(fileInput, fileCounter);
-    
-    if (files.length < 6) {
-      addMoreFilesBtn.style.display = 'block';
-    } else {
-      addMoreFilesBtn.style.display = 'none';
-    }
-  } else {
-    addMoreFilesBtn.style.display = 'none';
-    updateFileCounter(fileInput, fileCounter);
-  }
+  // تهيئة التطبيق
+  initStepIndicators();
+  showStep(currentStep);
+  initFileManagement();
 });
-
-// إضافة المزيد من الملفات للشعارات
-addMoreFilesBtn.addEventListener('click', () => {
-  fileInput.click();
-});
-
-// رفع الملفات المتعددة للشعارات القديمة
-oldFileUpload.addEventListener('click', () => {
-  oldFileInput.click();
-});
-
-oldFileInput.addEventListener('change', () => {
-  oldFileList.innerHTML = '';
-  const files = oldFileInput.files;
-  
-  if (files.length > 0) {
-    Array.from(files).forEach((file, index) => {
-      if (index < 6) {
-        const fileItem = document.createElement('div');
-        fileItem.className = 'file-item';
-        fileItem.innerHTML = `
-          <div class="file-info">
-            <div class="file-number">${index + 1}</div>
-            <i class="fas fa-file"></i>
-            <span>${file.name}</span>
-          </div>
-          <button type="button" class="remove-file" data-index="${index}">
-            <i class="fas fa-times"></i>
-          </button>
-        `;
-        oldFileList.appendChild(fileItem);
-        
-        // إضافة مستمع حدث لزر الحذف
-        fileItem.querySelector('.remove-file').addEventListener('click', function() {
-          // إنشاء DataTransfer جديد لإزالة الملف
-          const dt = new DataTransfer();
-          Array.from(files).forEach((f, i) => {
-            if (i !== index) {
-              dt.items.add(f);
-            }
-          });
-          oldFileInput.files = dt.files;
-          fileItem.remove();
-          updateFileCounter(oldFileInput, oldFileCounter);
-          if (oldFileInput.files.length === 0) {
-            addMoreOldFilesBtn.style.display = 'none';
-          }
-        });
-      }
-    });
-    
-    updateFileCounter(oldFileInput, oldFileCounter);
-    
-    if (files.length < 6) {
-      addMoreOldFilesBtn.style.display = 'block';
-    } else {
-      addMoreOldFilesBtn.style.display = 'none';
-    }
-  } else {
-    addMoreOldFilesBtn.style.display = 'none';
-    updateFileCounter(oldFileInput, oldFileCounter);
-  }
-});
-
-// إضافة المزيد من الملفات للشعارات القديمة
-addMoreOldFilesBtn.addEventListener('click', () => {
-  oldFileInput.click();
-});
-
-// تحديد العناصر المحددة عند النقر على البطاقات
-document.querySelectorAll('.option-card').forEach(card => {
-  card.addEventListener('click', function() {
-    const radio = this.querySelector('input[type="radio"]');
-    if (radio) {
-      radio.checked = true;
-      
-      // إزالة التحديد من جميع البطاقات في نفس المجموعة
-      const groupName = radio.name;
-      document.querySelectorAll(`.option-card input[name="${groupName}"]`).forEach(otherRadio => {
-        otherRadio.closest('.option-card').classList.remove('selected');
-      });
-      
-      // إضافة التحديد للبطاقة المختارة
-      this.classList.add('selected');
-      
-      // تشغيل حدث التغيير
-      radio.dispatchEvent(new Event('change'));
-    }
-  });
-});
-
-// تحديث واجهة المستخدم عند التحميل
-updateUI();
 </script>
 </body>
 </html>
-
