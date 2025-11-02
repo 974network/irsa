@@ -267,7 +267,7 @@ body {
 .progress {
   height: 100%;
   background: linear-gradient(90deg, var(--dark-gold), var(--gold));
-  width: 12.5%;
+  width: 14.28%;
   transition: width 0.5s ease;
   border-radius: 4px;
 }
@@ -847,7 +847,7 @@ body {
       <div class="progress-bar">
         <div class="progress" id="progress"></div>
       </div>
-      <div class="progress-text" id="progress-text">السؤال 1 من 8</div>
+      <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
     </div>
     
     <div class="step-indicators" id="step-indicators"></div>
@@ -883,204 +883,87 @@ body {
               <h3 class="option-title">يتضمن رمزًا أو أيقونة</h3>
             </div>
           </label>
-          <label class="option-card" id="other-logo-type">
-            <input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="logo-type-custom">
-          <input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل التفضيل الآخر" />
         </div>
         <div class="error-message" id="error-3"></div>
       </div>
 
       <!-- الخطوة 4 -->
       <div class="form-step" id="step-4">
-        <h2 class="question-title"><i class="fas fa-paint-brush"></i> ما الأسلوب الذي تريده؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="فاخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">فاخر</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="بسيط" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">بسيط</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="عصري" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">عصري</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="كلاسيكي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">كلاسيكي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_style" value="شبابي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شبابي</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-style">
-            <input type="radio" name="logo_style" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="style-custom">
-          <input type="text" class="text-input" name="style_custom" placeholder="أدخل الأسلوب الآخر" />
-        </div>
+        <h2 class="question-title"><i class="fas fa-palette"></i> ما الألوان التي تفضلها أو ترغب بتجنّبها؟</h2>
+        <textarea class="textarea-input" name="colors" placeholder="صف الألوان التي تفضلها والألوان التي تريد تجنبها (مثال: أفضّل الألوان الذهبية والترابية، أتجنب الألوان الزاهية)" id="colors-input"></textarea>
         <div class="error-message" id="error-4"></div>
       </div>
 
       <!-- الخطوة 5 -->
       <div class="form-step" id="step-5">
-        <h2 class="question-title"><i class="fas fa-palette"></i> ما الألوان التي تفضلها أو ترغب بتجنّبها؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="colors" value="ذهبي وكلاسيكي" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ذهبي وكلاسيكي</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="colors" value="ألوان ترابية" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ألوان ترابية</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="colors" value="ألوان زاهية" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ألوان زاهية</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-color">
-            <input type="radio" name="colors" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="color-custom">
-          <input type="text" class="text-input" name="color_custom" placeholder="أدخل الألوان الأخرى" />
-        </div>
-        <div class="error-message" id="error-5"></div>
-      </div>
-
-      <!-- الخطوة 6 -->
-      <div class="form-step" id="step-6">
         <h2 class="question-title"><i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟</h2>
-        <div id="links-container">
-          <div class="link-input-container">
-            <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
+        
+        <!-- قسم الروابط -->
+        <div style="margin-bottom: 25px;">
+          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+            <i class="fas fa-link"></i> روابط الشعارات (حتى 6 روابط)
+          </h3>
+          <div id="links-container">
+            <div class="link-input-container">
+              <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
+            </div>
           </div>
+          <button type="button" class="add-link-btn" id="add-link-btn">
+            <i class="fas fa-plus"></i> إضافة رابط آخر
+          </button>
         </div>
-        <button type="button" class="add-link-btn" id="add-link-btn">
-          <i class="fas fa-plus"></i> إضافة رابط آخر
-        </button>
-        <div class="error-message" id="error-6"></div>
-      </div>
 
-      <!-- الخطوة 7 -->
-      <div class="form-step" id="step-7">
-        <h2 class="question-title"><i class="fas fa-heart"></i> ما هي القيمة أو الشعور الذي تريد أن يوصلها الشعار للجمهور؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="feeling" value="ثقة" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ثقة</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="feeling" value="تميّز" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">تميّز</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="feeling" value="فخامة" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">فخامة</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="feeling" value="ابتكار" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">ابتكار</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-feeling">
-            <input type="radio" name="feeling" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="feeling-custom">
-          <input type="text" class="text-input" name="feeling_custom" placeholder="أدخل الشعور الآخر" />
-        </div>
-        <div class="error-message" id="error-7"></div>
-      </div>
-
-      <!-- الخطوة 8 -->
-      <div class="form-step" id="step-8">
-        <h2 class="question-title"><i class="fas fa-history"></i> هل لديك شعار قديم؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="old_logo" value="نعم" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">نعم</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="old_logo" value="لا" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">لا</h3>
-            </div>
-          </label>
-        </div>
-        <div id="logo-details" style="display:none;margin-top:20px;">
-          <textarea class="textarea-input" name="logo_details" rows="3" placeholder="صف اللوجو القديم إن وجد"></textarea>
-          
-          <!-- رفع ملفات متعددة -->
+        <!-- قسم رفع الملفات -->
+        <div>
+          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+            <i class="fas fa-cloud-upload-alt"></i> رفع الصور أو الفيديوهات (حتى 6 ملفات)
+          </h3>
           <div class="multi-file-upload">
             <div class="file-upload" id="file-upload">
               <i class="fas fa-cloud-upload-alt"></i>
-              <p>انقر لرفع اللوجو القديم (صور، فيديو، PDF، PSD، AI)</p>
+              <p>انقر لرفع الصور أو الفيديوهات (JPG, PNG, GIF, MP4, MOV)</p>
             </div>
             <div id="file-list"></div>
             <button type="button" class="add-more-btn" id="add-more-files" style="display:none;">
               <i class="fas fa-plus"></i> إضافة ملف آخر
             </button>
           </div>
-          
-          <!-- إضافة روابط -->
-          <div style="margin-top: 20px;">
-            <h3 style="color: var(--light-gold); margin-bottom: 10px;">أو إضافة روابط:</h3>
-            <div id="old-logo-links-container">
-              <div class="link-input-container">
-                <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط اللوجو القديم" />
-              </div>
+          <input type="file" id="file-input" style="display:none;" accept="image/*,video/*" multiple />
+        </div>
+        
+        <div class="error-message" id="error-5"></div>
+      </div>
+
+      <!-- الخطوة 6 -->
+      <div class="form-step" id="step-6">
+        <h2 class="question-title"><i class="fas fa-heart"></i> ما هي القيمة أو الشعور الذي تريد أن يوصلها الشعار للجمهور؟</h2>
+        <textarea class="textarea-input" name="feeling" placeholder="صف المشاعر والقيم التي تريد أن يعبر عنها الشعار (مثال: أريد أن يوصل الشعار شعور الثقة والاحترافية والابتكار)" id="feeling-input"></textarea>
+        <div class="error-message" id="error-6"></div>
+      </div>
+
+      <!-- الخطوة 7 -->
+      <div class="form-step" id="step-7">
+        <h2 class="question-title"><i class="fas fa-history"></i> هل لديك شعار قديم تريد تطويره أو تعديله؟</h2>
+        
+        <!-- قسم رفع الملفات فقط -->
+        <div>
+          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+            <i class="fas fa-cloud-upload-alt"></i> رفع الشعارات القديمة (حتى 6 ملفات)
+          </h3>
+          <div class="multi-file-upload">
+            <div class="file-upload" id="old-file-upload">
+              <i class="fas fa-cloud-upload-alt"></i>
+              <p>انقر لرفع الشعارات القديمة (صور، فيديو، PDF، PSD، AI)</p>
             </div>
-            <button type="button" class="add-link-btn" id="add-old-logo-link-btn">
-              <i class="fas fa-plus"></i> إضافة رابط آخر
+            <div id="old-file-list"></div>
+            <button type="button" class="add-more-btn" id="add-more-old-files" style="display:none;">
+              <i class="fas fa-plus"></i> إضافة ملف آخر
             </button>
           </div>
-          
-          <input type="file" id="file-input" style="display:none;" accept="image/*,video/*,.pdf,.psd,.ai" multiple />
+          <input type="file" id="old-file-input" style="display:none;" accept="image/*,video/*,.pdf,.psd,.ai" multiple />
         </div>
-        <div class="error-message" id="error-8"></div>
+        
+        <div class="error-message" id="error-7"></div>
       </div>
 
       <div class="form-navigation">
@@ -1118,7 +1001,7 @@ body {
 
 <script>
 // رابط السكربت - ضع رابطك الحقيقي هنا
-const scriptURL = "https://script.google.com/macros/s/AKfycbzyGsKc91oBhQlF4cu8m1QJch-6OIzkRH2VVXDCVDQhQLLlrHFVvhhS-6mtLO0iOIwp/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbyuz8osIEGJ-bL4w1oQorscNZf6VhayyGdhHZw2q8W-gt_sKUVaqViYmTyD2bHAxeTF/exec";
 
 // عناصر شاشة الترحيب
 const welcomeScreen = document.getElementById('welcomeScreen');
@@ -1126,7 +1009,7 @@ const startBtn = document.getElementById('startBtn');
 const mainContainer = document.getElementById('mainContainer');
 
 // عناصر الاستبيان
-const totalSteps = 8;
+const totalSteps = 7;
 let currentStep = 1;
 
 const progressBar = document.getElementById('progress');
@@ -1149,10 +1032,18 @@ const fileList = document.getElementById('file-list');
 const addMoreFilesBtn = document.getElementById('add-more-files');
 const addLinkBtn = document.getElementById('add-link-btn');
 const linksContainer = document.getElementById('links-container');
-const addOldLogoLinkBtn = document.getElementById('add-old-logo-link-btn');
-const oldLogoLinksContainer = document.getElementById('old-logo-links-container');
+
+// عناصر الملفات القديمة
+const oldFileUpload = document.getElementById('old-file-upload');
+const oldFileInput = document.getElementById('old-file-input');
+const oldFileList = document.getElementById('old-file-list');
+const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
+
+// حقول الإدخال
 const brandNameInput = document.getElementById('brand-name-input');
 const businessFieldInput = document.getElementById('business-field-input');
+const colorsInput = document.getElementById('colors-input');
+const feelingInput = document.getElementById('feeling-input');
 
 // بدء الاستبيان
 startBtn.addEventListener('click', () => {
@@ -1234,49 +1125,19 @@ function validateStep(step) {
         showError(3, 'يرجى اختيار نوع الشعار');
         return false;
       }
-      if (logoType.value === 'شيء آخر') {
-        const logoTypeCustom = document.querySelector('input[name="logo_type_custom"]').value.trim();
-        if (!logoTypeCustom) {
-          showError(3, 'يرجى إدخال التفضيل الآخر');
-          return false;
-        }
-      }
       hideError(3);
       return true;
       
     case 4:
-      const logoStyle = document.querySelector('input[name="logo_style"]:checked');
-      if (!logoStyle) {
-        showError(4, 'يرجى اختيار أسلوب الشعار');
+      const colors = document.querySelector('textarea[name="colors"]').value.trim();
+      if (!colors) {
+        showError(4, 'يرجى وصف الألوان المفضلة');
         return false;
-      }
-      if (logoStyle.value === 'شيء آخر') {
-        const styleCustom = document.querySelector('input[name="style_custom"]').value.trim();
-        if (!styleCustom) {
-          showError(4, 'يرجى إدخال الأسلوب الآخر');
-          return false;
-        }
       }
       hideError(4);
       return true;
       
     case 5:
-      const colors = document.querySelector('input[name="colors"]:checked');
-      if (!colors) {
-        showError(5, 'يرجى اختيار الألوان المفضلة');
-        return false;
-      }
-      if (colors.value === 'شيء آخر') {
-        const colorCustom = document.querySelector('input[name="color_custom"]').value.trim();
-        if (!colorCustom) {
-          showError(5, 'يرجى إدخال الألوان الأخرى');
-          return false;
-        }
-      }
-      hideError(5);
-      return true;
-      
-    case 6:
       const logoLinks = document.querySelectorAll('input[name="logo_links[]"]');
       let hasValidLink = false;
       logoLinks.forEach(link => {
@@ -1284,52 +1145,32 @@ function validateStep(step) {
           hasValidLink = true;
         }
       });
-      if (!hasValidLink) {
-        showError(6, 'يرجى إدخال رابط واحد على الأقل');
+      
+      const hasFiles = fileList.children.length > 0;
+      
+      if (!hasValidLink && !hasFiles) {
+        showError(5, 'يرجى إدخال رابط واحد على الأقل أو رفع ملف واحد على الأقل');
+        return false;
+      }
+      hideError(5);
+      return true;
+      
+    case 6:
+      const feeling = document.querySelector('textarea[name="feeling"]').value.trim();
+      if (!feeling) {
+        showError(6, 'يرجى وصف المشاعر والقيم المطلوبة');
         return false;
       }
       hideError(6);
       return true;
       
     case 7:
-      const feeling = document.querySelector('input[name="feeling"]:checked');
-      if (!feeling) {
-        showError(7, 'يرجى اختيار الشعور المطلوب');
+      const hasOldFiles = oldFileList.children.length > 0;
+      if (!hasOldFiles) {
+        showError(7, 'يرجى رفع ملف واحد على الأقل للشعار القديم');
         return false;
-      }
-      if (feeling.value === 'شيء آخر') {
-        const feelingCustom = document.querySelector('input[name="feeling_custom"]').value.trim();
-        if (!feelingCustom) {
-          showError(7, 'يرجى إدخال الشعور الآخر');
-          return false;
-        }
       }
       hideError(7);
-      return true;
-      
-    case 8:
-      const oldLogo = document.querySelector('input[name="old_logo"]:checked');
-      if (!oldLogo) {
-        showError(8, 'يرجى الإجابة على هذا السؤال');
-        return false;
-      }
-      if (oldLogo.value === 'نعم') {
-        const logoDetails = document.querySelector('textarea[name="logo_details"]').value.trim();
-        const hasFiles = fileList.children.length > 0;
-        const oldLogoLinks = document.querySelectorAll('input[name="old_logo_links[]"]');
-        let hasOldLogoLinks = false;
-        oldLogoLinks.forEach(link => {
-          if (link.value.trim() !== '') {
-            hasOldLogoLinks = true;
-          }
-        });
-        
-        if (!logoDetails && !hasFiles && !hasOldLogoLinks) {
-          showError(8, 'يرجى وصف اللوجو القديم أو رفع ملفات أو إضافة روابط');
-          return false;
-        }
-      }
-      hideError(8);
       return true;
       
     default:
@@ -1371,6 +1212,8 @@ function handleEnterKey(event) {
 // إضافة مستمعي الأحداث لحقول الإدخال
 brandNameInput.addEventListener('keypress', handleEnterKey);
 businessFieldInput.addEventListener('keypress', handleEnterKey);
+colorsInput.addEventListener('keypress', handleEnterKey);
+feelingInput.addEventListener('keypress', handleEnterKey);
 
 // إضافة مستمعي الأحداث للحقول النصية الأخرى
 document.addEventListener('DOMContentLoaded', function() {
@@ -1430,7 +1273,7 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
         }
       });
       
-      // إضافة الملفات إذا كانت موجودة (تحويل إلى base64)
+      // إضافة ملفات الشعارات
       const files = fileInput.files;
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
@@ -1440,6 +1283,17 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
         formData.append(`file_type_${i}`, file.type);
       }
       formData.append('file_count', files.length);
+      
+      // إضافة ملفات الشعارات القديمة
+      const oldFiles = oldFileInput.files;
+      for (let i = 0; i < oldFiles.length; i++) {
+        const file = oldFiles[i];
+        const base64 = await fileToBase64(file);
+        formData.append(`old_file_base64_${i}`, base64);
+        formData.append(`old_file_name_${i}`, file.name);
+        formData.append(`old_file_type_${i}`, file.type);
+      }
+      formData.append('old_file_count', oldFiles.length);
       
       // إرسال البيانات إلى Google Apps Script
       const response = await fetch(scriptURL, {
@@ -1462,47 +1316,10 @@ document.getElementById('clientForm').addEventListener('submit', async (e) => {
   }
 });
 
-// إظهار الحقول المخصصة عند اختيار "شيء آخر"
-document.querySelectorAll('input[type="radio"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    if (this.name === 'logo_type' && this.value === 'شيء آخر') {
-      document.getElementById('logo-type-custom').style.display = 'block';
-    } else if (this.name === 'logo_type') {
-      document.getElementById('logo-type-custom').style.display = 'none';
-    }
-    
-    if (this.name === 'logo_style' && this.value === 'شيء آخر') {
-      document.getElementById('style-custom').style.display = 'block';
-    } else if (this.name === 'logo_style') {
-      document.getElementById('style-custom').style.display = 'none';
-    }
-    
-    if (this.name === 'colors' && this.value === 'شيء آخر') {
-      document.getElementById('color-custom').style.display = 'block';
-    } else if (this.name === 'colors') {
-      document.getElementById('color-custom').style.display = 'none';
-    }
-    
-    if (this.name === 'feeling' && this.value === 'شيء آخر') {
-      document.getElementById('feeling-custom').style.display = 'block';
-    } else if (this.name === 'feeling') {
-      document.getElementById('feeling-custom').style.display = 'none';
-    }
-    
-    if (this.name === 'old_logo') {
-      if (this.value === 'نعم') {
-        document.getElementById('logo-details').style.display = 'block';
-      } else {
-        document.getElementById('logo-details').style.display = 'none';
-      }
-    }
-  });
-});
-
 // إضافة روابط للشعارات
 addLinkBtn.addEventListener('click', function() {
   const linkCount = linksContainer.children.length;
-  if (linkCount < 5) {
+  if (linkCount < 6) {
     const newLink = document.createElement('div');
     newLink.className = 'link-input-container';
     newLink.innerHTML = `
@@ -1521,34 +1338,11 @@ addLinkBtn.addEventListener('click', function() {
       newLink.remove();
     });
   } else {
-    alert('يمكنك إضافة最多 5 روابط فقط');
+    alert('يمكنك إضافة最多 6 روابط فقط');
   }
 });
 
-// إضافة روابط للوجو القديم
-addOldLogoLinkBtn.addEventListener('click', function() {
-  const linkCount = oldLogoLinksContainer.children.length;
-  if (linkCount < 5) {
-    const newLink = document.createElement('div');
-    newLink.className = 'link-input-container';
-    newLink.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-        <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط اللوجو القديم ${linkCount + 1}" />
-      </div>
-    `;
-    oldLogoLinksContainer.appendChild(newLink);
-    
-    // إضافة مستمع حدث لزر الحذف
-    newLink.querySelector('.remove-link').addEventListener('click', function() {
-      newLink.remove();
-    });
-  } else {
-    alert('يمكنك إضافة最多 5 روابط فقط');
-  }
-});
-
-// رفع الملفات المتعددة
+// رفع الملفات المتعددة للشعارات
 fileUpload.addEventListener('click', () => {
   fileInput.click();
 });
@@ -1557,28 +1351,75 @@ fileInput.addEventListener('change', () => {
   fileList.innerHTML = '';
   if (fileInput.files.length > 0) {
     Array.from(fileInput.files).forEach((file, index) => {
-      const fileItem = document.createElement('div');
-      fileItem.className = 'file-item';
-      fileItem.innerHTML = `
-        <div class="file-info">
-          <i class="fas fa-file"></i>
-          <span>${file.name}</span>
-        </div>
-        <button type="button" class="remove-file" data-index="${index}">
-          <i class="fas fa-times"></i>
-        </button>
-      `;
-      fileList.appendChild(fileItem);
+      if (index < 6) {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <i class="fas fa-file"></i>
+            <span>${file.name}</span>
+          </div>
+          <button type="button" class="remove-file" data-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        fileList.appendChild(fileItem);
+      }
     });
-    addMoreFilesBtn.style.display = 'block';
+    
+    if (fileInput.files.length < 6) {
+      addMoreFilesBtn.style.display = 'block';
+    } else {
+      addMoreFilesBtn.style.display = 'none';
+    }
   } else {
     addMoreFilesBtn.style.display = 'none';
   }
 });
 
-// إضافة المزيد من الملفات
+// إضافة المزيد من الملفات للشعارات
 addMoreFilesBtn.addEventListener('click', () => {
   fileInput.click();
+});
+
+// رفع الملفات المتعددة للشعارات القديمة
+oldFileUpload.addEventListener('click', () => {
+  oldFileInput.click();
+});
+
+oldFileInput.addEventListener('change', () => {
+  oldFileList.innerHTML = '';
+  if (oldFileInput.files.length > 0) {
+    Array.from(oldFileInput.files).forEach((file, index) => {
+      if (index < 6) {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-info">
+            <i class="fas fa-file"></i>
+            <span>${file.name}</span>
+          </div>
+          <button type="button" class="remove-file" data-index="${index}">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        oldFileList.appendChild(fileItem);
+      }
+    });
+    
+    if (oldFileInput.files.length < 6) {
+      addMoreOldFilesBtn.style.display = 'block';
+    } else {
+      addMoreOldFilesBtn.style.display = 'none';
+    }
+  } else {
+    addMoreOldFilesBtn.style.display = 'none';
+  }
+});
+
+// إضافة المزيد من الملفات للشعارات القديمة
+addMoreOldFilesBtn.addEventListener('click', () => {
+  oldFileInput.click();
 });
 
 // تحديد العناصر المحددة عند النقر على البطاقات
@@ -1596,9 +1437,6 @@ document.querySelectorAll('.option-card').forEach(card => {
       
       // إضافة التحديد للبطاقة المختارة
       this.classList.add('selected');
-      
-      // تشغيل حدث التغيير
-      radio.dispatchEvent(new Event('change'));
     }
   });
 });
@@ -1608,4 +1446,3 @@ updateUI();
 </script>
 </body>
 </html>
-
