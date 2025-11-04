@@ -1,1623 +1,766 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>استبيان العميل</title>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-<style>
-@import url('https://fonts.googleapis.com/css2?family=El+Messiri:wght@400;500;600;700&display=swap');
-:root {
-  --gold: #d4af37;
-  --dark-gold: #b8860b;
-  --light-gold: #f1c75e;
-  --text-light: #f8e9c4;
-  --glass: rgba(255,255,255,0.08);
-  --glass-border: rgba(212,175,55,0.3);
-  --error: #ff6b6b;
-  --success: #4CAF50;
-  --transition: all 0.3s ease;
-  --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'El Messiri', sans-serif;
-}
-
-body {
-  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
-  color: var(--text-light);
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 15px;
-  line-height: 1.6;
-  overflow-x: hidden;
-}
-
-/* شاشة الترحيب */
-.welcome-screen {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(135deg, #1a1208 0%, #2c1e0f 50%, #1a1208 100%);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
-  text-align: center;
-}
-
-.welcome-content {
-  max-width: 700px;
-  width: 100%;
-  padding: 40px;
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.welcome-content::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.welcome-title {
-  font-size: 3rem;
-  font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 15px rgba(212,175,55,0.5);
-  margin-bottom: 30px;
-  position: relative;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 0.5s;
-}
-
-.welcome-subtitle {
-  font-size: 1.8rem;
-  color: var(--light-gold);
-  margin-bottom: 20px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 1s;
-}
-
-.welcome-message {
-  font-size: 1.2rem;
-  color: var(--text-light);
-  margin-bottom: 30px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 1.5s;
-}
-
-.welcome-importance {
-  font-size: 1.1rem;
-  color: var(--light-gold);
-  margin-bottom: 40px;
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 2s;
-}
-
-.start-btn {
-  padding: 16px 40px;
-  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-  border: none;
-  border-radius: 12px;
-  color: #1c1a1a;
-  font-weight: bold;
-  font-size: 1.2rem;
-  cursor: pointer;
-  transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-  opacity: 0;
-  transform: translateY(20px);
-  animation: fadeInUp 1s ease forwards 2.5s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  margin: 0 auto;
-}
-
-.start-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
-}
-
-.start-btn:active {
-  transform: translateY(0);
-}
-
-.welcome-decoration {
-  position: absolute;
-  width: 200px;
-  height: 200px;
-  background: radial-gradient(circle, rgba(212,175,55,0.2) 0%, transparent 70%);
-  border-radius: 50%;
-  top: -100px;
-  right: -100px;
-  z-index: -1;
-}
-
-.welcome-decoration:nth-child(2) {
-  width: 150px;
-  height: 150px;
-  bottom: -75px;
-  left: -75px;
-  top: auto;
-  right: auto;
-}
-
-@keyframes fadeInUp {
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes fadeOut {
-  to {
-    opacity: 0;
-    visibility: hidden;
-  }
-}
-
-/* تصميم الاستبيان */
-.container {
-  max-width: 700px;
-  width: 100%;
-  margin: 0 auto;
-  opacity: 0;
-  transform: translateY(20px);
-  transition: all 0.8s ease;
-}
-
-.container.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.header {
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 0 10px;
-}
-
-.title {
-  font-size: 2.2rem;
-  font-weight: 700;
-  color: var(--gold);
-  text-shadow: 0 0 15px rgba(212,175,55,0.5);
-  margin-bottom: 10px;
-  position: relative;
-  display: inline-block;
-}
-
-.title::after {
-  content: '';
-  position: absolute;
-  bottom: -8px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 80px;
-  height: 3px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  border-radius: 2px;
-}
-
-.subtitle {
-  font-size: 1.05rem;
-  color: #f5e9c2;
-  max-width: 500px;
-  margin: 0 auto;
-}
-
-.form-container {
-  background: var(--glass);
-  backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  border-radius: 24px;
-  padding: 30px 25px;
-  box-shadow: var(--shadow);
-  position: relative;
-  overflow: hidden;
-}
-
-.form-container::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 1px;
-  background: linear-gradient(90deg, transparent, var(--gold), transparent);
-}
-
-.progress-container {
-  margin-bottom: 25px;
-}
-
-.progress-bar {
-  height: 8px;
-  background: rgba(212,175,55,0.2);
-  border-radius: 4px;
-  overflow: hidden;
-  margin-bottom: 10px;
-}
-
-.progress {
-  height: 100%;
-  background: linear-gradient(90deg, var(--dark-gold), var(--gold));
-  width: 14.28%;
-  transition: width 0.5s ease;
-  border-radius: 4px;
-}
-
-.progress-text {
-  text-align: center;
-  font-size: 0.95rem;
-  color: var(--light-gold);
-  font-weight: 500;
-}
-
-.step-indicators {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin: 15px 0 25px;
-}
-
-.step-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(212,175,55,0.3);
-  transition: var(--transition);
-}
-
-.step-indicator.active {
-  background: var(--gold);
-  box-shadow: 0 0 8px rgba(212,175,55,0.5);
-}
-
-.form-step {
-  display: none;
-  animation: fadeIn 0.5s ease;
-}
-
-.form-step.active {
-  display: block;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.question-title {
-  font-size: 1.35rem;
-  margin-bottom: 22px;
-  color: var(--light-gold);
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.question-title i {
-  color: var(--gold);
-  font-size: 1.2em;
-}
-
-.options-grid {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.option-card {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 14px;
-  padding: 18px;
-  cursor: pointer;
-  transition: var(--transition);
-  position: relative;
-  overflow: hidden;
-}
-
-.option-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--gold);
-  transform: scaleY(0);
-  transition: var(--transition);
-}
-
-.option-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-  border-color: rgba(212,175,55,0.5);
-}
-
-.option-card.selected {
-  border-color: var(--gold);
-  background: linear-gradient(135deg, rgba(212,175,55,0.15), rgba(180,140,11,0.1));
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(212,175,55,0.2);
-}
-
-.option-card.selected::before {
-  transform: scaleY(1);
-}
-
-.option-card.selected::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(212,175,55,0.1), transparent);
-  z-index: -1;
-  border-radius: 14px;
-}
-
-.option-title {
-  font-size: 1.05rem;
-  font-weight: 600;
-  color: var(--light-gold);
-  margin-bottom: 5px;
-  transition: var(--transition);
-}
-
-.option-card.selected .option-title {
-  color: var(--gold);
-  text-shadow: 0 0 10px rgba(212,175,55,0.3);
-}
-
-.option-desc {
-  font-size: 0.9rem;
-  color: rgba(255,255,255,0.7);
-}
-
-.radio {
-  display: none;
-}
-
-.text-input {
-  width: 100%;
-  padding: 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  color: var(--text-light);
-  font-size: 1rem;
-  transition: var(--transition);
-}
-
-.text-input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
-}
-
-.textarea-input {
-  width: 100%;
-  padding: 16px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  color: var(--text-light);
-  font-size: 1rem;
-  transition: var(--transition);
-  min-height: 120px;
-  resize: vertical;
-  font-family: 'El Messiri', sans-serif;
-}
-
-.textarea-input:focus {
-  outline: none;
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(212,175,55,0.2);
-}
-
-.custom-input {
-  margin-top: 15px;
-  display: none;
-  animation: slideDown 0.3s ease;
-}
-
-@keyframes slideDown {
-  from { opacity: 0; transform: translateY(-10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.error-message {
-  color: var(--error);
-  font-size: 0.9rem;
-  margin-top: 10px;
-  display: none;
-  padding: 8px 12px;
-  background: rgba(255,107,107,0.1);
-  border-radius: 8px;
-  border-right: 3px solid var(--error);
-}
-
-.form-navigation {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 35px;
-  gap: 12px;
-}
-
-.nav-btn {
-  padding: 16px 24px;
-  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-  border: none;
-  border-radius: 12px;
-  color: #1c1a1a;
-  font-weight: bold;
-  font-size: 1.05rem;
-  cursor: pointer;
-  flex: 1;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-}
-
-.nav-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
-}
-
-.nav-btn:active {
-  transform: translateY(0);
-}
-
-.nav-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
-}
-
-.file-upload {
-  margin-top: 15px;
-  padding: 20px;
-  background: rgba(255,255,255,0.05);
-  border: 2px dashed var(--glass-border);
-  border-radius: 12px;
-  text-align: center;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.file-upload:hover {
-  border-color: var(--gold);
-  background: rgba(212,175,55,0.05);
-}
-
-.file-name {
-  margin-top: 10px;
-  font-size: 0.9rem;
-  color: var(--light-gold);
-}
-
-/* شاشات التحميل والنتائج */
-.loading, .success-message, .final-message {
-  text-align: center;
-  display: none;
-  padding: 40px 20px;
-  animation: fadeIn 0.8s ease;
-}
-
-.loading i {
-  font-size: 3rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.loading p {
-  font-size: 1.2rem;
-}
-
-.success-message i {
-  font-size: 4rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.success-message h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: var(--light-gold);
-}
-
-.success-message p {
-  font-size: 1.1rem;
-  margin-bottom: 25px;
-}
-
-/* زر المتابعة - تم تعديل الحجم */
-.continue-btn {
-  padding: 18px 50px; /* تم زيادة الحجم */
-  background: linear-gradient(45deg, var(--dark-gold), var(--gold));
-  border: none;
-  border-radius: 14px; /* زادت النعومة */
-  color: #1c1a1a;
-  font-weight: bold;
-  font-size: 1.3rem; /* تم زيادة حجم الخط */
-  cursor: pointer;
-  transition: var(--transition);
-  box-shadow: 0 4px 12px rgba(212,175,55,0.3);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 12px; /* تم زيادة المسافة بين النص والأيقونة */
-  margin: 0 auto;
-  min-width: 200px; /* عرض أدنى */
-}
-
-.continue-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 15px rgba(212,175,55,0.4);
-}
-
-.continue-btn:active {
-  transform: translateY(0);
-}
-
-.final-message i {
-  font-size: 4rem;
-  color: var(--gold);
-  margin-bottom: 20px;
-}
-
-.final-message h2 {
-  font-size: 2rem;
-  margin-bottom: 15px;
-  color: var(--light-gold);
-}
-
-.final-message p {
-  font-size: 1.1rem;
-  margin-bottom: 25px;
-}
-
-/* أنماط جديدة للملفات المتعددة والروابط */
-.multi-file-upload {
-  margin-top: 15px;
-}
-
-.file-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  padding: 10px 15px;
-  margin-bottom: 8px;
-  animation: slideDown 0.3s ease;
-}
-
-.file-item:last-child {
-  margin-bottom: 0;
-}
-
-.file-info {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-}
-
-.file-number {
-  background: var(--gold);
-  color: #1a1208;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: bold;
-}
-
-.remove-file {
-  background: var(--error);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: var(--transition);
-}
-
-.remove-file:hover {
-  transform: scale(1.1);
-}
-
-.add-more-btn {
-  background: rgba(212,175,55,0.2);
-  color: var(--gold);
-  border: 1px dashed var(--gold);
-  border-radius: 8px;
-  padding: 10px 15px;
-  cursor: pointer;
-  text-align: center;
-  margin-top: 10px;
-  transition: var(--transition);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.add-more-btn:hover {
-  background: rgba(212,175,55,0.3);
-}
-
-.link-input-container {
-  margin-bottom: 10px;
-}
-
-.link-input {
-  width: 100%;
-  padding: 12px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid var(--glass-border);
-  border-radius: 8px;
-  color: var(--text-light);
-  font-size: 0.9rem;
-}
-
-.add-link-btn {
-  background: rgba(212,175,55,0.2);
-  color: var(--gold);
-  border: 1px dashed var(--gold);
-  border-radius: 8px;
-  padding: 10px 15px;
-  cursor: pointer;
-  text-align: center;
-  margin-top: 10px;
-  transition: var(--transition);
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-.add-link-btn:hover {
-  background: rgba(212,175,55,0.3);
-}
-
-.remove-link {
-  background: var(--error);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 25px;
-  height: 25px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 10px;
-  transition: var(--transition);
-}
-
-.remove-link:hover {
-  transform: scale(1.1);
-}
-
-.optional-badge {
-  background: rgba(212,175,55,0.3);
-  color: var(--light-gold);
-  padding: 4px 8px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin-right: 10px;
-}
-
-.file-counter {
-  background: rgba(212,175,55,0.2);
-  color: var(--gold);
-  padding: 4px 12px;
-  border-radius: 12px;
-  font-size: 0.8rem;
-  font-weight: bold;
-  margin-top: 10px;
-  display: inline-block;
-}
-
-/* تحسينات للجوال */
-@media (max-width: 768px) {
-  .welcome-title {
-    font-size: 2.2rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1.4rem;
-  }
-  
-  .welcome-message {
-    font-size: 1.1rem;
-  }
-  
-  .welcome-importance {
-    font-size: 1rem;
-  }
-  
-  .title {
-    font-size: 1.8rem;
-  }
-  
-  .subtitle {
-    font-size: 0.95rem;
-  }
-  
-  .form-container {
-    padding: 25px 20px;
-    border-radius: 20px;
-  }
-  
-  .question-title {
-    font-size: 1.2rem;
-  }
-  
-  .option-card {
-    padding: 15px;
-  }
-  
-  .nav-btn {
-    padding: 14px 20px;
-    font-size: 1rem;
-  }
-  
-  .form-navigation {
-    flex-direction: column;
-  }
-  
-  .step-indicators {
-    gap: 8px;
-  }
-  
-  .step-indicator {
-    width: 10px;
-    height: 10px;
-  }
-  
-  /* تعديل زر المتابعة للجوال */
-  .continue-btn {
-    padding: 16px 40px;
-    font-size: 1.2rem;
-    min-width: 180px;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 10px;
-  }
-  
-  .welcome-content {
-    padding: 30px 20px;
-  }
-  
-  .welcome-title {
-    font-size: 1.8rem;
-  }
-  
-  .welcome-subtitle {
-    font-size: 1.2rem;
-  }
-  
-  .welcome-message, .welcome-importance {
-    font-size: 0.95rem;
-  }
-  
-  .title {
-    font-size: 1.6rem;
-  }
-  
-  .form-container {
-    padding: 20px 15px;
-    border-radius: 18px;
-  }
-  
-  .question-title {
-    font-size: 1.1rem;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  
-  .option-title {
-    font-size: 1rem;
-  }
-  
-  .text-input, .textarea-input {
-    padding: 14px;
-  }
-  
-  .nav-btn {
-    padding: 12px 16px;
-  }
-  
-  /* تعديل زر المتابعة للشاشات الصغيرة */
-  .continue-btn {
-    padding: 14px 35px;
-    font-size: 1.1rem;
-    min-width: 160px;
-  }
-}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استبيان تصميم الشعار</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            direction: rtl;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1.1em;
+        }
+
+        .form-container {
+            padding: 30px;
+        }
+
+        .step {
+            display: none;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question {
+            margin-bottom: 25px;
+        }
+
+        .question h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.3em;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        textarea.input-field {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .option-card {
+            padding: 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .option-card:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .option-card.selected {
+            border-color: #667eea;
+            background: #f8f9ff;
+        }
+
+        .file-upload {
+            border: 2px dashed #667eea;
+            border-radius: 10px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .file-upload:hover {
+            background: #f8f9ff;
+        }
+
+        .file-upload i {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .file-list {
+            margin-top: 20px;
+        }
+
+        .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .remove-file {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.prev {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .nav-btn.next {
+            background: #667eea;
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #ecf0f1;
+            border-radius: 3px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            width: 14%;
+            transition: width 0.3s;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px 20px;
+        }
+
+        .loading i {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .success-message {
+            text-align: center;
+            padding: 50px 20px;
+            display: none;
+        }
+
+        .success-message i {
+            font-size: 4em;
+            color: #27ae60;
+            margin-bottom: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .link-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .link-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+        }
+
+        .add-link-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .remove-link {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .form-container {
+                padding: 20px;
+            }
+            
+            .navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
 </head>
 <body>
-<!-- شاشة الترحيب -->
-<div class="welcome-screen" id="welcomeScreen">
-  <div class="welcome-content">
-    <div class="welcome-decoration"></div>
-    <div class="welcome-decoration"></div>
-    
-    <h1 class="welcome-title">مرحباً عزيزنا العميل</h1>
-    <h2 class="welcome-subtitle">نحن سعداء بثقتك الغالية</h2>
-    <p class="welcome-message">نعمل معاً لتحقيق رؤيتك وتجسيد أفكارك بأفضل صورة</p>
-    <p class="welcome-importance">نؤمن بأن الاستبيان الدقيق هو أساس العمل الناجح، وسنعمل بناءً على إجاباتك لإنشاء تصميم يعبر عن هويتك</p>
-    
-    <button class="start-btn" id="startBtn">
-      <span>ابدأ الاستبيان</span>
-      <i class="fas fa-arrow-left"></i>
-    </button>
-  </div>
-</div>
-
-<!-- استبيان العميل -->
-<div class="container" id="mainContainer">
-  <div class="header">
-    <h1 class="title">استبيان العميل</h1>
-    <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
-  </div>
-  
-  <div class="form-container">
-    <div class="progress-container">
-      <div class="progress-bar">
-        <div class="progress" id="progress"></div>
-      </div>
-      <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
-    </div>
-    
-    <div class="step-indicators" id="step-indicators"></div>
-    
-    <form id="clientForm">
-      <!-- الخطوة 1 -->
-      <div class="form-step active" id="step-1">
-        <h2 class="question-title"><i class="fas fa-signature"></i> ما اسم العلامة التجارية كما تريد ظهوره في الشعار؟</h2>
-        <input type="text" class="text-input" name="brand_name" placeholder="أدخل اسم العلامة التجارية" id="brand-name-input" />
-        <div class="error-message" id="error-1"></div>
-      </div>
-
-      <!-- الخطوة 2 -->
-      <div class="form-step" id="step-2">
-        <h2 class="question-title"><i class="fas fa-briefcase"></i> ما هو نشاط الشركة أو مجالها الأساسي؟</h2>
-        <input type="text" class="text-input" name="business_field" placeholder="أدخل مجال العمل (مثال: تجارة الملابس، خدمات تقنية، مطعم، إلخ)" id="business-field-input" />
-        <div class="error-message" id="error-2"></div>
-      </div>
-
-      <!-- الخطوة 3 -->
-      <div class="form-step" id="step-3">
-        <h2 class="question-title"><i class="fas fa-pen-nib"></i> هل تفضّل أن يكون الشعار نصي فقط أم يتضمّن رمزًا أو أيقونة؟</h2>
-        <div class="options-grid">
-          <label class="option-card">
-            <input type="radio" name="logo_type" value="نصي فقط" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">نصي فقط</h3>
-            </div>
-          </label>
-          <label class="option-card">
-            <input type="radio" name="logo_type" value="يتضمن رمزًا أو أيقونة" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">يتضمن رمزًا أو أيقونة</h3>
-            </div>
-          </label>
-          <label class="option-card" id="other-logo-type">
-            <input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
-            <div class="option-content">
-              <h3 class="option-title">شيء آخر</h3>
-            </div>
-          </label>
-        </div>
-        <div class="custom-input" id="logo-type-custom">
-          <input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل التفضيل الآخر" />
-        </div>
-        <div class="error-message" id="error-3"></div>
-      </div>
-
-      <!-- الخطوة 4 -->
-      <div class="form-step" id="step-4">
-        <h2 class="question-title"><i class="fas fa-palette"></i> ما الألوان التي تفضلها أو ترغب بتجنّبها؟</h2>
-        <textarea class="textarea-input" name="colors" placeholder="صف الألوان التي تفضلها والألوان التي تريد تجنبها (مثال: أفضّل الألوان الذهبية والترابية، أتجنب الألوان الزاهية)" id="colors-input"></textarea>
-        <div class="error-message" id="error-4"></div>
-      </div>
-
-      <!-- الخطوة 5 -->
-      <div class="form-step" id="step-5">
-        <h2 class="question-title">
-          <i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟
-          <span class="optional-badge">اختياري</span>
-        </h2>
-        
-        <!-- قسم الروابط -->
-        <div style="margin-bottom: 25px;">
-          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
-            <i class="fas fa-link"></i> روابط الشعارات (حتى 6 روابط)
-          </h3>
-          <div id="links-container">
-            <div class="link-input-container">
-              <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
-            </div>
-          </div>
-          <button type="button" class="add-link-btn" id="add-link-btn">
-            <i class="fas fa-plus"></i> إضافة رابط آخر
-          </button>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 استبيان تصميم الشعار</h1>
+            <p>شاركنا رؤيتك لإنشاء شعار يعبر عن هويتك</p>
         </div>
 
-        <!-- قسم رفع الملفات -->
-        <div>
-          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
-            <i class="fas fa-cloud-upload-alt"></i> رفع الصور أو الفيديوهات (حتى 6 ملفات)
-          </h3>
-          <div class="multi-file-upload">
-            <div class="file-upload" id="file-upload">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <p>انقر لرفع الصور أو الفيديوهات (JPG, PNG, GIF, MP4, MOV)</p>
-              <p class="file-counter" id="file-counter">0/6 ملفات مرفوعة</p>
+        <div class="form-container">
+            <div class="progress-bar">
+                <div class="progress" id="progress"></div>
             </div>
-            <div id="file-list"></div>
-            <button type="button" class="add-more-btn" id="add-more-files">
-              <i class="fas fa-plus"></i> إضافة ملف آخر
-            </button>
-          </div>
-          <input type="file" id="file-input" style="display:none;" accept="image/*,video/*" multiple />
-        </div>
-        
-        <div class="error-message" id="error-5"></div>
-      </div>
 
-      <!-- الخطوة 6 -->
-      <div class="form-step" id="step-6">
-        <h2 class="question-title"><i class="fas fa-heart"></i> ما هي القيمة أو الشعور الذي تريد أن يوصلها الشعار للجمهور؟</h2>
-        <textarea class="textarea-input" name="feeling" placeholder="صف المشاعر والقيم التي تريد أن يعبر عنها الشعار (مثال: أريد أن يوصل الشعار شعور الثقة والاحترافية والابتكار)" id="feeling-input"></textarea>
-        <div class="error-message" id="error-6"></div>
-      </div>
+            <form id="surveyForm">
+                <!-- الخطوة 1 -->
+                <div class="step active" id="step1">
+                    <div class="question">
+                        <h3>ما اسم العلامة التجارية؟</h3>
+                        <input type="text" class="input-field" name="brand_name" placeholder="أدخل اسم العلامة التجارية" required>
+                    </div>
+                </div>
 
-      <!-- الخطوة 7 -->
-      <div class="form-step" id="step-7">
-        <h2 class="question-title">
-          <i class="fas fa-history"></i> هل لديك شعار قديم تريد تطويره أو تعديله؟
-          <span class="optional-badge">اختياري</span>
-        </h2>
-        
-        <!-- قسم رفع الملفات -->
-        <div style="margin-bottom: 25px;">
-          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
-            <i class="fas fa-cloud-upload-alt"></i> رفع الشعارات القديمة (حتى 6 ملفات)
-          </h3>
-          <div class="multi-file-upload">
-            <div class="file-upload" id="old-file-upload">
-              <i class="fas fa-cloud-upload-alt"></i>
-              <p>انقر لرفع الشعارات القديمة (صور، فيديو، PDF، PSD، AI)</p>
-              <p class="file-counter" id="old-file-counter">0/6 ملفات مرفوعة</p>
+                <!-- الخطوة 2 -->
+                <div class="step" id="step2">
+                    <div class="question">
+                        <h3>ما هو مجال عملك؟</h3>
+                        <input type="text" class="input-field" name="business_field" placeholder="مثال: مطعم، تجارة إلكترونية، خدمات تقنية..." required>
+                    </div>
+                </div>
+
+                <!-- الخطوة 3 -->
+                <div class="step" id="step3">
+                    <div class="question">
+                        <h3>ما نوع الشعار الذي تفضل؟</h3>
+                        <div class="options-grid">
+                            <div class="option-card" data-value="نصي فقط">
+                                <strong>نصي فقط</strong>
+                                <p>شعار مكون من النص فقط</p>
+                            </div>
+                            <div class="option-card" data-value="مع أيقونة">
+                                <strong>مع أيقونة</strong>
+                                <p>شعار يحتوي على نص وأيقونة</p>
+                            </div>
+                            <div class="option-card" data-value="أيقونة فقط">
+                                <strong>أيقونة فقط</strong>
+                                <p>شعار مكون من أيقونة فقط</p>
+                            </div>
+                        </div>
+                        <input type="hidden" name="logo_type" id="logoType">
+                    </div>
+                </div>
+
+                <!-- الخطوة 4 -->
+                <div class="step" id="step4">
+                    <div class="question">
+                        <h3>ما الألوان التي تفضل؟</h3>
+                        <textarea class="input-field" name="colors" placeholder="صف الألوان التي تفضلها والتي تريد تجنبها..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- الخطوة 5 -->
+                <div class="step" id="step5">
+                    <div class="question">
+                        <h3>أمثلة للشعارات التي تعجبك</h3>
+                        <p style="color: #666; margin-bottom: 15px;">يمكنك رفع صور أو فيديوهات (حد أقصى 10 ملفات)</p>
+                        
+                        <div class="file-upload" id="fileUpload">
+                            <i>📁</i>
+                            <h4>انقر لرفع الملفات</h4>
+                            <p>PNG, JPG, GIF, MP4, MOV - الحد الأقصى 50MB للملف</p>
+                        </div>
+                        <input type="file" id="fileInput" multiple style="display: none;" accept="image/*,video/*">
+                        
+                        <div class="file-list" id="fileList"></div>
+
+                        <div style="margin-top: 30px;">
+                            <h4>أو أضف روابط:</h4>
+                            <div id="linksContainer">
+                                <div class="link-input-container">
+                                    <input type="url" class="link-input" name="logo_links[]" placeholder="https://example.com/logo.jpg">
+                                    <button type="button" class="remove-link" onclick="removeLink(this)">✕</button>
+                                </div>
+                            </div>
+                            <button type="button" class="add-link-btn" onclick="addLink()" style="margin-top: 10px;">+ إضافة رابط</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- الخطوة 6 -->
+                <div class="step" id="step6">
+                    <div class="question">
+                        <h3>ما الشعور الذي تريد توصيله؟</h3>
+                        <textarea class="input-field" name="feeling" placeholder="صف المشاعر والقيم التي تريد أن يعبر عنها الشعار..." required></textarea>
+                    </div>
+                </div>
+
+                <!-- الخطوة 7 -->
+                <div class="step" id="step7">
+                    <div class="question">
+                        <h3>هل لديك شعار قديم؟</h3>
+                        <p style="color: #666; margin-bottom: 15px;">(اختياري) يمكنك رفع شعارك القديم للتطوير</p>
+                        
+                        <div class="file-upload" id="oldFileUpload">
+                            <i>🔄</i>
+                            <h4>انقر لرفع الشعارات القديمة</h4>
+                            <p>PNG, JPG, PSD, AI, PDF - الحد الأقصى 50MB للملف</p>
+                        </div>
+                        <input type="file" id="oldFileInput" multiple style="display: none;" accept="image/*,.psd,.ai,.pdf">
+                        
+                        <div class="file-list" id="oldFileList"></div>
+
+                        <div style="margin-top: 30px;">
+                            <h4>روابط الشعارات القديمة:</h4>
+                            <div id="oldLinksContainer">
+                                <div class="link-input-container">
+                                    <input type="url" class="link-input" name="old_logo_links[]" placeholder="https://example.com/old-logo.jpg">
+                                    <button type="button" class="remove-link" onclick="removeLink(this)">✕</button>
+                                </div>
+                            </div>
+                            <button type="button" class="add-link-btn" onclick="addOldLink()" style="margin-top: 10px;">+ إضافة رابط</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="navigation">
+                    <button type="button" class="nav-btn prev" id="prevBtn" disabled>السابق</button>
+                    <button type="button" class="nav-btn next" id="nextBtn">التالي</button>
+                    <button type="submit" class="nav-btn next" id="submitBtn" style="display: none;">إرسال الاستبيان</button>
+                </div>
+            </form>
+
+            <div class="loading hidden" id="loading">
+                <i>⏳</i>
+                <h3>جاري إرسال بياناتك...</h3>
+                <p>يرجى الانتظار</p>
             </div>
-            <div id="old-file-list"></div>
-            <button type="button" class="add-more-btn" id="add-more-old-files">
-              <i class="fas fa-plus"></i> إضافة ملف آخر
-            </button>
-          </div>
-          <input type="file" id="old-file-input" style="display:none;" accept="image/*,video/*,.pdf,.psd,.ai" multiple />
-        </div>
 
-        <!-- قسم الروابط -->
-        <div>
-          <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
-            <i class="fas fa-link"></i> روابط الشعارات القديمة (حتى 6 روابط)
-          </h3>
-          <div id="old-links-container">
-            <div class="link-input-container">
-              <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
+            <div class="success-message hidden" id="successMessage">
+                <i>✅</i>
+                <h3>تم الإرسال بنجاح!</h3>
+                <p>شكراً لك، سنتواصل معك قريباً</p>
+                <button type="button" class="nav-btn next" onclick="resetForm()" style="margin-top: 20px;">إرسال استبيان جديد</button>
             </div>
-          </div>
-          <button type="button" class="add-link-btn" id="add-old-link-btn">
-            <i class="fas fa-plus"></i> إضافة رابط آخر
-          </button>
         </div>
-        
-        <div class="error-message" id="error-7"></div>
-      </div>
-
-      <div class="form-navigation">
-        <button type="button" class="nav-btn" id="prev-btn"><i class="fas fa-arrow-right"></i> السابق</button>
-        <button type="button" class="nav-btn" id="next-btn">التالي <i class="fas fa-arrow-left"></i></button>
-        <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال الاستبيان</button>
-      </div>
-    </form>
-
-    <!-- شاشة التحميل -->
-    <div class="loading" id="loading">
-      <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري معالجة بياناتك وتحميلها...</p>
     </div>
 
-    <!-- شاشة النجاح -->
-    <div class="success-message" id="successMessage">
-      <i class="fas fa-check-circle"></i>
-      <h2>تم إرسال الاستبيان بنجاح!</h2>
-      <p>شكراً لك على وقتك، سنراجع إجاباتك ونعود إليك في أقرب وقت</p>
-      <button class="continue-btn" id="continueBtn">
-        <span>العودة للرئيسية</span>
-        <i class="fas fa-home"></i>
-      </button>
-    </div>
-  </div>
-</div>
+    <script>
+        // المتغيرات العامة
+        let currentStep = 1;
+        const totalSteps = 7;
+        let uploadedFiles = [];
+        let uploadedOldFiles = [];
+        const MAX_FILES = 10;
+        const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 
-<script>
-// رابط السكربت المحدث
-const scriptURL = "https://script.google.com/macros/s/AKfycbwGzvJ315D5-TMGmI5tzfCNmO0fVKwc9GRDCa343XlpT8ddvzwzZOMIYqTrcCtvsEo-/exec";
+        // عناصر DOM
+        const form = document.getElementById('surveyForm');
+        const steps = document.querySelectorAll('.step');
+        const progress = document.getElementById('progress');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const loading = document.getElementById('loading');
+        const successMessage = document.getElementById('successMessage');
 
-document.addEventListener('DOMContentLoaded', function() {
-  // متغيرات عامة
-  let currentStep = 1;
-  const totalSteps = 7;
-  let uploadedFiles = [];
-  let uploadedOldFiles = [];
-  const maxFiles = 6;
-  
-  // عناصر DOM
-  const welcomeScreen = document.getElementById('welcomeScreen');
-  const mainContainer = document.getElementById('mainContainer');
-  const startBtn = document.getElementById('startBtn');
-  const progress = document.getElementById('progress');
-  const progressText = document.getElementById('progress-text');
-  const stepIndicators = document.getElementById('step-indicators');
-  const prevBtn = document.getElementById('prev-btn');
-  const nextBtn = document.getElementById('next-btn');
-  const submitBtn = document.getElementById('submit-btn');
-  const form = document.getElementById('clientForm');
-  const loading = document.getElementById('loading');
-  const successMessage = document.getElementById('successMessage');
-  const continueBtn = document.getElementById('continueBtn');
-  
-  // تهيئة المؤشرات
-  function initStepIndicators() {
-    for (let i = 1; i <= totalSteps; i++) {
-      const indicator = document.createElement('div');
-      indicator.classList.add('step-indicator');
-      if (i === 1) indicator.classList.add('active');
-      stepIndicators.appendChild(indicator);
-    }
-  }
-  
-  // تحديث المؤشرات
-  function updateStepIndicators() {
-    const indicators = document.querySelectorAll('.step-indicator');
-    indicators.forEach((indicator, index) => {
-      if (index < currentStep) {
-        indicator.classList.add('active');
-      } else {
-        indicator.classList.remove('active');
-      }
-    });
-  }
-  
-  // تحديث التقدم
-  function updateProgress() {
-    const progressPercent = (currentStep / totalSteps) * 100;
-    progress.style.width = `${progressPercent}%`;
-    progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
-  }
-  
-  // الانتقال بين الخطوات
-  function goToStep(step) {
-    document.querySelectorAll('.form-step').forEach(el => {
-      el.classList.remove('active');
-    });
-    
-    document.getElementById(`step-${step}`).classList.add('active');
-    currentStep = step;
-    
-    updateProgress();
-    updateStepIndicators();
-    
-    // إظهار/إخفاء الأزرار
-    prevBtn.style.display = step === 1 ? 'none' : 'flex';
-    nextBtn.style.display = step === totalSteps ? 'none' : 'flex';
-    submitBtn.style.display = step === totalSteps ? 'flex' : 'none';
-  }
-  
-  // التحقق من صحة الخطوة الحالية
-  function validateStep(step) {
-    let isValid = true;
-    const errorElement = document.getElementById(`error-${step}`);
-    
-    // إخفاء رسالة الخطأ
-    errorElement.style.display = 'none';
-    
-    switch(step) {
-      case 1:
-        const brandName = document.querySelector('input[name="brand_name"]').value.trim();
-        if (!brandName) {
-          errorElement.textContent = 'يرجى إدخال اسم العلامة التجارية';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 2:
-        const businessField = document.querySelector('input[name="business_field"]').value.trim();
-        if (!businessField) {
-          errorElement.textContent = 'يرجى إدخال مجال العمل';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 3:
-        const logoType = document.querySelector('input[name="logo_type"]:checked');
-        if (!logoType) {
-          errorElement.textContent = 'يرجى اختيار نوع الشعار';
-          errorElement.style.display = 'block';
-          isValid = false;
-        } else if (logoType.value === 'شيء آخر') {
-          const customInput = document.querySelector('input[name="logo_type_custom"]').value.trim();
-          if (!customInput) {
-            errorElement.textContent = 'يرجى إدخال التفضيل الآخر';
-            errorElement.style.display = 'block';
-            isValid = false;
-          }
-        }
-        break;
-        
-      case 4:
-        const colors = document.querySelector('textarea[name="colors"]').value.trim();
-        if (!colors) {
-          errorElement.textContent = 'يرجى وصف الألوان المفضلة';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-        
-      case 6:
-        const feeling = document.querySelector('textarea[name="feeling"]').value.trim();
-        if (!feeling) {
-          errorElement.textContent = 'يرجى وصف المشاعر والقيم التي تريد توصيلها';
-          errorElement.style.display = 'block';
-          isValid = false;
-        }
-        break;
-    }
-    
-    return isValid;
-  }
-  
-  // الانتقال للخطوة التالية
-  function nextStep() {
-    if (validateStep(currentStep)) {
-      if (currentStep < totalSteps) {
-        goToStep(currentStep + 1);
-      }
-    }
-  }
-  
-  // الانتقال للخطوة السابقة
-  function prevStep() {
-    if (currentStep > 1) {
-      goToStep(currentStep - 1);
-    }
-  }
-  
-  // إدارة تحديد الخيارات
-  function initOptionSelection() {
-    document.querySelectorAll('.option-card').forEach(card => {
-      card.addEventListener('click', function() {
-        const radio = this.querySelector('input[type="radio"]');
-        if (radio) {
-          // إلغاء تحديد جميع الخيارات في نفس المجموعة
-          const groupName = radio.name;
-          document.querySelectorAll(`.option-card input[name="${groupName}"]`).forEach(otherRadio => {
-            otherRadio.closest('.option-card').classList.remove('selected');
-          });
-          
-          // تحديد الخيار الحالي
-          radio.checked = true;
-          this.classList.add('selected');
-          
-          // تشغيل حدث التغيير
-          radio.dispatchEvent(new Event('change'));
-        }
-      });
-    });
-  }
-  
-  // إظهار/إخفاء الحقل المخصص لنوع الشعار
-  document.getElementById('other-logo-type').addEventListener('click', function() {
-    const customInput = document.getElementById('logo-type-custom');
-    customInput.style.display = 'block';
-  });
-  
-  document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
-    radio.addEventListener('change', function() {
-      const customInput = document.getElementById('logo-type-custom');
-      if (this.value === 'شيء آخر') {
-        customInput.style.display = 'block';
-      } else {
-        customInput.style.display = 'none';
-      }
-    });
-  });
-  
-  // إدارة رفع الملفات للشعارات
-  const fileUpload = document.getElementById('file-upload');
-  const fileInput = document.getElementById('file-input');
-  const fileList = document.getElementById('file-list');
-  const addMoreFilesBtn = document.getElementById('add-more-files');
-  const fileCounter = document.getElementById('file-counter');
-  
-  fileUpload.addEventListener('click', () => fileInput.click());
-  addMoreFilesBtn.addEventListener('click', () => fileInput.click());
-  
-  fileInput.addEventListener('change', handleFileUpload);
-  
-  function handleFileUpload(e) {
-    const files = Array.from(e.target.files);
-    
-    // التحقق من عدد الملفات
-    if (uploadedFiles.length + files.length > maxFiles) {
-      alert(`يمكنك رفع ${maxFiles} ملفات كحد أقصى`);
-      return;
-    }
-    
-    // إضافة الملفات الجديدة
-    files.forEach(file => {
-      if (uploadedFiles.length < maxFiles) {
-        uploadedFiles.push(file);
-        addFileToList(file, fileList, uploadedFiles, fileCounter, 'files');
-      }
-    });
-    
-    // تحديث العداد
-    updateFileCounter(uploadedFiles, fileCounter);
-    
-    // إعادة تعيين حقل الرفع
-    fileInput.value = '';
-  }
-  
-  // إدارة رفع الملفات للشعارات القديمة
-  const oldFileUpload = document.getElementById('old-file-upload');
-  const oldFileInput = document.getElementById('old-file-input');
-  const oldFileList = document.getElementById('old-file-list');
-  const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
-  const oldFileCounter = document.getElementById('old-file-counter');
-  
-  oldFileUpload.addEventListener('click', () => oldFileInput.click());
-  addMoreOldFilesBtn.addEventListener('click', () => oldFileInput.click());
-  
-  oldFileInput.addEventListener('change', handleOldFileUpload);
-  
-  function handleOldFileUpload(e) {
-    const files = Array.from(e.target.files);
-    
-    // التحقق من عدد الملفات
-    if (uploadedOldFiles.length + files.length > maxFiles) {
-      alert(`يمكنك رفع ${maxFiles} ملفات كحد أقصى`);
-      return;
-    }
-    
-    // إضافة الملفات الجديدة
-    files.forEach(file => {
-      if (uploadedOldFiles.length < maxFiles) {
-        uploadedOldFiles.push(file);
-        addFileToList(file, oldFileList, uploadedOldFiles, oldFileCounter, 'old-files');
-      }
-    });
-    
-    // تحديث العداد
-    updateFileCounter(uploadedOldFiles, oldFileCounter);
-    
-    // إعادة تعيين حقل الرفع
-    oldFileInput.value = '';
-  }
-  
-  // إضافة ملف إلى القائمة
-  function addFileToList(file, listElement, filesArray, counterElement, type) {
-    const fileItem = document.createElement('div');
-    fileItem.classList.add('file-item');
-    
-    const fileNumber = filesArray.length;
-    
-    fileItem.innerHTML = `
-      <div class="file-info">
-        <div class="file-number">${fileNumber}</div>
-        <div>
-          <div>${file.name}</div>
-          <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">${formatFileSize(file.size)}</div>
-        </div>
-      </div>
-      <button type="button" class="remove-file" data-index="${fileNumber - 1}" data-type="${type}">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    listElement.appendChild(fileItem);
-    
-    // إضافة حدث إزالة الملف
-    const removeBtn = fileItem.querySelector('.remove-file');
-    removeBtn.addEventListener('click', function() {
-      const index = parseInt(this.getAttribute('data-index'));
-      filesArray.splice(index, 1);
-      listElement.removeChild(fileItem);
-      updateFileListNumbers(listElement, type);
-      updateFileCounter(filesArray, counterElement);
-    });
-  }
-  
-  // تحديث أرقام الملفات في القائمة
-  function updateFileListNumbers(listElement, type) {
-    const fileItems = listElement.querySelectorAll('.file-item');
-    fileItems.forEach((item, index) => {
-      const fileNumber = item.querySelector('.file-number');
-      fileNumber.textContent = index + 1;
-      
-      const removeBtn = item.querySelector('.remove-file');
-      removeBtn.setAttribute('data-index', index);
-    });
-    
-    // تحديث المصفوفة المناسبة
-    if (type === 'files') {
-      uploadedFiles = Array.from(fileItems).map((item, index) => {
-        return uploadedFiles[index];
-      });
-    } else if (type === 'old-files') {
-      uploadedOldFiles = Array.from(fileItems).map((item, index) => {
-        return uploadedOldFiles[index];
-      });
-    }
-  }
-  
-  // تحديث عداد الملفات
-  function updateFileCounter(filesArray, counterElement) {
-    counterElement.textContent = `${filesArray.length}/${maxFiles} ملفات مرفوعة`;
-  }
-  
-  // تنسيق حجم الملف
-  function formatFileSize(bytes) {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-  }
-  
-  // إدارة إضافة الروابط
-  const addLinkBtn = document.getElementById('add-link-btn');
-  const linksContainer = document.getElementById('links-container');
-  
-  addLinkBtn.addEventListener('click', function() {
-    const linkInputs = linksContainer.querySelectorAll('.link-input');
-    if (linkInputs.length < maxFiles) {
-      addLinkInput(linksContainer, 'logo_links[]');
-    } else {
-      alert(`يمكنك إضافة ${maxFiles} روابط كحد أقصى`);
-    }
-  });
-  
-  // إدارة إضافة الروابط للشعارات القديمة
-  const addOldLinkBtn = document.getElementById('add-old-link-btn');
-  const oldLinksContainer = document.getElementById('old-links-container');
-  
-  addOldLinkBtn.addEventListener('click', function() {
-    const linkInputs = oldLinksContainer.querySelectorAll('.link-input');
-    if (linkInputs.length < maxFiles) {
-      addLinkInput(oldLinksContainer, 'old_logo_links[]');
-    } else {
-      alert(`يمكنك إضافة ${maxFiles} روابط كحد أقصى`);
-    }
-  });
-  
-  // إضافة حقل رابط جديد
-  function addLinkInput(container, name) {
-    const linkInputContainer = document.createElement('div');
-    linkInputContainer.classList.add('link-input-container');
-    linkInputContainer.style.display = 'flex';
-    linkInputContainer.style.alignItems = 'center';
-    
-    linkInputContainer.innerHTML = `
-      <input type="url" class="link-input" name="${name}" placeholder="أدخل رابط الشعار" style="flex: 1;" />
-      <button type="button" class="remove-link">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
-    
-    container.appendChild(linkInputContainer);
-    
-    // إضافة حدث إزالة الرابط
-    const removeBtn = linkInputContainer.querySelector('.remove-link');
-    removeBtn.addEventListener('click', function() {
-      container.removeChild(linkInputContainer);
-    });
-  }
-  
-  // حل مشكلة Enter في الجوال
-  document.querySelectorAll('.text-input, .textarea-input').forEach(input => {
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        nextStep();
-      }
-    });
-  });
-  
-  // أحداث الأزرار
-  startBtn.addEventListener('click', function() {
-    welcomeScreen.style.animation = 'fadeOut 0.8s ease forwards';
-    setTimeout(() => {
-      welcomeScreen.style.display = 'none';
-      mainContainer.classList.add('show');
-    }, 800);
-  });
-  
-  nextBtn.addEventListener('click', nextStep);
-  prevBtn.addEventListener('click', prevStep);
-  
-  form.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    
-    // التحقق من صحة الخطوة الأخيرة
-    if (validateStep(currentStep)) {
-      // إظهار شاشة التحميل
-      form.style.display = 'none';
-      loading.style.display = 'block';
-      
-      try {
-        // جمع البيانات
-        const formData = new FormData();
-        
-        // إضافة جميع البيانات إلى formData
-        const formElements = document.querySelectorAll('input, textarea');
-        formElements.forEach(element => {
-          if (element.type === 'radio') {
-            if (element.checked) {
-              formData.append(element.name, element.value);
-            }
-          } else if (element.type !== 'file' && element.name) {
-            if (element.name.endsWith('[]')) {
-              // معالجة المدخلات المتعددة (الروابط)
-              if (element.value.trim() !== '') {
-                formData.append(element.name, element.value);
-              }
-            } else {
-              formData.append(element.name, element.value);
-            }
-          }
+        // رابط السكربت - ضع رابطك هنا بعد النشر
+        const SCRIPT_URL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
+
+        // التهيئة
+        document.addEventListener('DOMContentLoaded', function() {
+            initEventListeners();
+            updateProgress();
         });
-        
-        // إضافة ملفات الشعارات
-        for (let i = 0; i < uploadedFiles.length; i++) {
-          const file = uploadedFiles[i];
-          const base64 = await fileToBase64(file);
-          formData.append(`file_base64_${i}`, base64);
-          formData.append(`file_name_${i}`, file.name);
-          formData.append(`file_type_${i}`, file.type);
+
+        function initEventListeners() {
+            // التنقل بين الخطوات
+            prevBtn.addEventListener('click', prevStep);
+            nextBtn.addEventListener('click', nextStep);
+
+            // تحديد الخيارات
+            document.querySelectorAll('.option-card').forEach(card => {
+                card.addEventListener('click', function() {
+                    document.querySelectorAll('.option-card').forEach(c => c.classList.remove('selected'));
+                    this.classList.add('selected');
+                    document.getElementById('logoType').value = this.dataset.value;
+                });
+            });
+
+            // رفع الملفات
+            document.getElementById('fileUpload').addEventListener('click', () => document.getElementById('fileInput').click());
+            document.getElementById('oldFileUpload').addEventListener('click', () => document.getElementById('oldFileInput').click());
+
+            document.getElementById('fileInput').addEventListener('change', handleFileUpload);
+            document.getElementById('oldFileInput').addEventListener('change', handleOldFileUpload);
+
+            // إرسال النموذج
+            form.addEventListener('submit', handleSubmit);
         }
-        formData.append('file_count', uploadedFiles.length);
-        
-        // إضافة ملفات الشعارات القديمة
-        for (let i = 0; i < uploadedOldFiles.length; i++) {
-          const file = uploadedOldFiles[i];
-          const base64 = await fileToBase64(file);
-          formData.append(`old_file_base64_${i}`, base64);
-          formData.append(`old_file_name_${i}`, file.name);
-          formData.append(`old_file_type_${i}`, file.type);
+
+        function nextStep() {
+            if (validateStep(currentStep)) {
+                if (currentStep < totalSteps) {
+                    currentStep++;
+                    updateUI();
+                }
+            }
         }
-        formData.append('old_file_count', uploadedOldFiles.length);
-        
-        // إرسال البيانات إلى Google Apps Script
-        const response = await fetch(scriptURL, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.json();
-        
-        // إخفاء التحميل وإظهار النجاح
-        loading.style.display = 'none';
-        successMessage.style.display = 'block';
-        
-      } catch (error) {
-        // في حالة الخطأ
-        loading.style.display = 'none';
-        alert('حدث خطأ في الإرسال: ' + error.message);
-        form.style.display = 'block';
-      }
-    }
-  });
-  
-  // دالة تحويل الملف إلى base64
-  function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-  
-  continueBtn.addEventListener('click', function() {
-    // إعادة تعيين النموذج
-    form.reset();
-    uploadedFiles = [];
-    uploadedOldFiles = [];
-    fileList.innerHTML = '';
-    oldFileList.innerHTML = '';
-    updateFileCounter(uploadedFiles, fileCounter);
-    updateFileCounter(uploadedOldFiles, oldFileCounter);
-    
-    // إعادة إلى البداية
-    successMessage.style.display = 'none';
-    form.style.display = 'block';
-    goToStep(1);
-    
-    // إظهار شاشة الترحيب مرة أخرى
-    welcomeScreen.style.display = 'flex';
-    welcomeScreen.style.animation = 'none';
-    setTimeout(() => {
-      welcomeScreen.style.animation = 'fadeIn 0.8s ease forwards';
-    }, 10);
-    
-    mainContainer.classList.remove('show');
-  });
-  
-  // تهيئة التطبيق
-  initStepIndicators();
-  initOptionSelection();
-  updateProgress();
-});
-</script>
+
+        function prevStep() {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        }
+
+        function validateStep(step) {
+            const currentStepElement = document.getElementById(`step${step}`);
+            const inputs = currentStepElement.querySelectorAll('[required]');
+            
+            for (let input of inputs) {
+                if (!input.value.trim()) {
+                    alert('يرجى ملء جميع الحقول المطلوبة');
+                    input.focus();
+                    return false;
+                }
+            }
+
+            if (step === 3 && !document.getElementById('logoType').value) {
+                alert('يرجى اختيار نوع الشعار');
+                return false;
+            }
+
+            return true;
+        }
+
+        function updateUI() {
+            // إظهار/إخفاء الخطوات
+            steps.forEach((step, index) => {
+                step.classList.toggle('active', index + 1 === currentStep);
+            });
+
+            // تحديث التقدم
+            updateProgress();
+
+            // تحديث الأزرار
+            prevBtn.disabled = currentStep === 1;
+            nextBtn.style.display = currentStep === totalSteps ? 'none' : 'block';
+            submitBtn.style.display = currentStep === totalSteps ? 'block' : 'none';
+        }
+
+        function updateProgress() {
+            const progressPercent = (currentStep / totalSteps) * 100;
+            progress.style.width = `${progressPercent}%`;
+        }
+
+        function handleFileUpload(event) {
+            processFiles(event.target.files, uploadedFiles, 'fileList', 'files');
+            event.target.value = '';
+        }
+
+        function handleOldFileUpload(event) {
+            processFiles(event.target.files, uploadedOldFiles, 'oldFileList', 'oldFiles');
+            event.target.value = '';
+        }
+
+        function processFiles(files, filesArray, listId, type) {
+            for (let file of files) {
+                if (filesArray.length >= MAX_FILES) {
+                    alert(`يمكنك رفع ${MAX_FILES} ملفات كحد أقصى`);
+                    break;
+                }
+
+                if (file.size > MAX_FILE_SIZE) {
+                    alert(`الملف ${file.name} كبير جداً (الحد الأقصى 50MB)`);
+                    continue;
+                }
+
+                filesArray.push(file);
+                addFileToList(file, listId, filesArray, type);
+            }
+        }
+
+        function addFileToList(file, listId, filesArray, type) {
+            const fileList = document.getElementById(listId);
+            const fileItem = document.createElement('div');
+            fileItem.className = 'file-item';
+            fileItem.innerHTML = `
+                <div class="file-info">
+                    <div class="file-icon">${getFileIcon(file.type)}</div>
+                    <div>
+                        <div><strong>${file.name}</strong></div>
+                        <div style="font-size: 12px; color: #666;">${formatFileSize(file.size)}</div>
+                    </div>
+                </div>
+                <button type="button" class="remove-file" onclick="removeFile(this, '${type}')">✕</button>
+            `;
+            fileList.appendChild(fileItem);
+        }
+
+        function removeFile(button, type) {
+            const fileItem = button.closest('.file-item');
+            const fileName = fileItem.querySelector('strong').textContent;
+            const filesArray = type === 'files' ? uploadedFiles : uploadedOldFiles;
+            const index = filesArray.findIndex(file => file.name === fileName);
+            
+            if (index > -1) {
+                filesArray.splice(index, 1);
+            }
+            fileItem.remove();
+        }
+
+        function getFileIcon(fileType) {
+            if (fileType.startsWith('image/')) return '🖼️';
+            if (fileType.startsWith('video/')) return '🎬';
+            if (fileType.includes('pdf')) return '📄';
+            return '📁';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        function addLink() {
+            const container = document.getElementById('linksContainer');
+            const linkInput = document.createElement('div');
+            linkInput.className = 'link-input-container';
+            linkInput.innerHTML = `
+                <input type="url" class="link-input" name="logo_links[]" placeholder="https://example.com/logo.jpg">
+                <button type="button" class="remove-link" onclick="removeLink(this)">✕</button>
+            `;
+            container.appendChild(linkInput);
+        }
+
+        function addOldLink() {
+            const container = document.getElementById('oldLinksContainer');
+            const linkInput = document.createElement('div');
+            linkInput.className = 'link-input-container';
+            linkInput.innerHTML = `
+                <input type="url" class="link-input" name="old_logo_links[]" placeholder="https://example.com/old-logo.jpg">
+                <button type="button" class="remove-link" onclick="removeLink(this)">✕</button>
+            `;
+            container.appendChild(linkInput);
+        }
+
+        function removeLink(button) {
+            button.closest('.link-input-container').remove();
+        }
+
+        async function handleSubmit(event) {
+            event.preventDefault();
+
+            if (!validateStep(currentStep)) return;
+
+            // إظهار شاشة التحميل
+            form.style.display = 'none';
+            loading.classList.remove('hidden');
+
+            try {
+                // جمع البيانات
+                const formData = new FormData(form);
+                const submissionData = {
+                    brand_name: formData.get('brand_name'),
+                    business_field: formData.get('business_field'),
+                    logo_type: formData.get('logo_type'),
+                    colors: formData.get('colors'),
+                    feeling: formData.get('feeling'),
+                    logo_links: formData.getAll('logo_links[]').filter(link => link.trim()),
+                    old_logo_links: formData.getAll('old_logo_links[]').filter(link => link.trim()),
+                    files: [],
+                    old_files: []
+                };
+
+                // إضافة معلومات الملفات
+                submissionData.file_count = uploadedFiles.length;
+                for (let i = 0; i < uploadedFiles.length; i++) {
+                    const file = uploadedFiles[i];
+                    const base64 = await fileToBase64(file);
+                    submissionData.files.push({
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        base64: base64
+                    });
+                }
+
+                submissionData.old_file_count = uploadedOldFiles.length;
+                for (let i = 0; i < uploadedOldFiles.length; i++) {
+                    const file = uploadedOldFiles[i];
+                    const base64 = await fileToBase64(file);
+                    submissionData.old_files.push({
+                        name: file.name,
+                        type: file.type,
+                        size: file.size,
+                        base64: base64
+                    });
+                }
+
+                // إرسال البيانات
+                const response = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(submissionData)
+                });
+
+                const result = await response.json();
+
+                if (result.result === 'success') {
+                    loading.classList.add('hidden');
+                    successMessage.classList.remove('hidden');
+                } else {
+                    throw new Error(result.message || 'حدث خطأ غير معروف');
+                }
+
+            } catch (error) {
+                loading.classList.add('hidden');
+                form.style.display = 'block';
+                alert('❌ حدث خطأ في الإرسال: ' + error.message);
+                console.error('Error:', error);
+            }
+        }
+
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function resetForm() {
+            // إعادة تعيين النموذج
+            form.reset();
+            form.style.display = 'block';
+            successMessage.classList.add('hidden');
+            
+            // إعادة تعيين الملفات
+            uploadedFiles = [];
+            uploadedOldFiles = [];
+            document.getElementById('fileList').innerHTML = '';
+            document.getElementById('oldFileList').innerHTML = '';
+            document.getElementById('linksContainer').innerHTML = '<div class="link-input-container"><input type="url" class="link-input" name="logo_links[]" placeholder="https://example.com/logo.jpg"><button type="button" class="remove-link" onclick="removeLink(this)">✕</button></div>';
+            document.getElementById('oldLinksContainer').innerHTML = '<div class="link-input-container"><input type="url" class="link-input" name="old_logo_links[]" placeholder="https://example.com/old-logo.jpg"><button type="button" class="remove-link" onclick="removeLink(this)">✕</button></div>';
+            
+            // إعادة إلى الخطوة الأولى
+            currentStep = 1;
+            updateUI();
+        }
+    </script>
 </body>
 </html>
-
-
