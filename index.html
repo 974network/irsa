@@ -3,556 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>استبيان تصميم الهوية البصرية</title>
-    <style>
-        :root {
-            --primary-color: #4a6fa5;
-            --secondary-color: #6b8cbc;
-            --accent-color: #ff7e5f;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --success-color: #28a745;
-            --border-radius: 8px;
-            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: var(--dark-color);
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding: 20px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-        
-        h1 {
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .description {
-            font-size: 1.1rem;
-            opacity: 0.9;
-        }
-        
-        .form-section {
-            background-color: white;
-            padding: 25px;
-            margin-bottom: 25px;
-            border-radius: var(--border-radius);
-            box-shadow: var(--box-shadow);
-        }
-        
-        .section-title {
-            font-size: 1.4rem;
-            color: var(--primary-color);
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--light-color);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        
-        input[type="text"],
-        input[type="email"],
-        input[type="tel"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            transition: border 0.3s;
-        }
-        
-        input:focus,
-        textarea:focus,
-        select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-        
-        textarea {
-            min-height: 120px;
-            resize: vertical;
-        }
-        
-        .checkbox-group {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 8px;
-        }
-        
-        .checkbox-item input {
-            margin-left: 8px;
-        }
-        
-        .file-upload {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .file-upload-btn {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 12px 20px;
-            border-radius: var(--border-radius);
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: background-color 0.3s;
-        }
-        
-        .file-upload-btn:hover {
-            background-color: var(--secondary-color);
-        }
-        
-        .file-upload input[type="file"] {
-            position: absolute;
-            left: 0;
-            top: 0;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
-        
-        .file-list {
-            margin-top: 10px;
-        }
-        
-        .file-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background-color: var(--light-color);
-            padding: 8px 12px;
-            border-radius: var(--border-radius);
-            margin-bottom: 8px;
-        }
-        
-        .file-name {
-            flex-grow: 1;
-        }
-        
-        .remove-file {
-            color: #dc3545;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .submit-btn {
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            width: 100%;
-            transition: background-color 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .submit-btn:hover {
-            background-color: #ff6b4a;
-        }
-        
-        .submit-btn:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .loading {
-            display: none;
-            margin-left: 10px;
-        }
-        
-        .message {
-            padding: 15px;
-            border-radius: var(--border-radius);
-            margin-top: 20px;
-            text-align: center;
-            display: none;
-        }
-        
-        .success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            h1 {
-                font-size: 1.6rem;
-            }
-            
-            .form-section {
-                padding: 15px;
-            }
-        }
-    </style>
+    <title>استبيان العميل - تصميم شعار</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>استبيان تصميم الهوية البصرية</h1>
-            <p class="description">نرجو تعبئة هذا الاستبيان لمساعدتنا في تصميم هوية بصرية تناسب احتياجاتك</p>
-        </header>
-        
-        <form id="surveyForm">
-            <!-- المعلومات الأساسية -->
-            <section class="form-section">
-                <h2 class="section-title">المعلومات الأساسية</h2>
-                
-                <div class="form-group">
-                    <label for="name">الاسم الكامل *</label>
-                    <input type="text" id="name" name="name" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">البريد الإلكتروني *</label>
-                    <input type="email" id="email" name="email" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="phone">رقم الهاتف</label>
-                    <input type="tel" id="phone" name="phone">
-                </div>
-                
-                <div class="form-group">
-                    <label for="company">اسم الشركة / المؤسسة</label>
-                    <input type="text" id="company" name="company">
-                </div>
-            </section>
+    <!-- شاشة الترحيب -->
+    <div class="welcome-screen" id="welcomeScreen">
+        <div class="welcome-content">
+            <div class="welcome-decoration"></div>
+            <div class="welcome-decoration"></div>
             
-            <!-- معلومات المشروع -->
-            <section class="form-section">
-                <h2 class="section-title">معلومات المشروع</h2>
-                
-                <div class="form-group">
-                    <label for="projectType">نوع المشروع *</label>
-                    <select id="projectType" name="projectType" required>
-                        <option value="">اختر نوع المشروع</option>
-                        <option value="شركة ناشئة">شركة ناشئة</option>
-                        <option value="تطوير هوية قائمة">تطوير هوية قائمة</option>
-                        <option value="منتج جديد">منتج جديد</option>
-                        <option value="حدث أو حملة">حدث أو حملة</option>
-                        <option value="أخرى">أخرى</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="industry">المجال / الصناعة *</label>
-                    <input type="text" id="industry" name="industry" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="targetAudience">الجمهور المستهدف</label>
-                    <textarea id="targetAudience" name="targetAudience" placeholder="صف جمهورك المستهدف..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label for="projectDescription">وصف المشروع *</label>
-                    <textarea id="projectDescription" name="projectDescription" required placeholder="صف مشروعك وأهدافه..."></textarea>
-                </div>
-            </section>
+            <h1 class="welcome-title">مرحباً عزيزنا العميل</h1>
+            <h2 class="welcome-subtitle">نحن سعداء بثقتك الغالية</h2>
+            <p class="welcome-message">نعمل معاً لتحقيق رؤيتك وتجسيد أفكارك بأفضل صورة</p>
+            <p class="welcome-importance">نؤمن بأن الاستبيان الدقيق هو أساس العمل الناجح، وسنعمل بناءً على إجاباتك لإنشاء تصميم يعبر عن هويتك</p>
             
-            <!-- التفضيلات التصميمية -->
-            <section class="form-section">
-                <h2 class="section-title">التفضيلات التصميمية</h2>
-                
-                <div class="form-group">
-                    <label>أنماط التصميم المفضلة (يمكن اختيار أكثر من واحد)</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="minimal" name="designStyles" value="بسيط وأنيق">
-                            <label for="minimal">بسيط وأنيق</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="modern" name="designStyles" value="حديث وجريء">
-                            <label for="modern">حديث وجريء</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="classic" name="designStyles" value="كلاسيكي وتقليدي">
-                            <label for="classic">كلاسيكي وتقليدي</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="playful" name="designStyles" value="مرح وحيوي">
-                            <label for="playful">مرح وحيوي</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="elegant" name="designStyles" value="فاخر وأنيق">
-                            <label for="elegant">فاخر وأنيق</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="colors">الألوان المفضلة</label>
-                    <input type="text" id="colors" name="colors" placeholder="اذكر الألوان التي تفضلها أو التي تمثل علامتك التجارية...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="dislikedColors">الألوان غير المرغوبة</label>
-                    <input type="text" id="dislikedColors" name="dislikedColors" placeholder="اذكر الألوان التي لا تفضلها...">
-                </div>
-                
-                <div class="form-group">
-                    <label for="additionalPreferences">تفضيلات إضافية</label>
-                    <textarea id="additionalPreferences" name="additionalPreferences" placeholder="أي تفضيلات أخرى للتصميم..."></textarea>
-                </div>
-            </section>
-            
-            <!-- المواد المرجعية -->
-            <section class="form-section">
-                <h2 class="section-title">المواد المرجعية</h2>
-                
-                <div class="form-group">
-                    <label for="references">روابط لتصاميم تعجبك</label>
-                    <textarea id="references" name="references" placeholder="ضع روابط لمواقع أو تصاميم تعجبك..."></textarea>
-                </div>
-                
-                <div class="form-group">
-                    <label>رفع ملفات (صور، فيديوهات، إلخ)</label>
-                    <div class="file-upload">
-                        <div class="file-upload-btn">
-                            <span>اختر الملفات</span>
-                        </div>
-                        <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf,.doc,.docx">
-                    </div>
-                    <div class="file-list" id="fileList"></div>
-                </div>
-            </section>
-            
-            <!-- معلومات إضافية -->
-            <section class="form-section">
-                <h2 class="section-title">معلومات إضافية</h2>
-                
-                <div class="form-group">
-                    <label for="budget">الميزانية المقدرة</label>
-                    <select id="budget" name="budget">
-                        <option value="">اختر نطاق الميزانية</option>
-                        <option value="أقل من 1000 دولار">أقل من 1000 دولار</option>
-                        <option value="1000 - 3000 دولار">1000 - 3000 دولار</option>
-                        <option value="3000 - 5000 دولار">3000 - 5000 دولار</option>
-                        <option value="أكثر من 5000 دولار">أكثر من 5000 دولار</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="timeline">الجدول الزمني المطلوب</label>
-                    <select id="timeline" name="timeline">
-                        <option value="">اختر الجدول الزمني</option>
-                        <option value="أقل من أسبوعين">أقل من أسبوعين</option>
-                        <option value="2-4 أسابيع">2-4 أسابيع</option>
-                        <option value="1-2 أشهر">1-2 أشهر</option>
-                        <option value="أكثر من شهرين">أكثر من شهرين</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="additionalInfo">معلومات إضافية</label>
-                    <textarea id="additionalInfo" name="additionalInfo" placeholder="أي معلومات إضافية ترغب في إضافتها..."></textarea>
-                </div>
-            </section>
-            
-            <button type="submit" class="submit-btn" id="submitBtn">
-                إرسال الاستبيان
-                <div class="loading" id="loadingSpinner">⏳</div>
+            <button class="start-btn" id="startBtn">
+                <span>ابدأ الاستبيان</span>
+                <i class="fas fa-arrow-left"></i>
             </button>
-            
-            <div class="message success" id="successMessage">
-                تم إرسال استبيانك بنجاح! سنتواصل معك قريباً.
-            </div>
-            
-            <div class="message error" id="errorMessage">
-                حدث خطأ أثناء إرسال الاستبيان. يرجى المحاولة مرة أخرى.
-            </div>
-        </form>
+        </div>
     </div>
 
-    <script>
-        // إدارة رفع الملفات
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-        const uploadedFiles = [];
+    <!-- استبيان العميل -->
+    <div class="container" id="mainContainer">
+        <div class="header">
+            <h1 class="title">استبيان العميل</h1>
+            <p class="subtitle">نحن هنا لتصميم هوية فريدة تناسب ذوقك الرفيع. يرجى تعبئة جميع البيانات بدقة</p>
+        </div>
         
-        fileInput.addEventListener('change', function(e) {
-            const files = e.target.files;
+        <div class="form-container">
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress" id="progress"></div>
+                </div>
+                <div class="progress-text" id="progress-text">السؤال 1 من 7</div>
+            </div>
             
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                uploadedFiles.push(file);
-                
-                const fileItem = document.createElement('div');
-                fileItem.className = 'file-item';
-                fileItem.innerHTML = `
-                    <span class="file-name">${file.name}</span>
-                    <span class="remove-file" data-index="${uploadedFiles.length - 1}">✕</span>
-                `;
-                
-                fileList.appendChild(fileItem);
-            }
+            <div class="step-indicators" id="step-indicators"></div>
             
-            // إعادة تعيين حقل الرفع للسماح برفع نفس الملف مرة أخرى إذا لزم الأمر
-            fileInput.value = '';
-        });
-        
-        // إزالة الملفات من القائمة
-        fileList.addEventListener('click', function(e) {
-            if (e.target.classList.contains('remove-file')) {
-                const index = parseInt(e.target.getAttribute('data-index'));
-                uploadedFiles.splice(index, 1);
-                
-                // إعادة بناء القائمة
-                fileList.innerHTML = '';
-                uploadedFiles.forEach((file, index) => {
-                    const fileItem = document.createElement('div');
-                    fileItem.className = 'file-item';
-                    fileItem.innerHTML = `
-                        <span class="file-name">${file.name}</span>
-                        <span class="remove-file" data-index="${index}">✕</span>
-                    `;
-                    fileList.appendChild(fileItem);
-                });
-            }
-        });
-        
-        // إرسال النموذج
-        const surveyForm = document.getElementById('surveyForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const loadingSpinner = document.getElementById('loadingSpinner');
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        
-        surveyForm.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            // التحقق من صحة النموذج
-            if (!surveyForm.checkValidity()) {
-                surveyForm.reportValidity();
-                return;
-            }
-            
-            // إظهار حالة التحميل
-            submitBtn.disabled = true;
-            loadingSpinner.style.display = 'inline-block';
-            successMessage.style.display = 'none';
-            errorMessage.style.display = 'none';
-            
-            try {
-                // جمع بيانات النموذج
-                const formData = new FormData();
-                
-                // إضافة بيانات النص
-                const formElements = surveyForm.elements;
-                for (let i = 0; i < formElements.length; i++) {
-                    const element = formElements[i];
+            <form id="clientForm">
+                <!-- الخطوة 1 -->
+                <div class="form-step active" id="step-1">
+                    <h2 class="question-title"><i class="fas fa-signature"></i> ما اسم العلامة التجارية كما تريد ظهوره في الشعار؟</h2>
+                    <input type="text" class="text-input" name="brand_name" placeholder="أدخل اسم العلامة التجارية" id="brand-name-input" />
+                    <div class="error-message" id="error-1"></div>
+                </div>
+
+                <!-- الخطوة 2 -->
+                <div class="form-step" id="step-2">
+                    <h2 class="question-title"><i class="fas fa-briefcase"></i> ما هو نشاط الشركة أو مجالها الأساسي؟</h2>
+                    <input type="text" class="text-input" name="business_field" placeholder="أدخل مجال العمل (مثال: تجارة الملابس، خدمات تقنية، مطعم، إلخ)" id="business-field-input" />
+                    <div class="error-message" id="error-2"></div>
+                </div>
+
+                <!-- الخطوة 3 -->
+                <div class="form-step" id="step-3">
+                    <h2 class="question-title"><i class="fas fa-pen-nib"></i> هل تفضّل أن يكون الشعار نصي فقط أم يتضمّن رمزًا أو أيقونة؟</h2>
+                    <div class="options-grid">
+                        <label class="option-card">
+                            <input type="radio" name="logo_type" value="نصي فقط" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">نصي فقط</h3>
+                            </div>
+                        </label>
+                        <label class="option-card">
+                            <input type="radio" name="logo_type" value="يتضمن رمزًا أو أيقونة" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">يتضمن رمزًا أو أيقونة</h3>
+                            </div>
+                        </label>
+                        <label class="option-card" id="other-logo-type">
+                            <input type="radio" name="logo_type" value="شيء آخر" class="radio"/>
+                            <div class="option-content">
+                                <h3 class="option-title">شيء آخر</h3>
+                            </div>
+                        </label>
+                    </div>
+                    <div class="custom-input" id="logo-type-custom">
+                        <input type="text" class="text-input" name="logo_type_custom" placeholder="أدخل التفضيل الآخر" />
+                    </div>
+                    <div class="error-message" id="error-3"></div>
+                </div>
+
+                <!-- الخطوة 4 -->
+                <div class="form-step" id="step-4">
+                    <h2 class="question-title"><i class="fas fa-palette"></i> ما الألوان التي تفضلها أو ترغب بتجنّبها؟</h2>
+                    <textarea class="textarea-input" name="colors" placeholder="صف الألوان التي تفضلها والألوان التي تريد تجنبها (مثال: أفضّل الألوان الذهبية والترابية، أتجنب الألوان الزاهية)" id="colors-input"></textarea>
+                    <div class="error-message" id="error-4"></div>
+                </div>
+
+                <!-- الخطوة 5 -->
+                <div class="form-step" id="step-5">
+                    <h2 class="question-title">
+                        <i class="fas fa-images"></i> هل لديك أمثلة لشعارات تعجبك أو تمثل الذوق المطلوب؟
+                        <span class="optional-badge">اختياري</span>
+                    </h2>
                     
-                    if (element.name && element.type !== 'file') {
-                        if (element.type === 'checkbox') {
-                            if (element.checked) {
-                                formData.append(element.name, element.value);
-                            }
-                        } else {
-                            formData.append(element.name, element.value);
-                        }
-                    }
-                }
-                
-                // إضافة الملفات
-                uploadedFiles.forEach(file => {
-                    formData.append('attachments', file);
-                });
-                
-                // إرسال البيانات إلى Google Apps Script
-                // استبدل هذا الرابط برابط نشر Google Apps Script الخاص بك
-                const scriptURL = 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec';
-                
-                const response = await fetch(scriptURL, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                if (response.ok) {
-                    // إظهار رسالة النجاح
-                    successMessage.style.display = 'block';
-                    surveyForm.reset();
-                    fileList.innerHTML = '';
-                    uploadedFiles.length = 0;
+                    <!-- قسم الروابط -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-link"></i> روابط الشعارات (حتى 6 روابط)
+                        </h3>
+                        <div id="links-container">
+                            <div class="link-input-container">
+                                <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار (مثال: https://example.com/logo.jpg)" />
+                            </div>
+                        </div>
+                        <button type="button" class="add-link-btn" id="add-link-btn">
+                            <i class="fas fa-plus"></i> إضافة رابط آخر
+                        </button>
+                    </div>
+
+                    <!-- قسم رفع الملفات -->
+                    <div>
+                        <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-cloud-upload-alt"></i> رفع الصور أو الفيديوهات (حتى 6 ملفات)
+                        </h3>
+                        <div class="multi-file-upload">
+                            <div class="file-upload" id="file-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>انقر لرفع الصور أو الفيديوهات (JPG, PNG, GIF, MP4, MOV)</p>
+                                <p class="file-counter" id="file-counter">0/6 ملفات مرفوعة</p>
+                            </div>
+                            <div id="file-list"></div>
+                            <button type="button" class="add-more-btn" id="add-more-files">
+                                <i class="fas fa-plus"></i> إضافة ملف آخر
+                            </button>
+                        </div>
+                        <input type="file" id="file-input" style="display:none;" accept="image/*,video/*" multiple />
+                    </div>
                     
-                    // التمرير إلى الأعلى لعرض رسالة النجاح
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                } else {
-                    throw new Error('فشل إرسال النموذج');
-                }
-                
-            } catch (error) {
-                console.error('Error:', error);
-                errorMessage.style.display = 'block';
-                
-                // التمرير إلى الأعلى لعرض رسالة الخطأ
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-            } finally {
-                // إخفاء حالة التحميل
-                submitBtn.disabled = false;
-                loadingSpinner.style.display = 'none';
-            }
-        });
-    </script>
+                    <div class="error-message" id="error-5"></div>
+                </div>
+
+                <!-- الخطوة 6 -->
+                <div class="form-step" id="step-6">
+                    <h2 class="question-title"><i class="fas fa-heart"></i> ما هي القيمة أو الشعور الذي تريد أن يوصلها الشعار للجمهور؟</h2>
+                    <textarea class="textarea-input" name="feeling" placeholder="صف المشاعر والقيم التي تريد أن يعبر عنها الشعار (مثال: أريد أن يوصل الشعار شعور الثقة والاحترافية والابتكار)" id="feeling-input"></textarea>
+                    <div class="error-message" id="error-6"></div>
+                </div>
+
+                <!-- الخطوة 7 -->
+                <div class="form-step" id="step-7">
+                    <h2 class="question-title">
+                        <i class="fas fa-history"></i> هل لديك شعار قديم تريد تطويره أو تعديله؟
+                        <span class="optional-badge">اختياري</span>
+                    </h2>
+                    
+                    <!-- قسم رفع الملفات -->
+                    <div style="margin-bottom: 25px;">
+                        <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-cloud-upload-alt"></i> رفع الشعارات القديمة (حتى 6 ملفات)
+                        </h3>
+                        <div class="multi-file-upload">
+                            <div class="file-upload" id="old-file-upload">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>انقر لرفع الشعارات القديمة (صور، فيديو، PDF، PSD، AI)</p>
+                                <p class="file-counter" id="old-file-counter">0/6 ملفات مرفوعة</p>
+                            </div>
+                            <div id="old-file-list"></div>
+                            <button type="button" class="add-more-btn" id="add-more-old-files">
+                                <i class="fas fa-plus"></i> إضافة ملف آخر
+                            </button>
+                        </div>
+                        <input type="file" id="old-file-input" style="display:none;" accept="image/*,video/*,.pdf,.psd,.ai" multiple />
+                    </div>
+
+                    <!-- قسم الروابط -->
+                    <div>
+                        <h3 style="color: var(--light-gold); margin-bottom: 15px; font-size: 1.1rem;">
+                            <i class="fas fa-link"></i> روابط الشعارات القديمة (حتى 6 روابط)
+                        </h3>
+                        <div id="old-links-container">
+                            <div class="link-input-container">
+                                <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم" />
+                            </div>
+                        </div>
+                        <button type="button" class="add-link-btn" id="add-old-link-btn">
+                            <i class="fas fa-plus"></i> إضافة رابط آخر
+                        </button>
+                    </div>
+                    
+                    <div class="error-message" id="error-7"></div>
+                </div>
+
+                <div class="form-navigation">
+                    <button type="button" class="nav-btn" id="prev-btn"><i class="fas fa-arrow-right"></i> السابق</button>
+                    <button type="button" class="nav-btn" id="next-btn">التالي <i class="fas fa-arrow-left"></i></button>
+                    <button type="submit" class="nav-btn" id="submit-btn" style="display:none;"><i class="fas fa-paper-plane"></i> إرسال الاستبيان</button>
+                </div>
+            </form>
+
+            <!-- شاشة التحميل -->
+            <div class="loading" id="loading">
+                <i class="fas fa-spinner fa-spin"></i>
+                <p>جاري معالجة بياناتك وتحميلها...</p>
+            </div>
+
+            <!-- شاشة النجاح -->
+            <div class="success-message" id="successMessage">
+                <i class="fas fa-check-circle"></i>
+                <h2>تم إرسال الاستبيان بنجاح!</h2>
+                <p>شكراً لك على وقتك، سنراجع إجاباتك ونعود إليك في أقرب وقت</p>
+                <button class="continue-btn" id="continueBtn">
+                    <span>العودة للرئيسية</span>
+                    <i class="fas fa-home"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
 </body>
 </html>
