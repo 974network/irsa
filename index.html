@@ -467,17 +467,6 @@ body {
   border-right: 3px solid var(--error);
 }
 
-.success-message {
-  color: var(--success);
-  font-size: 0.9rem;
-  margin-top: 10px;
-  display: none;
-  padding: 8px 12px;
-  background: rgba(76,175,80,0.1);
-  border-radius: 8px;
-  border-right: 3px solid var(--success);
-}
-
 .form-navigation {
   display: flex;
   justify-content: space-between;
@@ -1107,6 +1096,9 @@ body {
 </div>
 
 <script>
+// رابط السكربت المحدث
+const scriptURL = "https://script.google.com/macros/s/AKfycbx1OYeeKsdlZXtNJIqswAk7gKUI2JKM10K69W7QGDWz5bpaJgHM99wxSLmukC2PNDcHFg/exec";
+
 document.addEventListener('DOMContentLoaded', function() {
   // متغيرات عامة
   let currentStep = 1;
@@ -1511,7 +1503,7 @@ document.addEventListener('DOMContentLoaded', function() {
   nextBtn.addEventListener('click', nextStep);
   prevBtn.addEventListener('click', prevStep);
   
-  form.addEventListener('submit', function(e) {
+  form.addEventListener('submit', async function(e) {
     e.preventDefault();
     
     // التحقق من صحة الخطوة الأخيرة
@@ -1520,13 +1512,79 @@ document.addEventListener('DOMContentLoaded', function() {
       form.style.display = 'none';
       loading.style.display = 'block';
       
-      // محاكاة إرسال البيانات
-      setTimeout(() => {
+      try {
+        // جمع البيانات
+        const formData = new FormData();
+        
+        // إضافة جميع البيانات إلى formData
+        const formElements = document.querySelectorAll('input, textarea');
+        formElements.forEach(element => {
+          if (element.type === 'radio') {
+            if (element.checked) {
+              formData.append(element.name, element.value);
+            }
+          } else if (element.type !== 'file' && element.name) {
+            if (element.name.endsWith('[]')) {
+              // معالجة المدخلات المتعددة (الروابط)
+              if (element.value.trim() !== '') {
+                formData.append(element.name, element.value);
+              }
+            } else {
+              formData.append(element.name, element.value);
+            }
+          }
+        });
+        
+        // إضافة ملفات الشعارات
+        for (let i = 0; i < uploadedFiles.length; i++) {
+          const file = uploadedFiles[i];
+          const base64 = await fileToBase64(file);
+          formData.append(`file_base64_${i}`, base64);
+          formData.append(`file_name_${i}`, file.name);
+          formData.append(`file_type_${i}`, file.type);
+        }
+        formData.append('file_count', uploadedFiles.length);
+        
+        // إضافة ملفات الشعارات القديمة
+        for (let i = 0; i < uploadedOldFiles.length; i++) {
+          const file = uploadedOldFiles[i];
+          const base64 = await fileToBase64(file);
+          formData.append(`old_file_base64_${i}`, base64);
+          formData.append(`old_file_name_${i}`, file.name);
+          formData.append(`old_file_type_${i}`, file.type);
+        }
+        formData.append('old_file_count', uploadedOldFiles.length);
+        
+        // إرسال البيانات إلى Google Apps Script
+        const response = await fetch(scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        // إخفاء التحميل وإظهار النجاح
         loading.style.display = 'none';
         successMessage.style.display = 'block';
-      }, 2000);
+        
+      } catch (error) {
+        // في حالة الخطأ
+        loading.style.display = 'none';
+        alert('حدث خطأ في الإرسال: ' + error.message);
+        form.style.display = 'block';
+      }
     }
   });
+  
+  // دالة تحويل الملف إلى base64
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result.split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
   
   continueBtn.addEventListener('click', function() {
     // إعادة تعيين النموذج
