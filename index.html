@@ -1072,485 +1072,450 @@ body {
     <!-- شاشة التحميل -->
     <div class="loading" id="loading">
       <i class="fas fa-spinner fa-spin"></i>
-      <p>جاري إرسال الاستبيان...</p>
+      <p>جاري معالجة بياناتك وتحميلها...</p>
     </div>
-    
+
     <!-- شاشة النجاح -->
-    <div class="success-message" id="success-message">
+    <div class="success-message" id="successMessage">
       <i class="fas fa-check-circle"></i>
-      <h2>تم إرسال الاستبيان بنجاح</h2>
-      <p>شكراً لك على تعبئة الاستبيان</p>
-      <button class="continue-btn" id="continue-btn">
-        <span>متابعة</span>
-        <i class="fas fa-arrow-left"></i>
+      <h2>تم إرسال الاستبيان بنجاح!</h2>
+      <p>شكراً لك على وقتك، سنراجع إجاباتك ونعود إليك في أقرب وقت</p>
+      <button class="continue-btn" id="continueBtn">
+        <span>العودة للرئيسية</span>
+        <i class="fas fa-home"></i>
       </button>
-    </div>
-    
-    <!-- الشاشة النهائية -->
-    <div class="final-message" id="final-message">
-      <i class="fas fa-heart"></i>
-      <h2>شكراً لك يا عميلنا العزيز</h2>
-      <p>سوف نتواصل معك إن احتجنا أي استفسار آخر</p>
     </div>
   </div>
 </div>
 
 <script>
-// رابط السكربت - ضع رابطك الحقيقي هنا
-const scriptURL = "https://script.google.com/macros/s/AKfycbyuz8osIEGJ-bL4w1oQorscNZf6VhayyGdhHZw2q8W-gt_sKUVaqViYmTyD2bHAxeTF/exec";
-
-// عناصر شاشة الترحيب
-const welcomeScreen = document.getElementById('welcomeScreen');
-const startBtn = document.getElementById('startBtn');
-const mainContainer = document.getElementById('mainContainer');
-
-// عناصر الاستبيان
-const totalSteps = 7;
-let currentStep = 1;
-
-const progressBar = document.getElementById('progress');
-const progressText = document.getElementById('progress-text');
-const stepIndicators = document.getElementById('step-indicators');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const submitBtn = document.getElementById('submit-btn');
-
-// عناصر الرسائل
-const loadingElement = document.getElementById('loading');
-const successMessage = document.getElementById('success-message');
-const finalMessage = document.getElementById('final-message');
-const continueBtn = document.getElementById('continue-btn');
-
-// عناصر الملفات والروابط
-const fileUpload = document.getElementById('file-upload');
-const fileInput = document.getElementById('file-input');
-const fileList = document.getElementById('file-list');
-const addMoreFilesBtn = document.getElementById('add-more-files');
-const addLinkBtn = document.getElementById('add-link-btn');
-const linksContainer = document.getElementById('links-container');
-const fileCounter = document.getElementById('file-counter');
-
-// عناصر الملفات القديمة
-const oldFileUpload = document.getElementById('old-file-upload');
-const oldFileInput = document.getElementById('old-file-input');
-const oldFileList = document.getElementById('old-file-list');
-const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
-const addOldLinkBtn = document.getElementById('add-old-link-btn');
-const oldLinksContainer = document.getElementById('old-links-container');
-const oldFileCounter = document.getElementById('old-file-counter');
-
-// متغيرات لتخزين الملفات
-let selectedFiles = [];
-let selectedOldFiles = [];
-
-// بدء الاستبيان
-startBtn.addEventListener('click', () => {
-  welcomeScreen.style.animation = 'fadeOut 1s ease forwards';
-  setTimeout(() => {
-    welcomeScreen.style.display = 'none';
-    mainContainer.classList.add('show');
-  }, 1000);
-});
-
-// إنشاء مؤشرات الخطوات
-for (let i = 1; i <= totalSteps; i++) {
-  const dot = document.createElement('div');
-  dot.classList.add('step-indicator');
-  if (i === 1) dot.classList.add('active');
-  stepIndicators.appendChild(dot);
-}
-
-// تحديث واجهة المستخدم
-function updateUI() {
-  progressBar.style.width = (currentStep / totalSteps * 100) + '%';
-  progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
-  prevBtn.style.display = currentStep === 1 ? 'none' : 'flex';
-  nextBtn.style.display = currentStep === totalSteps ? 'none' : 'flex';
-  submitBtn.style.display = currentStep === totalSteps ? 'flex' : 'none';
+document.addEventListener('DOMContentLoaded', function() {
+  // متغيرات عامة
+  let currentStep = 1;
+  const totalSteps = 7;
+  let uploadedFiles = [];
+  let uploadedOldFiles = [];
+  const maxFiles = 6;
   
-  document.querySelectorAll('.form-step').forEach(step => {
-    step.classList.remove('active');
-  });
+  // عناصر DOM
+  const welcomeScreen = document.getElementById('welcomeScreen');
+  const mainContainer = document.getElementById('mainContainer');
+  const startBtn = document.getElementById('startBtn');
+  const progress = document.getElementById('progress');
+  const progressText = document.getElementById('progress-text');
+  const stepIndicators = document.getElementById('step-indicators');
+  const prevBtn = document.getElementById('prev-btn');
+  const nextBtn = document.getElementById('next-btn');
+  const submitBtn = document.getElementById('submit-btn');
+  const form = document.getElementById('clientForm');
+  const loading = document.getElementById('loading');
+  const successMessage = document.getElementById('successMessage');
+  const continueBtn = document.getElementById('continueBtn');
   
-  document.getElementById(`step-${currentStep}`).classList.add('active');
-  
-  document.querySelectorAll('.step-indicator').forEach((indicator, index) => {
-    indicator.classList.toggle('active', index < currentStep);
-  });
-  
-  window.scrollTo({ top: 0, behavior: 'smooth' });
-}
-
-// عرض رسالة الخطأ
-function showError(step, message) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) {
-    errorElement.textContent = message;
-    errorElement.style.display = 'block';
+  // تهيئة المؤشرات
+  function initStepIndicators() {
+    for (let i = 1; i <= totalSteps; i++) {
+      const indicator = document.createElement('div');
+      indicator.classList.add('step-indicator');
+      if (i === 1) indicator.classList.add('active');
+      stepIndicators.appendChild(indicator);
+    }
   }
-}
-
-// إخفاء رسالة الخطأ
-function hideError(step) {
-  const errorElement = document.getElementById(`error-${step}`);
-  if (errorElement) errorElement.style.display = 'none';
-}
-
-// التحقق من صحة الخطوة الحالية
-function validateStep(step) {
-  switch (step) {
-    case 1:
-      const brandName = document.querySelector('input[name="brand_name"]').value.trim();
-      if (!brandName) {
-        showError(1, 'يرجى إدخال اسم العلامة التجارية');
-        return false;
+  
+  // تحديث المؤشرات
+  function updateStepIndicators() {
+    const indicators = document.querySelectorAll('.step-indicator');
+    indicators.forEach((indicator, index) => {
+      if (index < currentStep) {
+        indicator.classList.add('active');
+      } else {
+        indicator.classList.remove('active');
       }
-      hideError(1);
-      return true;
-      
-    case 2:
-      const businessField = document.querySelector('input[name="business_field"]').value.trim();
-      if (!businessField) {
-        showError(2, 'يرجى إدخال مجال العمل');
-        return false;
-      }
-      hideError(2);
-      return true;
-      
-    case 3:
-      const logoType = document.querySelector('input[name="logo_type"]:checked');
-      if (!logoType) {
-        showError(3, 'يرجى اختيار نوع الشعار');
-        return false;
-      }
-      if (logoType.value === 'شيء آخر') {
-        const logoTypeCustom = document.querySelector('input[name="logo_type_custom"]').value.trim();
-        if (!logoTypeCustom) {
-          showError(3, 'يرجى إدخال التفضيل الآخر');
-          return false;
+    });
+  }
+  
+  // تحديث التقدم
+  function updateProgress() {
+    const progressPercent = (currentStep / totalSteps) * 100;
+    progress.style.width = `${progressPercent}%`;
+    progressText.textContent = `السؤال ${currentStep} من ${totalSteps}`;
+  }
+  
+  // الانتقال بين الخطوات
+  function goToStep(step) {
+    document.querySelectorAll('.form-step').forEach(el => {
+      el.classList.remove('active');
+    });
+    
+    document.getElementById(`step-${step}`).classList.add('active');
+    currentStep = step;
+    
+    updateProgress();
+    updateStepIndicators();
+    
+    // إظهار/إخفاء الأزرار
+    prevBtn.style.display = step === 1 ? 'none' : 'flex';
+    nextBtn.style.display = step === totalSteps ? 'none' : 'flex';
+    submitBtn.style.display = step === totalSteps ? 'flex' : 'none';
+  }
+  
+  // التحقق من صحة الخطوة الحالية
+  function validateStep(step) {
+    let isValid = true;
+    const errorElement = document.getElementById(`error-${step}`);
+    
+    // إخفاء رسالة الخطأ
+    errorElement.style.display = 'none';
+    
+    switch(step) {
+      case 1:
+        const brandName = document.querySelector('input[name="brand_name"]').value.trim();
+        if (!brandName) {
+          errorElement.textContent = 'يرجى إدخال اسم العلامة التجارية';
+          errorElement.style.display = 'block';
+          isValid = false;
         }
-      }
-      hideError(3);
-      return true;
-      
-    case 4:
-      const colors = document.querySelector('textarea[name="colors"]').value.trim();
-      if (!colors) {
-        showError(4, 'يرجى وصف الألوان المفضلة');
-        return false;
-      }
-      hideError(4);
-      return true;
-      
-    case 5:
-      // هذا الحقل اختياري - دائماً يعتبر صحيح
-      hideError(5);
-      return true;
-      
-    case 6:
-      const feeling = document.querySelector('textarea[name="feeling"]').value.trim();
-      if (!feeling) {
-        showError(6, 'يرجى وصف المشاعر والقيم المطلوبة');
-        return false;
-      }
-      hideError(6);
-      return true;
-      
-    case 7:
-      // هذا الحقل اختياري - دائماً يعتبر صحيح
-      hideError(7);
-      return true;
-      
-    default:
-      return true;
+        break;
+        
+      case 2:
+        const businessField = document.querySelector('input[name="business_field"]').value.trim();
+        if (!businessField) {
+          errorElement.textContent = 'يرجى إدخال مجال العمل';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+        
+      case 3:
+        const logoType = document.querySelector('input[name="logo_type"]:checked');
+        if (!logoType) {
+          errorElement.textContent = 'يرجى اختيار نوع الشعار';
+          errorElement.style.display = 'block';
+          isValid = false;
+        } else if (logoType.value === 'شيء آخر') {
+          const customInput = document.querySelector('input[name="logo_type_custom"]').value.trim();
+          if (!customInput) {
+            errorElement.textContent = 'يرجى إدخال التفضيل الآخر';
+            errorElement.style.display = 'block';
+            isValid = false;
+          }
+        }
+        break;
+        
+      case 4:
+        const colors = document.querySelector('textarea[name="colors"]').value.trim();
+        if (!colors) {
+          errorElement.textContent = 'يرجى وصف الألوان المفضلة';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+        
+      case 6:
+        const feeling = document.querySelector('textarea[name="feeling"]').value.trim();
+        if (!feeling) {
+          errorElement.textContent = 'يرجى وصف المشاعر والقيم التي تريد توصيلها';
+          errorElement.style.display = 'block';
+          isValid = false;
+        }
+        break;
+    }
+    
+    return isValid;
   }
-}
-
-// الانتقال للخطوة التالية
-nextBtn.addEventListener('click', () => {
-  if (validateStep(currentStep)) {
-    currentStep++;
-    updateUI();
-  }
-});
-
-// الانتقال للخطوة السابقة
-prevBtn.addEventListener('click', () => {
-  currentStep--;
-  updateUI();
-});
-
-// زر المتابعة
-continueBtn.addEventListener('click', () => {
-  successMessage.style.display = 'none';
-  finalMessage.style.display = 'block';
-});
-
-// التعامل مع ضغط Enter في حقول الإدخال
-function handleEnterKey(event) {
-  if (event.key === 'Enter') {
-    event.preventDefault();
+  
+  // الانتقال للخطوة التالية
+  function nextStep() {
     if (validateStep(currentStep)) {
-      currentStep++;
-      updateUI();
-    }
-  }
-}
-
-// إضافة مستمعي الأحداث لحقول الإدخال
-brandNameInput.addEventListener('keypress', handleEnterKey);
-businessFieldInput.addEventListener('keypress', handleEnterKey);
-colorsInput.addEventListener('keypress', handleEnterKey);
-feelingInput.addEventListener('keypress', handleEnterKey);
-
-// دالة تحويل الملف إلى base64
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(reader.result.split(",")[1]);
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-// إرسال النموذج
-document.getElementById('clientForm').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  
-  if (validateStep(currentStep)) {
-    // إخفاء النموذج وإظهار شاشة التحميل
-    document.querySelector('form').style.display = 'none';
-    loadingElement.style.display = 'block';
-    
-    try {
-      // جمع البيانات
-      const formData = new FormData();
-      
-      // إضافة جميع البيانات إلى formData
-      const formElements = document.querySelectorAll('input, textarea');
-      formElements.forEach(element => {
-        if (element.type === 'radio') {
-          if (element.checked) {
-            formData.append(element.name, element.value);
-          }
-        } else if (element.type !== 'file' && element.name) {
-          if (element.name.endsWith('[]')) {
-            // معالجة المدخلات المتعددة (الروابط)
-            if (element.value.trim() !== '') {
-              formData.append(element.name, element.value);
-            }
-          } else {
-            formData.append(element.name, element.value);
-          }
-        }
-      });
-      
-      // إضافة ملفات الشعارات
-      for (let i = 0; i < selectedFiles.length; i++) {
-        const file = selectedFiles[i];
-        const base64 = await fileToBase64(file);
-        formData.append(`file_base64_${i}`, base64);
-        formData.append(`file_name_${i}`, file.name);
-        formData.append(`file_type_${i}`, file.type);
+      if (currentStep < totalSteps) {
+        goToStep(currentStep + 1);
       }
-      formData.append('file_count', selectedFiles.length);
-      
-      // إضافة ملفات الشعارات القديمة
-      for (let i = 0; i < selectedOldFiles.length; i++) {
-        const file = selectedOldFiles[i];
-        const base64 = await fileToBase64(file);
-        formData.append(`old_file_base64_${i}`, base64);
-        formData.append(`old_file_name_${i}`, file.name);
-        formData.append(`old_file_type_${i}`, file.type);
+    }
+  }
+  
+  // الانتقال للخطوة السابقة
+  function prevStep() {
+    if (currentStep > 1) {
+      goToStep(currentStep - 1);
+    }
+  }
+  
+  // إظهار/إخفاء الحقل المخصص لنوع الشعار
+  document.getElementById('other-logo-type').addEventListener('click', function() {
+    const customInput = document.getElementById('logo-type-custom');
+    customInput.style.display = 'block';
+  });
+  
+  document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+      const customInput = document.getElementById('logo-type-custom');
+      if (this.value === 'شيء آخر') {
+        customInput.style.display = 'block';
+      } else {
+        customInput.style.display = 'none';
       }
-      formData.append('old_file_count', selectedOldFiles.length);
-      
-      // إرسال البيانات إلى Google Apps Script
-      const response = await fetch(scriptURL, {
-        method: 'POST',
-        body: formData
-      });
-      
-      const result = await response.json();
-      
-      // إخفاء التحميل وإظهار النجاح
-      loadingElement.style.display = 'none';
-      successMessage.style.display = 'block';
-      
-    } catch (error) {
-      // في حالة الخطأ
-      loadingElement.style.display = 'none';
-      alert('حدث خطأ في الإرسال: ' + error.message);
-      document.querySelector('form').style.display = 'block';
-    }
-  }
-});
-
-// إظهار/إخفاء الحقل المخصص لـ "شيء آخر"
-document.querySelectorAll('input[name="logo_type"]').forEach(radio => {
-  radio.addEventListener('change', function() {
-    if (this.value === 'شيء آخر') {
-      document.getElementById('logo-type-custom').style.display = 'block';
-    } else {
-      document.getElementById('logo-type-custom').style.display = 'none';
-    }
-  });
-});
-
-// إضافة روابط للشعارات
-addLinkBtn.addEventListener('click', function() {
-  const linkCount = linksContainer.children.length;
-  if (linkCount < 6) {
-    const newLink = document.createElement('div');
-    newLink.className = 'link-input-container';
-    newLink.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-        <input type="url" class="link-input" name="logo_links[]" placeholder="أدخل رابط الشعار ${linkCount + 1}" />
-      </div>
-    `;
-    linksContainer.appendChild(newLink);
-    
-    // إضافة مستمع حدث لزر الحذف
-    newLink.querySelector('.remove-link').addEventListener('click', function() {
-      newLink.remove();
     });
-  } else {
-    alert('يمكنك إضافة最多 6 روابط فقط');
-  }
-});
-
-// إضافة روابط للشعارات القديمة
-addOldLinkBtn.addEventListener('click', function() {
-  const linkCount = oldLinksContainer.children.length;
-  if (linkCount < 6) {
-    const newLink = document.createElement('div');
-    newLink.className = 'link-input-container';
-    newLink.innerHTML = `
-      <div style="display: flex; align-items: center;">
-        <button type="button" class="remove-link"><i class="fas fa-times"></i></button>
-        <input type="url" class="link-input" name="old_logo_links[]" placeholder="أدخل رابط الشعار القديم ${linkCount + 1}" />
-      </div>
-    `;
-    oldLinksContainer.appendChild(newLink);
-    
-    // إضافة مستمع حدث لزر الحذف
-    newLink.querySelector('.remove-link').addEventListener('click', function() {
-      newLink.remove();
-    });
-  } else {
-    alert('يمكنك إضافة最多 6 روابط فقط');
-  }
-});
-
-// تحديث عداد الملفات
-function updateFileCounter(filesArray, counterElement) {
-  const fileCount = filesArray.length;
-  counterElement.textContent = `${fileCount}/6 ملفات مرفوعة`;
-}
-
-// إدارة الملفات المرفوعة للشعارات
-function handleFileSelection(files, filesArray, fileList, counterElement) {
-  const newFiles = Array.from(files);
-  
-  // التحقق من عدم تجاوز الحد الأقصى
-  if (filesArray.length + newFiles.length > 6) {
-    alert('يمكنك رفع最多 6 ملفات فقط');
-    return;
-  }
-  
-  // إضافة الملفات الجديدة
-  newFiles.forEach(file => {
-    filesArray.push(file);
   });
   
-  // تحديث العرض
-  updateFileDisplay(filesArray, fileList, counterElement);
-}
-
-// تحديث عرض الملفات
-function updateFileDisplay(filesArray, fileList, counterElement) {
-  fileList.innerHTML = '';
+  // إدارة رفع الملفات للشعارات
+  const fileUpload = document.getElementById('file-upload');
+  const fileInput = document.getElementById('file-input');
+  const fileList = document.getElementById('file-list');
+  const addMoreFilesBtn = document.getElementById('add-more-files');
+  const fileCounter = document.getElementById('file-counter');
   
-  filesArray.forEach((file, index) => {
+  fileUpload.addEventListener('click', () => fileInput.click());
+  addMoreFilesBtn.addEventListener('click', () => fileInput.click());
+  
+  fileInput.addEventListener('change', handleFileUpload);
+  
+  function handleFileUpload(e) {
+    const files = Array.from(e.target.files);
+    
+    // التحقق من عدد الملفات
+    if (uploadedFiles.length + files.length > maxFiles) {
+      alert(`يمكنك رفع ${maxFiles} ملفات كحد أقصى`);
+      return;
+    }
+    
+    // إضافة الملفات الجديدة
+    files.forEach(file => {
+      if (uploadedFiles.length < maxFiles) {
+        uploadedFiles.push(file);
+        addFileToList(file, fileList, uploadedFiles, fileCounter, 'files');
+      }
+    });
+    
+    // تحديث العداد
+    updateFileCounter(uploadedFiles, fileCounter);
+    
+    // إعادة تعيين حقل الرفع
+    fileInput.value = '';
+  }
+  
+  // إدارة رفع الملفات للشعارات القديمة
+  const oldFileUpload = document.getElementById('old-file-upload');
+  const oldFileInput = document.getElementById('old-file-input');
+  const oldFileList = document.getElementById('old-file-list');
+  const addMoreOldFilesBtn = document.getElementById('add-more-old-files');
+  const oldFileCounter = document.getElementById('old-file-counter');
+  
+  oldFileUpload.addEventListener('click', () => oldFileInput.click());
+  addMoreOldFilesBtn.addEventListener('click', () => oldFileInput.click());
+  
+  oldFileInput.addEventListener('change', handleOldFileUpload);
+  
+  function handleOldFileUpload(e) {
+    const files = Array.from(e.target.files);
+    
+    // التحقق من عدد الملفات
+    if (uploadedOldFiles.length + files.length > maxFiles) {
+      alert(`يمكنك رفع ${maxFiles} ملفات كحد أقصى`);
+      return;
+    }
+    
+    // إضافة الملفات الجديدة
+    files.forEach(file => {
+      if (uploadedOldFiles.length < maxFiles) {
+        uploadedOldFiles.push(file);
+        addFileToList(file, oldFileList, uploadedOldFiles, oldFileCounter, 'old-files');
+      }
+    });
+    
+    // تحديث العداد
+    updateFileCounter(uploadedOldFiles, oldFileCounter);
+    
+    // إعادة تعيين حقل الرفع
+    oldFileInput.value = '';
+  }
+  
+  // إضافة ملف إلى القائمة
+  function addFileToList(file, listElement, filesArray, counterElement, type) {
     const fileItem = document.createElement('div');
-    fileItem.className = 'file-item';
+    fileItem.classList.add('file-item');
+    
+    const fileNumber = filesArray.length;
+    
     fileItem.innerHTML = `
       <div class="file-info">
-        <div class="file-number">${index + 1}</div>
-        <i class="fas fa-file"></i>
-        <span>${file.name}</span>
+        <div class="file-number">${fileNumber}</div>
+        <div>
+          <div>${file.name}</div>
+          <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">${formatFileSize(file.size)}</div>
+        </div>
       </div>
-      <button type="button" class="remove-file" data-index="${index}">
+      <button type="button" class="remove-file" data-index="${fileNumber - 1}" data-type="${type}">
         <i class="fas fa-times"></i>
       </button>
     `;
-    fileList.appendChild(fileItem);
     
-    // إضافة مستمع حدث لزر الحذف
-    fileItem.querySelector('.remove-file').addEventListener('click', function() {
+    listElement.appendChild(fileItem);
+    
+    // إضافة حدث إزالة الملف
+    const removeBtn = fileItem.querySelector('.remove-file');
+    removeBtn.addEventListener('click', function() {
+      const index = parseInt(this.getAttribute('data-index'));
       filesArray.splice(index, 1);
-      updateFileDisplay(filesArray, fileList, counterElement);
+      listElement.removeChild(fileItem);
+      updateFileListNumbers(listElement, type);
+      updateFileCounter(filesArray, counterElement);
+    });
+  }
+  
+  // تحديث أرقام الملفات في القائمة
+  function updateFileListNumbers(listElement, type) {
+    const fileItems = listElement.querySelectorAll('.file-item');
+    fileItems.forEach((item, index) => {
+      const fileNumber = item.querySelector('.file-number');
+      fileNumber.textContent = index + 1;
+      
+      const removeBtn = item.querySelector('.remove-file');
+      removeBtn.setAttribute('data-index', index);
+    });
+    
+    // تحديث المصفوفة المناسبة
+    if (type === 'files') {
+      uploadedFiles = Array.from(fileItems).map((item, index) => {
+        return uploadedFiles[index];
+      });
+    } else if (type === 'old-files') {
+      uploadedOldFiles = Array.from(fileItems).map((item, index) => {
+        return uploadedOldFiles[index];
+      });
+    }
+  }
+  
+  // تحديث عداد الملفات
+  function updateFileCounter(filesArray, counterElement) {
+    counterElement.textContent = `${filesArray.length}/${maxFiles} ملفات مرفوعة`;
+  }
+  
+  // تنسيق حجم الملف
+  function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  }
+  
+  // إدارة إضافة الروابط
+  const addLinkBtn = document.getElementById('add-link-btn');
+  const linksContainer = document.getElementById('links-container');
+  
+  addLinkBtn.addEventListener('click', function() {
+    const linkInputs = linksContainer.querySelectorAll('.link-input');
+    if (linkInputs.length < maxFiles) {
+      addLinkInput(linksContainer, 'logo_links[]');
+    } else {
+      alert(`يمكنك إضافة ${maxFiles} روابط كحد أقصى`);
+    }
+  });
+  
+  // إدارة إضافة الروابط للشعارات القديمة
+  const addOldLinkBtn = document.getElementById('add-old-link-btn');
+  const oldLinksContainer = document.getElementById('old-links-container');
+  
+  addOldLinkBtn.addEventListener('click', function() {
+    const linkInputs = oldLinksContainer.querySelectorAll('.link-input');
+    if (linkInputs.length < maxFiles) {
+      addLinkInput(oldLinksContainer, 'old_logo_links[]');
+    } else {
+      alert(`يمكنك إضافة ${maxFiles} روابط كحد أقصى`);
+    }
+  });
+  
+  // إضافة حقل رابط جديد
+  function addLinkInput(container, name) {
+    const linkInputContainer = document.createElement('div');
+    linkInputContainer.classList.add('link-input-container');
+    linkInputContainer.style.display = 'flex';
+    linkInputContainer.style.alignItems = 'center';
+    
+    linkInputContainer.innerHTML = `
+      <input type="url" class="link-input" name="${name}" placeholder="أدخل رابط الشعار" style="flex: 1;" />
+      <button type="button" class="remove-link">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+    
+    container.appendChild(linkInputContainer);
+    
+    // إضافة حدث إزالة الرابط
+    const removeBtn = linkInputContainer.querySelector('.remove-link');
+    removeBtn.addEventListener('click', function() {
+      container.removeChild(linkInputContainer);
+    });
+  }
+  
+  // حل مشكلة Enter في الجوال
+  document.querySelectorAll('.text-input, .textarea-input').forEach(input => {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        nextStep();
+      }
     });
   });
   
-  updateFileCounter(filesArray, counterElement);
-}
-
-// رفع الملفات المتعددة للشعارات
-fileUpload.addEventListener('click', () => {
-  fileInput.click();
-});
-
-fileInput.addEventListener('change', (e) => {
-  handleFileSelection(e.target.files, selectedFiles, fileList, fileCounter);
-  fileInput.value = ''; // إعادة تعيين حقل الإدخال للسماح باختيار نفس الملفات مرة أخرى
-});
-
-// إضافة المزيد من الملفات للشعارات
-addMoreFilesBtn.addEventListener('click', () => {
-  fileInput.click();
-});
-
-// رفع الملفات المتعددة للشعارات القديمة
-oldFileUpload.addEventListener('click', () => {
-  oldFileInput.click();
-});
-
-oldFileInput.addEventListener('change', (e) => {
-  handleFileSelection(e.target.files, selectedOldFiles, oldFileList, oldFileCounter);
-  oldFileInput.value = ''; // إعادة تعيين حقل الإدخال للسماح باختيار نفس الملفات مرة أخرى
-});
-
-// إضافة المزيد من الملفات للشعارات القديمة
-addMoreOldFilesBtn.addEventListener('click', () => {
-  oldFileInput.click();
-});
-
-// تحديد العناصر المحددة عند النقر على البطاقات
-document.querySelectorAll('.option-card').forEach(card => {
-  card.addEventListener('click', function() {
-    const radio = this.querySelector('input[type="radio"]');
-    if (radio) {
-      radio.checked = true;
+  // أحداث الأزرار
+  startBtn.addEventListener('click', function() {
+    welcomeScreen.style.animation = 'fadeOut 0.8s ease forwards';
+    setTimeout(() => {
+      welcomeScreen.style.display = 'none';
+      mainContainer.classList.add('show');
+    }, 800);
+  });
+  
+  nextBtn.addEventListener('click', nextStep);
+  prevBtn.addEventListener('click', prevStep);
+  
+  form.addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    // التحقق من صحة الخطوة الأخيرة
+    if (validateStep(currentStep)) {
+      // إظهار شاشة التحميل
+      form.style.display = 'none';
+      loading.style.display = 'block';
       
-      // إزالة التحديد من جميع البطاقات في نفس المجموعة
-      const groupName = radio.name;
-      document.querySelectorAll(`.option-card input[name="${groupName}"]`).forEach(otherRadio => {
-        otherRadio.closest('.option-card').classList.remove('selected');
-      });
-      
-      // إضافة التحديد للبطاقة المختارة
-      this.classList.add('selected');
-      
-      // تشغيل حدث التغيير
-      radio.dispatchEvent(new Event('change'));
+      // محاكاة إرسال البيانات
+      setTimeout(() => {
+        loading.style.display = 'none';
+        successMessage.style.display = 'block';
+      }, 2000);
     }
   });
+  
+  continueBtn.addEventListener('click', function() {
+    // إعادة تعيين النموذج
+    form.reset();
+    uploadedFiles = [];
+    uploadedOldFiles = [];
+    fileList.innerHTML = '';
+    oldFileList.innerHTML = '';
+    updateFileCounter(uploadedFiles, fileCounter);
+    updateFileCounter(uploadedOldFiles, oldFileCounter);
+    
+    // إعادة إلى البداية
+    successMessage.style.display = 'none';
+    form.style.display = 'block';
+    goToStep(1);
+    
+    // إظهار شاشة الترحيب مرة أخرى
+    welcomeScreen.style.display = 'flex';
+    welcomeScreen.style.animation = 'none';
+    setTimeout(() => {
+      welcomeScreen.style.animation = 'fadeIn 0.8s ease forwards';
+    }, 10);
+    
+    mainContainer.classList.remove('show');
+  });
+  
+  // تهيئة التطبيق
+  initStepIndicators();
+  updateProgress();
 });
-
-// تحديث واجهة المستخدم عند التحميل
-updateUI();
 </script>
 </body>
 </html>
