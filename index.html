@@ -1098,6 +1098,53 @@ body {
     height: 80px;
     filter: blur(5px);
 }
+        /* تأثير السحر الأسود - إضافة جديدة */
+.magic-cursor {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.3) 0%,
+        rgba(0, 0, 0, 0.2) 25%,
+        rgba(0, 0, 0, 0.1) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.1s linear;
+    filter: blur(10px);
+    mix-blend-mode: multiply;
+}
+
+/* تأثير عند النقر/اللمس */
+.magic-cursor.active {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.magic-cursor.click {
+    transform: translate(-50%, -50%) scale(0.8);
+    opacity: 0.8;
+}
+
+/* تأثير على العناصر عند المرور عليها */
+.link-item:hover ~ .magic-cursor {
+    background: radial-gradient(
+        circle at center,
+        rgba(129, 41, 217, 0.4) 0%,
+        rgba(129, 41, 217, 0.2) 40%,
+        transparent 70%
+    );
+    filter: blur(8px);
+}
+
+.social-link:hover ~ .magic-cursor {
+    transform: translate(-50%, -50%) scale(1.2);
+}
 
     </style>
 </head>
@@ -2972,11 +3019,101 @@ document.addEventListener('touchmove', (e) => {
 
 document.addEventListener('touchend', () => {
     magicEffect.classList.remove('active');
+    
+<!-- تأثير السحر الأسود -->
+<div class="magic-cursor" id="magicCursor"></div>
+
+<script>
+// تأثير المؤشر السحري
+document.addEventListener('DOMContentLoaded', function() {
+    const cursor = document.getElementById('magicCursor');
+    
+    // للماوس (الكمبيوتر)
+    document.addEventListener('mousemove', (e) => {
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        cursor.classList.add('active');
+    });
+    
+    // عند النقر بالماوس
+    document.addEventListener('mousedown', () => {
+        cursor.classList.add('click');
+    });
+    
+    document.addEventListener('mouseup', () => {
+        cursor.classList.remove('click');
+    });
+    
+    // عند مغادرة النافذة
+    document.addEventListener('mouseleave', () => {
+        cursor.classList.remove('active');
+    });
+    
+    // للجوال (اللمس)
+    document.addEventListener('touchstart', (e) => {
+        const touch = e.touches[0];
+        cursor.style.left = touch.clientX + 'px';
+        cursor.style.top = touch.clientY + 'px';
+        cursor.classList.add('active');
+        cursor.classList.add('click');
+    });
+    
+    document.addEventListener('touchmove', (e) => {
+        e.preventDefault();
+        const touch = e.touches[0];
+        cursor.style.left = touch.clientX + 'px';
+        cursor.style.top = touch.clientY + 'px';
+    });
+    
+    document.addEventListener('touchend', () => {
+        cursor.classList.remove('active');
+        cursor.classList.remove('click');
+    });
+    
+    // تأثيرات إضافية عند المرور على الروابط
+    const links = document.querySelectorAll('a, button, .link-item, .social-link');
+    
+    links.forEach(link => {
+        link.addEventListener('mouseenter', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1.3)';
+            cursor.style.background = 'radial-gradient(circle at center, rgba(0,0,0,0.4) 0%, rgba(0,0,0,0.2) 40%, transparent 70%)';
+        });
+        
+        link.addEventListener('mouseleave', () => {
+            cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+            cursor.style.background = 'radial-gradient(circle at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.2) 25%, rgba(0,0,0,0.1) 50%, transparent 70%)';
+        });
+    });
+    
+    // تأثير التلاشي عند عدم الحركة
+    let timeout;
+    document.addEventListener('mousemove', () => {
+        cursor.classList.add('active');
+        clearTimeout(timeout);
+        
+        timeout = setTimeout(() => {
+            cursor.classList.remove('active');
+        }, 1000);
+    });
+    
+    // التأثير على العناصر النشطة
+    document.addEventListener('mousedown', (e) => {
+        if (e.target.closest('a, button')) {
+            cursor.style.transform = 'translate(-50%, -50%) scale(0.7)';
+            cursor.style.opacity = '0.9';
+            
+            setTimeout(() => {
+                cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+                cursor.style.opacity = '1';
+            }, 200);
+        }
+    });
 });
 </script>
 </body>
 
 </html>
+
 
 
 
