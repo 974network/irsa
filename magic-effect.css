@@ -1,0 +1,117 @@
+/* =========================================== */
+/* تأثير السحر الأسود - Magic Cursor Effect */
+/* ملف منفصل: magic-effect.css */
+/* =========================================== */
+
+/* المؤشر السحري الرئيسي */
+.magic-cursor {
+    position: fixed;
+    width: 120px;
+    height: 120px;
+    background: radial-gradient(
+        circle at center,
+        rgba(0, 0, 0, 0.25) 0%,
+        rgba(0, 0, 0, 0.15) 25%,
+        rgba(0, 0, 0, 0.08) 50%,
+        transparent 70%
+    );
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.1s linear;
+    filter: blur(12px);
+    mix-blend-mode: multiply;
+}
+
+/* حالة النشاط */
+.magic-cursor.active {
+    opacity: 0.8;
+}
+
+/* حالة النقر */
+.magic-cursor.click {
+    transform: translate(-50%, -50%) scale(0.85);
+}
+
+/* تأثير الذيل */
+.magic-trail {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    background: radial-gradient(circle, rgba(0,0,0,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    animation: magicTrail 0.4s ease-out forwards;
+}
+
+/* تأثير النقر */
+.magic-pulse {
+    position: fixed;
+    width: 100px;
+    height: 100px;
+    background: radial-gradient(circle, rgba(0,0,0,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9997;
+    transform: translate(-50%, -50%);
+    animation: magicPulse 0.6s ease-out;
+}
+
+/* الأنيميشنات */
+@keyframes magicTrail {
+    0% {
+        opacity: 0.5;
+        transform: translate(-50%, -50%) scale(0.5);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+@keyframes magicPulse {
+    0% {
+        opacity: 0.8;
+        transform: translate(-50%, -50%) scale(0.3);
+    }
+    50% {
+        opacity: 0.4;
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+    }
+}
+
+/* تحسينات للجوال */
+@media (max-width: 768px) {
+    .magic-cursor {
+        width: 140px;
+        height: 140px;
+        filter: blur(15px);
+        opacity: 0.6;
+    }
+    
+    .magic-trail {
+        width: 80px;
+        height: 80px;
+    }
+    
+    .magic-pulse {
+        width: 120px;
+        height: 120px;
+    }
+}
+
+/* تأثيرات على العناصر التفاعلية */
+.magic-hover {
+    transition: transform 0.2s ease !important;
+}
+
+.magic-hover:hover {
+    transform: translateY(-2px) !important;
+}
