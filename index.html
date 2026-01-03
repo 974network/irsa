@@ -1,0 +1,2958 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- بعد <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#000000">
+<meta name="msapplication-navbutton-color" content="#000000">
+<meta name="apple-mobile-web-app-title" content="INTER GULF">
+<link rel="apple-touch-icon" href="inter-gulf.png">
+<link rel="manifest" href="manifest.json">
+    <title>Natazia - الروابط</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Cairo:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<!-- في نهاية الـ head -->
+<script type="application/ld+json">
+{
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "INTER GULF",
+    "url": "https://yourdomain.com",
+    "description": "من الهمس إلى الزئير نصنع حضور رقمي",
+    "publisher": {
+        "@type": "Organization",
+        "name": "INTER GULF"
+    }
+}
+</script>
+    <style>
+        :root {
+            --pansy: #00000;
+            --primary: #8129d9;
+            --primary-alt: #5d18a2;
+            --orchid: #00000;
+            --rose: #fc3e4b;
+            --canopy: #43e660;
+            --forest: #254f1a;
+            --chartreuse: #d2e823;
+            --dahlia: #502274;
+            --stone: #383a36;
+            --charcoal: #1b1d1a;
+            --slate: #60696c;
+            --concrete: #676b5f;
+            --pebble: #a8aaa2;
+            --sand: #e0e2d9;
+            --marble: #f3f3f1;
+            --chalk: #f6f7f5;
+            --white: #ffffff;
+            --black: #000000;
+            --danger: #bf000b;
+            --success: #016e1a;
+            --info: #2665d6;
+            --warning: #f1bc00;
+            
+            --profileBackground: #f6f7f5;
+            --bodyText: #1b1d1a;
+            --linkText: #1b1d1a;
+            --profileTitleText: #1b1d1a;
+            --profileDescriptionText: #676b5f;
+            
+            --linkRadius: 1.5rem;
+            --profile-container-desktop-width: 480px;
+            --link-gap: 1rem;
+            
+            --shadow-low: 0px 6px 12px rgba(0,0,0,0.08);
+            --shadow-medium: 0px 4px 16px 0px rgba(0,0,0,0.08), 0px 1px 2px 0px rgba(0,0,0,0.04), 0px 0px 0px 1px rgba(0,0,0,0.04);
+            --shadow-high: 0px 16px 32px 4px rgba(0,0,0,0.12);
+            
+            --transition-default: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+/* تأثير السحر الأسود عند اللمس */
+.touch-magic-effect {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.1s;
+    width: 100px;
+    height: 100px;
+    filter: blur(10px);
+}
+
+.touch-magic-effect.active {
+    opacity: 1;
+}
+
+/* تأثيرات إضافية للخلفية عند اللمس */
+body.touch-active .background-animation .bg-circle {
+    animation-duration: 10s !important;
+    opacity: 0.2 !important;
+}
+
+body.touch-active .link-item {
+    border-color: var(--pansy) !important;
+}
+/* أضف هذا مباشرة بعد :root */
+/* تثبيت لون الأيقونات أسود مع إبقاء التأثيرات */
+:root {
+    /* ... الألوان الحالية ... */
+    
+    /* إضافة متغير جديد للون الأيقونة */
+    --icon-default-color: #000000;
+    --icon-hover-color: #000000;
+}
+
+/* إصلاح ألوان الأيقونات في الروابط */
+.link-icon i {
+    color: var(--icon-default-color) !important;
+    /* إبقاء تأثير الانتقال */
+    transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.link-item:hover .link-icon i {
+    color: var(--icon-hover-color) !important;
+    /* إبقاء التأثيرات الأخرى تعمل */
+    transform: scale(1.1);
+}
+
+/* للروابط المميزة (featured) */
+.link-item.featured .link-icon i {
+    color: white !important;
+}
+
+.link-item.featured:hover .link-icon i {
+    color: white !important;
+    transform: scale(1.1);
+}
+
+/* إبقاء خلفية الأيقونة تتغير عند hover */
+.link-icon {
+    background-color: var(--chalk);
+    transition: var(--transition-default);
+}
+
+.link-item:hover .link-icon {
+    background-color: var(--pansy);
+    transform: scale(1.1);
+}
+
+.link-item.featured .link-icon {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+.link-item.featured:hover .link-icon {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        html {
+            scroll-behavior: smooth;
+            scrollbar-color: color-mix(in srgb, var(--bodyText) 50%, transparent) color-mix(in srgb, var(--profileBackground) 80%, #000);
+        }
+        
+        body {
+            font-family: 'Inter', 'Cairo', sans-serif;
+            background-color: var(--profileBackground);
+            color: var(--bodyText);
+            line-height: 1.5;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1.5rem 1rem 3rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* تصميم الخلفية المتحركة */
+        .background-animation {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+            pointer-events: none;
+        }
+        
+        .bg-circle {
+            position: absolute;
+            border-radius: 50%;
+            background: radial-gradient(circle, var(--pansy), transparent 70%);
+            opacity: 0.1;
+            animation: float 25s infinite linear;
+        }
+        
+        .bg-circle:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            top: 10%;
+            left: 5%;
+            animation-delay: 0s;
+        }
+        
+        .bg-circle:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            top: 60%;
+            right: 10%;
+            background: radial-gradient(circle, var(--orchid), transparent 70%);
+            animation-delay: -5s;
+            animation-duration: 20s;
+        }
+        
+        .bg-circle:nth-child(3) {
+            width: 400px;
+            height: 400px;
+            bottom: -100px;
+            left: 50%;
+            background: radial-gradient(circle, var(--chartreuse), transparent 70%);
+            animation-delay: -10s;
+            animation-duration: 30s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            25% {
+                transform: translate(30px, 50px) rotate(90deg);
+            }
+            50% {
+                transform: translate(0, 100px) rotate(180deg);
+            }
+            75% {
+                transform: translate(-30px, 50px) rotate(270deg);
+            }
+        }
+        
+        /* الحاوية الرئيسية */
+        .profile-container {
+            width: 100%;
+            max-width: var(--profile-container-desktop-width);
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+        
+        /* الرأس */
+        .profile-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid var(--white);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .avatar-fallback {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pansy), var(--orchid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.5rem;
+            font-weight: 700;
+            border: 4px solid var(--white);
+            box-shadow: var(--shadow-medium);
+        }
+        
+        .profile-name {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--profileTitleText);
+            letter-spacing: -0.02em;
+        }
+        
+        .profile-bio {
+            font-size: 1rem;
+            color: var(--profileDescriptionText);
+            max-width: 90%;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+        
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        
+        .social-link {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: var(--white);
+            color: var(--bodyText);
+            text-decoration: none;
+            transition: var(--transition-default);
+            box-shadow: var(--shadow-low);
+            border: 1px solid var(--sand);
+        }
+        
+        .social-link:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-high);
+            color: #000000;
+            border-color: var(--pansy);
+        }
+        
+        /* قسم الروابط */
+        .links-section {
+            display: flex;
+            flex-direction: column;
+            gap: var(--link-gap);
+            margin-bottom: 2.5rem;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+        
+        .link-item {
+            position: relative;
+            display: block;
+            text-decoration: none;
+            background-color: var(--white);
+            border-radius: var(--linkRadius);
+            padding: 1.25rem 1.5rem;
+            color: var(--linkText);
+            transition: var(--transition-default);
+            box-shadow: var(--shadow-medium);
+            border: 1px solid transparent;
+            overflow: hidden;
+        }
+        
+        .link-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, var(--pansy), var(--orchid));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 0;
+        }
+        
+        .link-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-high);
+            border-color: var(--pansy);
+        }
+        
+        .link-item:hover::before {
+            opacity: 0.05;
+        }
+        
+        .link-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .link-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background-color: var(--chalk);
+            color: var(--pansy);
+            flex-shrink: 0;
+            transition: var(--transition-default);
+        }
+        
+        .link-item:hover .link-icon {
+            transform: scale(1.1);
+            background-color: var(--pansy);
+            color: white;
+        }
+        
+        .link-text {
+            flex-grow: 1;
+        }
+        
+        .link-title {
+            font-weight: 600;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .link-description {
+            font-size: 0.875rem;
+            color: var(--concrete);
+        }
+        
+        .link-arrow {
+            font-size: 1.25rem;
+            color: var(--pebble);
+            transition: var(--transition-default);
+        }
+        
+        .link-item:hover .link-arrow {
+            color: var(--pansy);
+            transform: translateX(5px);
+        }
+        
+        /* روابط خاصة */
+        .link-item.featured {
+            background: linear-gradient(135deg, var(--pansy) 0%, var(--orchid) 100%);
+            color: white;
+        }
+        
+        .link-item.featured .link-icon {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .link-item.featured .link-description {
+            color: rgba(255, 255, 255, 0.8);
+        }
+        
+        .link-item.featured .link-arrow {
+            color: white;
+        }
+        
+        .link-item.featured:hover {
+            background: linear-gradient(135deg, var(--primary-alt) 0%, #c115d1 100%);
+        }
+        
+        /* قسم الموسيقى */
+        .music-player {
+            background-color: var(--white);
+            border-radius: var(--linkRadius);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-medium);
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+        }
+        
+        .music-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+        }
+        
+        .music-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--rose), var(--orchid));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+        
+        .music-title {
+            font-weight: 700;
+            font-size: 1.25rem;
+            color: var(--bodyText);
+        }
+        
+        .music-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        
+        .play-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--pansy), var(--orchid));
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition-default);
+            box-shadow: 0 8px 20px rgba(129, 41, 217, 0.3);
+        }
+        
+        .play-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(129, 41, 217, 0.4);
+        }
+        
+        .track-info {
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+        
+        .track-name {
+            font-weight: 700;
+            font-size: 1.125rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .track-artist {
+            color: var(--concrete);
+            font-size: 0.875rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: var(--chalk);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--pansy), var(--orchid));
+            width: 30%;
+            border-radius: 3px;
+            transition: width 0.1s linear;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--concrete);
+        }
+        
+        /* الفوتر */
+        .profile-footer {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--sand);
+            color: var(--concrete);
+            font-size: 0.875rem;
+            animation: fadeIn 0.8s ease-out 0.6s both;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+        
+        .footer-link {
+            color: var(--concrete);
+            text-decoration: none;
+            transition: var(--transition-default);
+        }
+        
+        .footer-link:hover {
+            color: var(--pansy);
+        }
+        
+        /* أنيميشنات */
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        
+        /* تأثيرات خاصة */
+        .spotlight {
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spotlight::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        
+        .spotlight:hover::after {
+            opacity: 1;
+        }
+        
+        /* التجاوب مع مختلف الشاشات */
+        @media (max-width: 768px) {
+            .profile-name {
+                font-size: 1.75rem;
+            }
+            
+            .profile-bio {
+                font-size: 0.95rem;
+            }
+            
+            .link-item {
+                padding: 1rem 1.25rem;
+            }
+            
+            .link-icon {
+                width: 42px;
+                height: 42px;
+                font-size: 1.25rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            body {
+                padding: 1rem 0.75rem 2rem;
+            }
+            
+            .profile-name {
+                font-size: 1.5rem;
+            }
+            
+            .avatar-container {
+                width: 100px;
+                height: 100px;
+            }
+            
+            .social-link {
+                width: 40px;
+                height: 40px;
+            }
+            
+            .link-content {
+                gap: 0.75rem;
+            }
+            
+            .link-title {
+                font-size: 1rem;
+            }
+            
+            .music-player {
+                padding: 1.25rem;
+            }
+        }
+        
+        /* تأثيرات التمرير */
+        .scroll-animation {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        
+        .scroll-animation.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* تأثيرات النصوص */
+        .text-gradient {
+            background: linear-gradient(90deg, var(--pansy), var(--orchid));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        /* زر العودة للأعلى */
+        .back-to-top {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--pansy);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            text-decoration: none;
+            box-shadow: var(--shadow-high);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition-default);
+            z-index: 100;
+        }
+        
+        .back-to-top.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .back-to-top:hover {
+            background-color: var(--primary-alt);
+            transform: translateY(-5px);
+        }
+        
+        /* تأثيرات إضافية للروابط */
+        .link-item.pulse:hover {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: var(--shadow-medium), 0 0 0 0 rgba(129, 41, 217, 0.4);
+            }
+            70% {
+                box-shadow: var(--shadow-medium), 0 0 0 10px rgba(129, 41, 217, 0);
+            }
+            100% {
+                box-shadow: var(--shadow-medium), 0 0 0 0 rgba(129, 41, 217, 0);
+            }
+        /* إضافة هذا في <style> بعد كل الكود الموجود */
+.profile-name {
+    margin-bottom: 1.2rem;
+}
+
+.profile-name img {
+    height: 50px;
+    max-width: 280px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto;
+    filter: drop-shadow(0 3px 8px rgba(129, 41, 217, 0.15));
+}
+/* تأثير السحر الأسود عند اللمس */
+.touch-magic-effect {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(0,0,0,0.3) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    z-index: 9998;
+    opacity: 0;
+    transition: opacity 0.3s, transform 0.1s;
+    width: 100px;
+    height: 100px;
+    filter: blur(10px);
+}
+
+.touch-magic-effect.active {
+    opacity: 1;
+}
+
+/* تأثيرات إضافية للخلفية عند اللمس */
+body.touch-active .background-animation .bg-circle {
+    animation-duration: 10s !important;
+    opacity: 0.2 !important;
+}
+
+body.touch-active .link-item {
+    border-color: var(--pansy) !important;
+}
+/* =========================================== */
+/* تحسينات خاصة للجوال Mobile Optimizations */
+/* =========================================== */
+
+/* إصلاح viewport للجوال */
+@viewport {
+    width: device-width;
+    initial-scale: 1.0;
+}
+
+/* منع التكبير التلقائي في حقول الإدخال على iOS */
+input, textarea, select {
+    font-size: 16px !important;
+}
+
+/* تحسين التمرير على iOS */
+body {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: none;
+}
+
+/* إصلاح ارتفاع 100vh على الجوال */
+.mobile-full-height {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+}
+
+/* شريط التنقل للجوال */
+.mobile-nav {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    /* تحسينات الجوال العامة */
+    html, body {
+        width: 100%;
+        overflow-x: hidden;
+        position: relative;
+    }
+    
+    body {
+        padding: 1rem 0.75rem 2rem !important;
+        min-height: 100vh;
+        min-height: -webkit-fill-available;
+    }
+    
+    /* تحسين الحاوية */
+    .profile-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 5px;
+    }
+    
+    /* تحسين اللوجو للجوال */
+    .profile-name img {
+        height: 60px !important;
+        max-width: 200px !important;
+        margin: 0 auto 1rem !important;
+        display: block;
+    }
+    
+    /* تحسين الرأس */
+    .profile-header {
+        margin-bottom: 2rem !important;
+        padding-top: env(safe-area-inset-top);
+    }
+    
+    .avatar-container {
+        width: 100px !important;
+        height: 100px !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    /* تحسين الروابط للجوال */
+    .link-item {
+        padding: 1.2rem 1.2rem !important;
+        border-radius: 1.2rem !important;
+        margin-bottom: 0.8rem !important;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+    }
+    
+    .link-icon {
+        width: 44px !important;
+        height: 44px !important;
+        font-size: 1.3rem !important;
+    }
+    
+    .link-title {
+        font-size: 1.05rem !important;
+    }
+    
+    .link-description {
+        font-size: 0.85rem !important;
+    }
+    
+    /* تحسين الأزرار الاجتماعية */
+    .social-link {
+        width: 48px !important;
+        height: 48px !important;
+        margin: 0 0.3rem;
+    }
+    
+    /* تحسين الموسيقى للجوال */
+    .music-player {
+        padding: 1.2rem !important;
+        margin-bottom: 1.5rem !important;
+    }
+    
+    .play-btn {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.8rem !important;
+    }
+    
+    /* تحسين الفوتر */
+    .profile-footer {
+        padding-top: 1.5rem !important;
+        font-size: 0.8rem !important;
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    
+    .footer-links {
+        flex-wrap: wrap;
+        gap: 1rem !important;
+        margin-top: 0.8rem !important;
+    }
+    
+    .footer-link {
+        font-size: 0.85rem !important;
+    }
+    
+    /* إصلاح مشاكل اللمس */
+    button, a {
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* منع التحديد النصي باللمس */
+    * {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* السماح بتحديد النصوص في أماكن معينة */
+    .profile-bio, .link-description {
+        -webkit-user-select: text;
+        user-select: text;
+    }
+    
+    /* تحسين البداية الآمنة للشاشات المختلفة */
+    @supports (padding: max(0px)) {
+        body {
+            padding-left: max(0.75rem, env(safe-area-inset-left)) !important;
+            padding-right: max(0.75rem, env(safe-area-inset-right)) !important;
+        }
+    }
+}
+
+/* تحسينات للشاشات الصغيرة جداً */
+@media (max-width: 360px) {
+    .profile-name img {
+        height: 50px !important;
+        max-width: 180px !important;
+    }
+    
+    .link-item {
+        padding: 1rem 1rem !important;
+    }
+    
+    .link-content {
+        gap: 0.8rem !important;
+    }
+    
+    .link-icon {
+        width: 40px !important;
+        height: 40px !important;
+    }
+}
+
+/* إصلاحات للآيفون */
+@supports (-webkit-touch-callout: none) {
+    body {
+        min-height: -webkit-fill-available;
+    }
+    
+    .profile-container {
+        min-height: -webkit-fill-available;
+    }
+}
+
+/* إصلاح شريط الحالة للآيفون */
+.status-bar-fix {
+    padding-top: env(safe-area-inset-top);
+    background: var(--profileBackground);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top);
+    z-index: 9999;
+}
+
+/* تحسين ظهور لوحة المفاتيح */
+.keyboard-open {
+    position: fixed;
+    width: 100%;
+}
+
+/* تحسينات لشاشات مائلة (Landscape) */
+@media (max-height: 500px) and (orientation: landscape) {
+    .profile-header {
+        margin-bottom: 1rem !important;
+    }
+    
+    .avatar-container {
+        width: 70px !important;
+        height: 70px !important;
+        margin-bottom: 0.8rem !important;
+    }
+    
+    .profile-name {
+        font-size: 1.3rem !important;
+        margin-bottom: 0.3rem !important;
+    }
+    
+    .profile-bio {
+        font-size: 0.85rem !important;
+        line-height: 1.3 !important;
+        margin-bottom: 0.5rem !important;
+    }
+    
+    .links-section {
+        gap: 0.5rem !important;
+        margin-bottom: 1rem !important;
+    }
+    
+    .link-item {
+        padding: 0.8rem 1rem !important;
+        margin-bottom: 0.5rem !important;
+    }
+}
+/* ... الكود الحالي ... */
+
+/* تأثير السحر الأسود - أضف هذا في نهاية قسم الـ style */
+.black-magic-effect {
+    position: fixed;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, 
+        rgba(0, 0, 0, 0.4) 0%, 
+        rgba(0, 0, 0, 0.2) 30%, 
+        rgba(0, 0, 0, 0.1) 60%, 
+        transparent 80%);
+    transform: translate(-50%, -50%);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.1s ease;
+    filter: blur(8px);
+    width: 120px;
+    height: 120px;
+}
+
+.black-magic-effect.active {
+    opacity: 0.8;
+}
+
+.black-magic-effect.mouse {
+    width: 80px;
+    height: 80px;
+    filter: blur(5px);
+}
+
+    </style>
+</head>
+<body>
+<!-- زر المشاركة في الزاوية اليمنى العليا -->
+<button class="top-right-share-btn" id="shareBtn" aria-label="مشاركة الملف الشخصي">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="black" viewBox="0 0 24 24">
+        <path d="M18 16.08c-0.76 0-1.44.3-1.96.77l-7.13-4.15c0.05-.23.09-.46.09-.7s-0.04-.47-0.09-0.7l7.05-4.11c0.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7l-7.05 4.11c-0.54-0.5-1.25-0.81-2.04-0.81-1.66 0-3 1.34-3 3s1.34 3 3 3c0.79 0 1.5-0.31 2.04-0.81l7.12 4.16c-0.05.21-0.08.43-0.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/>
+    </svg>
+</button>
+
+<!-- كود JavaScript مباشر وبسيط -->
+<script>
+// الكود الأساسي لزر المشاركة
+document.addEventListener('DOMContentLoaded', function() {
+    const shareBtn = document.getElementById('shareBtn');
+    
+    if (!shareBtn) {
+        console.error('❌ زر المشاركة غير موجود في الصفحة!');
+        return;
+    }
+    
+    console.log('✅ زر المشاركة موجود وجاهز');
+    
+    // إضافة event listener مباشر
+    shareBtn.addEventListener('click', function(event) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        console.log('🎯 تم النقر على زر المشاركة!');
+        
+        // عرض نافذة المشاركة البسيطة
+        showSimpleShareModal();
+    });
+    
+    // إضافة تأثيرات hover
+    shareBtn.addEventListener('mouseenter', function() {
+        this.style.transform = 'scale(1.15) rotate(5deg)';
+        this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.3)';
+        this.style.background = '#000000';
+        this.querySelector('svg').style.fill = 'white';
+    });
+    
+    shareBtn.addEventListener('mouseleave', function() {
+        this.style.transform = 'scale(1) rotate(0deg)';
+        this.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)';
+        this.style.background = 'white';
+        this.querySelector('svg').style.fill = 'black';
+    });
+});
+
+// نافذة المشاركة البسيطة
+function showSimpleShareModal() {
+    // الحصول على بيانات الصفحة
+    const profileName = "INTER GULF";
+    const currentUrl = window.location.href;
+    
+    // إنشاء نافذة المشاركة
+    const modalHTML = `
+        <div id="simpleShareModal" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 9999;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            animation: fadeIn 0.2s ease;
+        ">
+            <div style="
+                background: white;
+                width: 100%;
+                max-width: 500px;
+                border-radius: 20px 20px 0 0;
+                padding: 20px;
+                animation: slideUp 0.3s ease;
+            ">
+                <!-- شريط السحب -->
+                <div style="
+                    width: 40px;
+                    height: 4px;
+                    background: #ddd;
+                    border-radius: 2px;
+                    margin: 0 auto 15px;
+                "></div>
+                
+                <!-- العنوان -->
+                <div style="
+                    display: flex;
+                    align-items: center;
+                    gap: 10px;
+                    margin-bottom: 20px;
+                ">
+                    <div style="
+                        width: 36px;
+                        height: 36px;
+                        background: #f0f0f0;
+                        border-radius: 10px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                    ">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="black">
+                            <path d="M18 16.08c-0.76 0-1.44.3-1.96.77l-7.13-4.15c0.05-.23.09-.46.09-.7s-0.04-.47-0.09-0.7l7.05-4.11c0.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7l-7.05 4.11c-0.54-0.5-1.25-0.81-2.04-0.81-1.66 0-3 1.34-3 3s1.34 3 3 3c0.79 0 1.5-0.31 2.04-0.81l7.12 4.16c-0.05.21-0.08.43-0.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z"/>
+                        </svg>
+                    </div>
+                    <h3 style="margin: 0; font-size: 18px; font-weight: 600;">Share Linktree</h3>
+                </div>
+                
+                <!-- الرابط -->
+                <div style="margin-bottom: 25px;">
+                    <div style="
+                        display: flex;
+                        gap: 10px;
+                        margin-bottom: 8px;
+                    ">
+                        <input type="text" id="shareLinkInput" value="${currentUrl}" readonly style="
+                            flex: 1;
+                            border: 1px solid #ddd;
+                            border-radius: 10px;
+                            padding: 12px 15px;
+                            font-size: 14px;
+                            background: #f9f9f9;
+                        ">
+                        <button onclick="copyLink()" style="
+                            background: black;
+                            color: white;
+                            border: none;
+                            border-radius: 10px;
+                            padding: 0 20px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            min-width: 70px;
+                        ">
+                            Copy
+                        </button>
+                    </div>
+                    <p style="font-size: 13px; color: #888; text-align: center; margin: 0;">
+                        Copy the URL to share anywhere
+                    </p>
+                </div>
+                
+             <!-- استبدل قسم أزرار المشاركة في النافذة المنبثقة بهذا الكود -->
+
+   
+<!-- استبدل قسم أزرار المشاركة في النافذة المنبثقة بهذا الكود -->
+
+<!-- أزرار المشاركة -->
+<div style="margin-bottom: 25px;">
+    <p style="font-size: 14px; color: #666; margin-bottom: 15px;">Share directly to</p>
+    <div style="
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+    ">
+        <!-- واتساب -->
+        <button onclick="shareTo('whatsapp')" style="
+            background: #25D366;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.76.982.998-3.675-.236-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.9 6.994c-.004 5.45-4.438 9.88-9.888 9.88m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.333 .157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.333 11.893-11.893 0-3.18-1.24-6.162-3.495-8.411"></path>
+            </svg>
+            WhatsApp
+        </button>
+        
+        <!-- فيسبوك -->
+        <button onclick="shareTo('facebook')" style="
+            background: #1877F2;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+            </svg>
+            Facebook
+        </button>
+        
+        <!-- انستغرام -->
+        <button onclick="shareToInstagram()" style="
+            background: linear-gradient(45deg, #405DE6, #5851DB, #833AB4, #C13584, #E1306C, #FD1D1D);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+            Instagram
+        </button>
+        
+        <!-- تيليجرام -->
+<button onclick="shareTo('telegram')" style="
+    background: #0088CC;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 15px 10px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    font-size: 12px;
+">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+        <path d="M9.417 15.181l-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.622-16.972.001-.001c.321-1.496-.541-2.081-1.527-1.714l-21.29 8.151c-1.453.564-1.431 1.374-.247 1.741l5.443 1.693 12.643-7.911c.595-.394 1.136-.176.691.218z"/>
+    </svg>
+    Telegram
+</button>
+        
+        <!-- إيميل -->
+        <button onclick="shareTo('email')" style="
+            background: #EA4335;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            </svg>
+            Email
+        </button>
+        
+        <!-- يوتيوب -->
+        <button onclick="shareToYouTube()" style="
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+            YouTube
+        </button>
+        
+        <!-- أوتلوك -->
+        <button onclick="shareTo('outlook')" style="
+            background: #0072C6;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 15px 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+            font-size: 12px;
+        ">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
+                <path d="M4.75 3h14.5c.966 0 1.75.784 1.75 1.75v14.5c0 .966-.784 1.75-1.75 1.75H4.75c-.966 0-1.75-.784-1.75-1.75V4.75C3 3.784 3.784 3 4.75 3zm.75 9.5v7.25c0 .138.112.25.25.25h14.5c.138 0 .25-.112.25-.25V12.5h-15zm15-1.5V4.75c0-.138-.112-.25-.25-.25H4.75c-.138 0-.25.112-.25.25V11h15z"/>
+            </svg>
+            Outlook
+        </button>
+    </div>
+</div>
+                
+                <!-- زر الإغلاق -->
+                <button onclick="closeModal()" style="
+                    width: 100%;
+                    background: black;
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 16px;
+                    font-weight: 600;
+                    font-size: 16px;
+                    cursor: pointer;
+                    margin-top: 10px;
+                ">
+                    Done
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // إضافة النافذة للصفحة
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    
+    // إضافة الأنيميشن
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        @keyframes slideDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+        }
+    `;
+    document.head.appendChild(style);
+}
+
+// دالة نسخ الرابط
+function copyLink() {
+    const input = document.getElementById('shareLinkInput');
+    if (!input) return;
+    
+    input.select();
+    input.setSelectionRange(0, 99999);
+    
+    navigator.clipboard.writeText(input.value)
+        .then(() => {
+            const btn = document.querySelector('#simpleShareModal button[onclick="copyLink()"]');
+            if (btn) {
+                btn.textContent = 'Copied!';
+                btn.style.background = '#4CAF50';
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.style.background = 'black';
+                }, 2000);
+            }
+        });
+}
+
+// دالة المشاركة لانستغرام
+function shareToInstagram() {
+    const url = window.location.href;
+    const text = "Check out my Linktree profile! 👉 " + url;
+    
+    // محاولة استخدام Web Share API أولاً (إن وجد)
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Linktree Profile',
+            text: text,
+            url: url
+        }).then(() => {
+            console.log('Thanks for sharing!');
+        }).catch(console.error);
+    } else {
+        // إذا لم يكن Web Share API متاحاً، نسخ الرابط
+        navigator.clipboard.writeText(text).then(() => {
+            // إظهار رسالة نجاح
+            showCustomAlert('Instagram', 'Link copied! Open Instagram and paste it in your story or post.');
+        }).catch(err => {
+            // طريقة بديلة للنسخ
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showCustomAlert('Instagram', 'Link copied to clipboard! Open Instagram and paste it in your story or post.');
+        });
+    }
+    
+    closeModal();
+}
+
+// دالة المشاركة ليوتيوب
+function shareToYouTube() {
+    const url = window.location.href;
+    const text = "Check out my Linktree profile! " + url;
+    
+    // محاولة استخدام Web Share API أولاً
+    if (navigator.share) {
+        navigator.share({
+            title: 'My Linktree Profile',
+            text: text,
+            url: url
+        }).then(() => {
+            console.log('Thanks for sharing!');
+        }).catch(console.error);
+    } else {
+        // نسخ الرابط للكمبيوتر
+        navigator.clipboard.writeText(text).then(() => {
+            showCustomAlert('YouTube', 'Link copied! You can now share it on YouTube.');
+        }).catch(err => {
+            // طريقة بديلة للنسخ
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            document.body.appendChild(textArea);
+            textArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textArea);
+            showCustomAlert('YouTube', 'Link copied to clipboard! You can share it on YouTube.');
+        });
+    }
+    
+    closeModal();
+}
+
+// دالة لعرض رسالة مخصصة
+function showCustomAlert(platform, message) {
+    // إخفاء النافذة الرئيسية مؤقتاً
+    const modal = document.getElementById('simpleShareModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+    
+    // إنشاء نافذة الرسالة
+    const alertHTML = `
+        <div id="customAlert" style="
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease;
+        ">
+            <div style="
+                background: white;
+                width: 85%;
+                max-width: 400px;
+                border-radius: 20px;
+                padding: 25px;
+                text-align: center;
+                animation: scaleIn 0.3s ease;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            ">
+                <!-- أيقونة المنصة -->
+                <div style="
+                    width: 60px;
+                    height: 60px;
+                    border-radius: 50%;
+                    margin: 0 auto 20px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 28px;
+                " id="platformIcon">
+                    📋
+                </div>
+                
+                <!-- الرسالة -->
+                <h3 style="margin: 0 0 10px; color: #333; font-size: 18px;">
+                    Share to ${platform}
+                </h3>
+                <p style="color: #666; margin: 0 0 25px; line-height: 1.5; font-size: 15px;">
+                    ${message}
+                </p>
+                
+                <!-- زر OK -->
+                <button onclick="closeCustomAlert()" style="
+                    background: black;
+                    color: white;
+                    border: none;
+                    border-radius: 12px;
+                    padding: 14px 30px;
+                    font-weight: 600;
+                    font-size: 16px;
+                    cursor: pointer;
+                    width: 100%;
+                    transition: all 0.2s;
+                ">
+                    OK
+                </button>
+            </div>
+        </div>
+        
+        <style>
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes scaleIn {
+                from { transform: scale(0.8); opacity: 0; }
+                to { transform: scale(1); opacity: 1; }
+            }
+        </style>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', alertHTML);
+    
+    // تغيير الأيقونة حسب المنصة
+    const iconDiv = document.getElementById('platformIcon');
+    if (platform === 'Instagram') {
+        iconDiv.innerHTML = `
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="url(#instagram-gradient)">
+                <defs>
+                    <linearGradient id="instagram-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#405DE6"/>
+                        <stop offset="30%" style="stop-color:#833AB4"/>
+                        <stop offset="70%" style="stop-color:#C13584"/>
+                        <stop offset="100%" style="stop-color:#FD1D1D"/>
+                    </linearGradient>
+                </defs>
+                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
+            </svg>
+        `;
+    } else if (platform === 'YouTube') {
+        iconDiv.innerHTML = `
+            <svg width="35" height="35" viewBox="0 0 24 24" fill="#FF0000">
+                <path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/>
+            </svg>
+        `;
+        iconDiv.style.background = 'white';
+        iconDiv.style.borderRadius = '10px';
+        iconDiv.style.padding = '5px';
+    }
+}
+
+// دالة لإغلاق الرسالة المخصصة
+function closeCustomAlert() {
+    const alert = document.getElementById('customAlert');
+    if (alert) {
+        alert.remove();
+    }
+    
+    // إعادة عرض النافذة الرئيسية
+    const modal = document.getElementById('simpleShareModal');
+    if (modal) {
+        modal.style.display = 'flex';
+    }
+    
+    // إغلاق النافذة الرئيسية بعد الرسالة
+    closeModal();
+}
+
+// تحديث دالة المشاركة الرئيسية
+function shareTo(platform) {
+    const url = window.location.href;
+    const text = "Check out my Linktree profile!";
+    const emailSubject = "Check out this Linktree profile";
+    const emailBody = `Check out this amazing Linktree profile: ${url}\n\nBest regards`;
+    
+    let shareUrl = '';
+    
+    if (platform === 'whatsapp') {
+        shareUrl = `https://wa.me/?text=${encodeURIComponent(text + ' ' + url)}`;
+    } else if (platform === 'facebook') {
+        shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    } else if (platform === 'telegram') {
+        shareUrl = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
+    } else if (platform === 'email') {
+        shareUrl = `mailto:?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+        window.location.href = shareUrl;
+        closeModal();
+        return;
+    } else if (platform === 'outlook') {
+        shareUrl = `https://outlook.office.com/mail/deeplink/compose?subject=${encodeURIComponent(emailSubject)}&body=${encodeURIComponent(emailBody)}`;
+    }
+    
+    if (shareUrl) {
+        window.open(shareUrl, '_blank');
+    }
+    
+    closeModal();
+}
+// دالة إغلاق النافذة
+function closeModal() {
+    const modal = document.getElementById('simpleShareModal');
+    if (modal) {
+        modal.style.animation = 'slideDown 0.3s ease';
+        setTimeout(() => {
+            modal.remove();
+        }, 280);
+    }
+}
+
+// للاختبار: افتح الكونسول واضغط على الزر
+console.log("🔧 زر المشاركة جاهز للاستخدام!");
+console.log("🔧 اضغط على الزر في الزاوية اليمنى العليا");
+</script>           <path d="M216,112v96a16,16,0,0,1-16,16H56a16,16,0,0,1-16-16V112A16,16,0,0,1,56,96H80a8,8,0,0,1,0,16H56v96H200V112H176a8,8,0,0,1,0-16h24A16,16,0,0,1,216,112ZM93.66,69.66,120,43.31V136a8,8,0,0,0,16,0V43.31l26.34,26.35a8,8,0,0,0,11.32-11.32l-40-40a8,8,0,0,0-11.32,0l-40,40A8,8,0,0,0,93.66,69.66Z"></path>
+    </svg>
+</button>
+
+<style>
+/* زر المشاركة في الزاوية اليمنى العليا */
+.top-right-share-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    height: 45px;
+    width: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 2px solid #000000;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+    padding: 0;
+    margin: 0;
+    outline: none;
+}
+
+.top-right-share-btn:hover {
+    transform: scale(1.1);
+    background: #f8f8f8;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.top-right-share-btn:active {
+    transform: scale(0.95);
+}
+/* إصلاح ظهور اللوجو في الجوال */
+@media (max-width: 768px) {
+    .profile-header {
+        margin-top: 15px !important;
+        padding-top: 10px !important;
+    }
+    
+    .profile-name img {
+        height: 40px !important;
+        margin-bottom: 15px !important;
+        display: block !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+    
+    .avatar-container {
+        margin-top: 10px !important;
+    }
+}
+
+/* للموبايلات الصغيرة جداً */
+@media (max-width: 480px) {
+    body {
+        padding-top: 10px !important;
+    }
+    
+    .profile-header {
+        padding-top: 5px !important;
+        margin-top: 10px !important;
+    }
+    
+    .profile-name img {
+        height: 35px !important;
+        max-width: 160px !important;
+        margin-bottom: 10px !important;
+    }
+}
+
+/* إصلاح خاص للآيفون */
+@supports (-webkit-touch-callout: none) {
+    .profile-header {
+        margin-top: max(15px, env(safe-area-inset-top)) !important;
+        padding-top: env(safe-area-inset-top) !important;
+    }
+}
+</style>
+
+    <!-- خلفية متحركة -->
+    <div class="background-animation">
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+        <div class="bg-circle"></div>
+    </div>
+    
+    <!-- الحاوية الرئيسية -->
+    <main class="profile-container">
+        <!-- رأس الملف الشخصي -->
+        <header class="profile-header">
+            
+                <!-- يمكن استبدال هذا بصورتك -->
+                <!-- <img src="صورة-الملف-الشخصي.jpg" alt="Natazia" class="avatar"> -->
+            </div>
+            
+           <h1 class="profile-name">
+    <img src="inter gulf.png" alt="" style="height: 45px; max-width: 150px; object-fit: contain;">
+</h1>
+            <p class="profile-bio">
+                من الهمس إلى الزئير نصنع حضور رقمي يُسمع ويُترك أثر بناء الهوية | سوشال ميديا | حلول رقمية | البرمجة والمواقع الالكترونية
+            </p>
+            
+            <div class="social-links">
+                <a href="https://www.instagram.com/intergulfqa/?next=%2F" class="social-link" target="_blank">
+                    <i class="fab fa-instagram"></i>
+                </a>
+                <a href="https://wa.me/905011536140?text=" class="social-link" target="_blank" style="transform: translateY(0px) scale(1);">
+    <i class="fab fa-whatsapp"></i>
+</a>
+                            </div>
+        </header>
+                
+        <!-- قسم الروابط -->
+        <section class="links-section">
+            <!-- رابط مميز -->
+            <a href="https://www.behance.net/khalidalyafie" class="link-item spotlight" target="_blank">
+    <div class="link-content">
+        <div class="link-icon">
+            <i class="fab fa-behance"></i>
+        </div>
+       <div class="link-text">
+    <div class="link-title bold-title"> معرض الاعمال | Behance </div>
+    <div class="link-description"></div>
+</div>
+        <div class="link-arrow">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+</a>
+            
+            <!-- روابط عادية -->
+           <a href="https://wa.me/905011536140?text=" class="link-item spotlight" target="_blank">
+    <div class="link-content">
+        <div class="link-icon">
+            <i class="fab fa-whatsapp"></i>
+        </div>
+        <div class="link-text">
+            <div class="link-title">تواصل مع أخصائي التسويق الآن</div>
+            <div class="link-description"></div>
+        </div>
+        <div class="link-arrow">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+</a>
+            
+            <a href="https://www.google.com/maps/place/Tornado+Tower,+Majlis+Al+Taawon+St,+Doha,+Qatar/@25.3193077,51.5254109,786m/data=!3m2!1e3!4b1!4m6!3m5!1s0x3e45c4c6583fd66b:0xb267737e9801c160!8m2!3d25.3193029!4d51.5279858!16s%2Fm%2F0wfbhsj?authuser=0&entry=ttu&g_ep=EgoyMDI1MTIwOS4wIKXMDSoASAFQAw%3D%3D" class="link-item spotlight" target="_blank">
+    <div class="link-content">
+        <div class="link-icon">
+            <i class="fas fa-map-marker-alt"></i>
+        </div>
+        <div class="link-text">
+            <div class="link-title">العنوان: الدوحة، قطر - برج اعصار</div>
+            <div class="link-description"></div>
+        </div>
+        <div class="link-arrow">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+</a>
+            
+            <a href="https://www.linkedin.com/in/[اسم-حسابك]" class="link-item spotlight" target="_blank">
+    <div class="link-content">
+        <div class="link-icon">
+            <i class="fab fa-linkedin"></i>
+        </div>
+        <div class="link-text">
+            <div class="link-title">حساب LinkedIn</div>
+            <div class="link-description"></div>
+        </div>
+        <div class="link-arrow">
+            <i class="fas fa-arrow-left"></i>
+        </div>
+    </div>
+</a>
+            
+            <a href="#" class="link-item spotlight" id="comingSoonLink">
+    <div class="link-content">
+        <div class="link-icon">
+            <i class="fas fa-globe"></i>
+        </div>
+        <div class="link-text">
+            <div class="link-title">موقع إلكتروني قريباً</div>
+            <div class="link-description"></div>
+        </div>
+        <div class="link-arrow">
+            <i class="fas fa-clock"></i>
+        </div>
+    </div>
+</a>
+            
+            <a href="963mohanadneef@gmail.com" class="link-item spotlight">
+                <div class="link-content">
+                    <div class="link-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="link-text">
+                        <div class="link-title">البريد الإلكتروني</div>
+                        <div class="link-description"></div>
+                    </div>
+                    <div class="link-arrow">
+                        <i class="fas fa-arrow-left"></i>
+                    </div>
+                </div>
+            </a>
+        </section>
+        
+        <!-- الفوتر -->
+        <footer class="profile-footer">
+            <p>© 2023 inter gulf. جميع الحقوق محفوظة.</p>
+            <div class="footer-links">
+                <a href="#" class="footer-link">سياسة الخصوصية</a>
+                <a href="#" class="footer-link">شروط الاستخدام</a>
+                <a href="#" class="footer-link">اتصل بنا</a>
+            </div>
+        </footer>
+    </main>
+    
+    <!-- زر العودة للأعلى -->
+    <a href="#" class="back-to-top" id="backToTop">
+        <i class="fas fa-chevron-up"></i>
+    </a>
+    
+    <script>
+        // تفعيل الموسيقى
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const progressBar = document.getElementById('progressBar');
+        const progressContainer = document.getElementById('progressContainer');
+        const currentTimeEl = document.getElementById('currentTime');
+        const durationEl = document.getElementById('duration');
+        let isPlaying = false;
+        
+        // محاكاة وقت الأغنية
+        let currentTime = 0;
+        let duration = 225; // 3:45 بالثواني
+        
+        // تحديث الوقت على الشاشة
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+        }
+        
+        durationEl.textContent = formatTime(duration);
+        
+        // تشغيل/إيقاف الموسيقى
+        playBtn.addEventListener('click', function() {
+            isPlaying = !isPlaying;
+            
+            if (isPlaying) {
+                playIcon.classList.remove('fa-play');
+                playIcon.classList.add('fa-pause');
+                // في حالة حقيقية، هنا يتم تشغيل الصوت
+                simulatePlayback();
+            } else {
+                playIcon.classList.remove('fa-pause');
+                playIcon.classList.add('fa-play');
+                // إيقاف المحاكاة
+                clearInterval(playbackInterval);
+            }
+        });
+        
+        // محاكاة تشغيل الموسيقى
+        let playbackInterval;
+        function simulatePlayback() {
+            playbackInterval = setInterval(() => {
+                if (currentTime < duration) {
+                    currentTime += 1;
+                    updateProgress();
+                } else {
+                    // إعادة التشغيل من البداية عند الانتهاء
+                    currentTime = 0;
+                    updateProgress();
+                }
+            }, 1000);
+        }
+        
+        // تحديث شريط التقدم
+        function updateProgress() {
+            const progressPercent = (currentTime / duration) * 100;
+            progressBar.style.width = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentTime);
+        }
+        
+        // النقر على شريط التقدم للانتقال إلى وقت معين
+        progressContainer.addEventListener('click', function(e) {
+            const width = this.clientWidth;
+            const clickX = e.offsetX;
+            const duration = 225;
+            
+            currentTime = (clickX / width) * duration;
+            updateProgress();
+        });
+        
+        // تفعيل تأثيرات التمرير
+        const scrollElements = document.querySelectorAll('.scroll-animation');
+        
+        const elementInView = (el, dividend = 1) => {
+            const elementTop = el.getBoundingClientRect().top;
+            return (
+                elementTop <= (window.innerHeight || document.documentElement.clientHeight) / dividend
+            );
+        };
+        
+        const displayScrollElement = (element) => {
+            element.classList.add('visible');
+        };
+        
+        const handleScrollAnimation = () => {
+            scrollElements.forEach((el) => {
+                if (elementInView(el, 1.25)) {
+                    displayScrollElement(el);
+                }
+            });
+            
+            // زر العودة للأعلى
+            const backToTop = document.getElementById('backToTop');
+            if (window.scrollY > 300) {
+                backToTop.classList.add('visible');
+            } else {
+                backToTop.classList.remove('visible');
+            }
+        };
+        
+        window.addEventListener('scroll', () => {
+            handleScrollAnimation();
+        });
+        
+        // تهيئة العناصر المرئية عند التحميل
+        document.addEventListener('DOMContentLoaded', () => {
+            // إظهار العناصر التي تكون مرئية بالفعل عند التحميل
+            handleScrollAnimation();
+            
+            // إضافة تأثيرات عند التمرير فوق الروابط
+            const links = document.querySelectorAll('.link-item');
+            links.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-4px)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+            
+            // إضافة تأثيرات للروابط الاجتماعية
+            const socialLinks = document.querySelectorAll('.social-link');
+            socialLinks.forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-3px) scale(1.05)';
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+            
+            // تأثيرات النصوص المتدرجة
+            const profileName = document.querySelector('.profile-name');
+            profileName.innerHTML = profileName.textContent.replace(/(\S+)/g, '<span class="text-gradient">$1</span>');
+        });
+        
+        // إضافة تأثير كتابة النص الحيوي (إذا أردت)
+        const profileBio = document.querySelector('.profile-bio');
+        const originalBio = profileBio.textContent;
+        
+        // يمكن تفعيل تأثير الكتابة إذا أردت
+        /*
+        let bioIndex = 0;
+        function typeBio() {
+            if (bioIndex < originalBio.length) {
+                profileBio.textContent = originalBio.substring(0, bioIndex + 1);
+                bioIndex++;
+                setTimeout(typeBio, 50);
+            }
+        }
+        
+        // ابدأ الكتابة بعد ثانية من التحميل
+        setTimeout(() => {
+            profileBio.textContent = '';
+            typeBio();
+        }, 1000);
+        */
+        
+        // تأثيرات إضافية عند النقر على الروابط
+        document.querySelectorAll('.link-item').forEach(link => {
+            link.addEventListener('click', function(e) {
+                // تأثير النقر
+                this.style.transform = 'scale(0.98)';
+                
+                // إذا كان الرابط خارجي، تأخير قليل قبل الانتقال
+                if (this.getAttribute('target') === '_blank' || this.getAttribute('href').startsWith('http')) {
+                    e.preventDefault();
+                    const href = this.getAttribute('href');
+                    
+                    setTimeout(() => {
+                        window.open(href, '_blank');
+                    }, 300);
+                }
+                
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 300);
+            });
+        });
+        
+        // تأثيرات خاصة لصفحة التحميل (إذا أردت)
+        window.addEventListener('load', function() {
+            document.body.style.opacity = 0;
+            document.body.style.transition = 'opacity 0.5s ease';
+            
+            setTimeout(() => {
+                document.body.style.opacity = 1;
+            }, 100);
+       <script>
+
+<script>
+// دالة المشاركة مثل Linktree
+function shareProfileLinktree() {
+    // بيانات الملف الشخصي
+    const profileName = "Natazia"; // أو "Inter Gulf"
+    const profileHandle = "@natazia"; // يمكن تغييره
+    const url = window.location.href;
+    
+    // إنشاء نافذة المشاركة
+    const shareModal = document.createElement('div');
+    shareModal.id = 'linktreeShareModal';
+    shareModal.innerHTML = `
+        <div class="linktree-modal-overlay" onclick="closeLinktreeModal()"></div>
+        <div class="linktree-modal-content">
+            <!-- شريط السحب -->
+            <div class="linktree-drag-bar"></div>
+            
+            <!-- الهيدر -->
+            <div class="linktree-modal-header">
+                <div class="linktree-modal-title">
+                    <div class="linktree-share-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 16.08C17.24 16.08 16.56 16.38 16.04 16.85L8.91 12.7C8.96 12.47 9 12.24 9 12C9 11.76 8.96 11.53 8.91 11.3L15.96 7.19C16.5 7.69 17.21 8 18 8C19.66 8 21 6.66 21 5C21 3.34 19.66 2 18 2C16.34 2 15 3.34 15 5C15 5.24 15.04 5.47 15.09 5.7L8.04 9.81C7.5 9.31 6.79 9 6 9C4.34 9 3 10.34 3 12C3 13.66 4.34 15 6 15C6.79 15 7.5 14.69 8.04 14.19L15.16 18.35C15.11 18.56 15.08 18.78 15.08 19C15.08 20.61 16.39 21.92 18 21.92C19.61 21.92 20.92 20.61 20.92 19C20.92 17.39 19.61 16.08 18 16.08Z" fill="currentColor"/>
+                        </svg>
+                    </div>
+                    <h3>Share linktree</h3>
+                </div>
+                <button class="linktree-close-btn" onclick="closeLinktreeModal()">✕</button>
+            </div>
+            
+            <!-- معلومات الملف الشخصي -->
+            <div class="linktree-profile-info">
+                <div class="linktree-avatar">
+                    <div class="linktree-avatar-initial">N</div>
+                </div>
+                <div class="linktree-profile-details">
+                    <div class="linktree-profile-name">${profileName}</div>
+                    <div class="linktree-profile-handle">${profileHandle}</div>
+                </div>
+            </div>
+            
+            <!-- رابط المشاركة -->
+            <div class="linktree-share-url">
+                <div class="linktree-url-box">
+                    <input type="text" value="${url}" readonly id="linktreeUrlInput">
+                    <button class="linktree-copy-btn" onclick="copyLinktreeUrl()">
+                        Copy
+                    </button>
+                </div>
+                <div class="linktree-url-note">Copy the URL to share anywhere</div>
+            </div>
+            
+            <!-- أزرار المشاركة السريعة -->
+            <div class="linktree-quick-share">
+                <div class="linktree-quick-share-title">Share directly to</div>
+                <div class="linktree-share-buttons">
+                    <button class="linktree-share-btn linktree-facebook" onclick="shareToFacebook('${profileName} - ${profileHandle}', '${url}')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M18 2H15C13.6739 2 12.4021 2.52678 11.4645 3.46447C10.5268 4.40215 10 5.67392 10 7V10H7V14H10V22H14V14H17L18 10H14V7C14 6.73478 14.1054 6.48043 14.2929 6.29289C14.4804 6.10536 14.7348 6 15 6H18V2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Facebook</span>
+                    </button>
+                    
+                    <button class="linktree-share-btn linktree-whatsapp" onclick="shareToWhatsApp('${profileName} - ${profileHandle}\\n${url}')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0034 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>WhatsApp</span>
+                    </button>
+                    
+                    <button class="linktree-share-btn linktree-telegram" onclick="shareToTelegram('${profileName} - ${profileHandle}\\n${url}')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M21 5L2 12.5L9 15M21 5L18.5 21L9 15M21 5L9 15M9 15V19L12.5 17.5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Telegram</span>
+                    </button>
+                    
+                    <button class="linktree-share-btn linktree-twitter" onclick="shareToTwitter('${profileName} - ${profileHandle}\\n${url}')">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M23 3.00005C22.0424 3.67552 20.9821 4.19216 19.86 4.53005C19.2577 3.83756 18.4573 3.34674 17.567 3.12397C16.6767 2.90121 15.7395 2.95724 14.8821 3.2845C14.0247 3.61176 13.2884 4.19445 12.773 4.95376C12.2575 5.71308 11.9877 6.61238 12 7.53005V8.53005C10.2426 8.57561 8.50127 8.18586 6.93101 7.39549C5.36074 6.60512 4.01032 5.43868 3 4.00005C3 4.00005 -1 13 8 17C5.94053 18.398 3.48716 19.099 1 19C10 24 21 19 21 7.50005C20.9991 7.2215 20.9723 6.94364 20.92 6.67005C21.9406 5.66354 22.6608 4.39276 23 3.00005Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        <span>Twitter</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- قسم دعوة Linktree -->
+            <div class="linktree-cta-section">
+                <div class="linktree-cta-content">
+                    <div class="linktree-cta-icon">🌴</div>
+                    <div class="linktree-cta-text">
+                        <div class="linktree-cta-title">Join ${profileName} on Linktree</div>
+                        <div class="linktree-cta-subtitle">Get your own free Linktree. The only link in bio trusted by 50M+ people.</div>
+                    </div>
+                </div>
+                <div class="linktree-cta-buttons">
+                    <a href="https://linktr.ee" target="_blank" class="linktree-cta-btn linktree-signup-btn">Sign up free</a>
+                    <a href="https://linktr.ee/about" target="_blank" class="linktree-cta-btn linktree-more-btn">Find out more</a>
+                </div>
+            </div>
+            
+            <!-- زر إغلاق -->
+            <button class="linktree-done-btn" onclick="closeLinktreeModal()">Done</button>
+        </div>
+    `;
+    
+    document.body.appendChild(shareModal);
+    
+    // إضافة الأنماط إذا لم تكن موجودة
+    if (!document.getElementById('linktreeModalStyles')) {
+        addLinktreeModalStyles();
+    }
+    
+    // إضافة تفاعل السحب للإغلاق
+    setupLinktreeDragClose();
+}
+
+// إغلاق نافذة Linktree
+function closeLinktreeModal() {
+    const modal = document.getElementById('linktreeShareModal');
+    if (modal) {
+        modal.style.animation = 'slideDown 0.3s ease-out';
+        setTimeout(() => {
+            modal.remove();
+        }, 280);
+    }
+}
+
+// نسخ رابط Linktree
+function copyLinktreeUrl() {
+    const urlInput = document.getElementById('linktreeUrlInput');
+    if (!urlInput) return;
+    
+    urlInput.select();
+    urlInput.setSelectionRange(0, 99999);
+    
+    navigator.clipboard.writeText(urlInput.value)
+        .then(() => {
+            const copyBtn = document.querySelector('.linktree-copy-btn');
+            if (copyBtn) {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '';
+                }, 2000);
+            }
+        })
+        .catch(() => {
+            document.execCommand('copy');
+            const copyBtn = document.querySelector('.linktree-copy-btn');
+            if (copyBtn) {
+                const originalText = copyBtn.textContent;
+                copyBtn.textContent = 'Copied!';
+                copyBtn.style.background = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyBtn.textContent = originalText;
+                    copyBtn.style.background = '';
+                }, 2000);
+            }
+        });
+}
+
+// إضافة أنماط Linktree
+function addLinktreeModalStyles() {
+    const styles = `
+        #linktreeShareModal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10000;
+            animation: fadeIn 0.2s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideDown {
+            from { opacity: 1; }
+            to { opacity: 0; transform: translateY(50px); }
+        }
+        
+        .linktree-modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+        }
+        
+        .linktree-modal-content {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #ffffff;
+            border-radius: 24px 24px 0 0;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -4px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        
+        .linktree-drag-bar {
+            width: 40px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            margin: 12px auto;
+        }
+        
+        .linktree-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px 16px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .linktree-modal-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .linktree-share-icon {
+            width: 36px;
+            height: 36px;
+            background: #f5f5f5;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #000;
+        }
+        
+        .linktree-modal-title h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+            color: #000;
+        }
+        
+        .linktree-close-btn {
+            background: none;
+            border: none;
+            font-size: 20px;
+            color: #666;
+            cursor: pointer;
+            width: 36px;
+            height: 36px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        .linktree-close-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .linktree-profile-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .linktree-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+        
+        .linktree-profile-details {
+            flex: 1;
+        }
+        
+        .linktree-profile-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: #000;
+            margin-bottom: 2px;
+        }
+        
+        .linktree-profile-handle {
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .linktree-share-url {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .linktree-url-box {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        #linktreeUrlInput {
+            flex: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            background: #fafafa;
+            color: #333;
+            outline: none;
+            font-family: inherit;
+        }
+        
+        .linktree-copy-btn {
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 0 20px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .linktree-copy-btn:hover {
+            background: #333;
+            transform: scale(0.98);
+        }
+        
+        .linktree-url-note {
+            font-size: 13px;
+            color: #888;
+            text-align: center;
+        }
+        
+        .linktree-quick-share {
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .linktree-quick-share-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+        
+        .linktree-share-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .linktree-share-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+            border-radius: 12px;
+            padding: 14px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: white;
+        }
+        
+        .linktree-share-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .linktree-facebook { background: #1877F2; }
+        .linktree-whatsapp { background: #25D366; }
+        .linktree-telegram { background: #0088CC; }
+        .linktree-twitter { background: #1DA1F2; }
+        
+        .linktree-cta-section {
+            padding: 20px;
+            background: #f8f9fa;
+            margin: 20px;
+            border-radius: 16px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .linktree-cta-content {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .linktree-cta-icon {
+            font-size: 24px;
+        }
+        
+        .linktree-cta-text {
+            flex: 1;
+        }
+        
+        .linktree-cta-title {
+            font-weight: 600;
+            font-size: 14px;
+            color: #000;
+            margin-bottom: 4px;
+        }
+        
+        .linktree-cta-subtitle {
+            font-size: 12px;
+            color: #666;
+            line-height: 1.4;
+        }
+        
+        .linktree-cta-buttons {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .linktree-cta-btn {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+        
+        .linktree-signup-btn {
+            background: #000;
+            color: white;
+        }
+        
+        .linktree-signup-btn:hover {
+            background: #333;
+        }
+        
+        .linktree-more-btn {
+            background: white;
+            color: #000;
+            border: 2px solid #000;
+        }
+        
+        .linktree-more-btn:hover {
+            background: #f5f5f5;
+        }
+        
+        .linktree-done-btn {
+            display: block;
+            width: calc(100% - 40px);
+            margin: 0 20px 30px;
+            background: #000;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .linktree-done-btn:hover {
+            background: #333;
+            transform: scale(0.98);
+        }
+        
+        /* تفاعل السحب للإغلاق */
+        .linktree-modal-content.dragging-down {
+            transform: translateY(var(--drag-distance, 0));
+            transition: transform 0.1s;
+        }
+    `;
+    
+    const styleSheet = document.createElement('style');
+    styleSheet.id = 'linktreeModalStyles';
+    styleSheet.textContent = styles;
+    document.head.appendChild(styleSheet);
+}
+
+// إعداد تفاعل السحب للإغلاق
+function setupLinktreeDragClose() {
+    const modalContent = document.querySelector('.linktree-modal-content');
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    
+    modalContent.addEventListener('touchstart', (e) => {
+        startY = e.touches[0].clientY;
+        isDragging = true;
+    }, { passive: true });
+    
+    modalContent.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        
+        currentY = e.touches[0].clientY;
+        const diff = currentY - startY;
+        
+        if (diff > 0) { // سحب للأسفل فقط
+            modalContent.style.setProperty('--drag-distance', `${diff}px`);
+            modalContent.classList.add('dragging-down');
+        }
+    }, { passive: true });
+    
+    modalContent.addEventListener('touchend', () => {
+        if (!isDragging) return;
+        
+        isDragging = false;
+        const diff = currentY - startY;
+        
+        if (diff > 100) { // إذا تم السحب لأكثر من 100px
+            closeLinktreeModal();
+        } else {
+            modalContent.style.removeProperty('--drag-distance');
+            modalContent.classList.remove('dragging-down');
+        }
+    });
+}
+
+// وظائف المشاركة
+function shareToFacebook(title, url) {
+    window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}&quote=${encodeURIComponent(title)}`, '_blank');
+}
+
+function shareToWhatsApp(text) {
+    window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareToTelegram(text) {
+    window.open(`https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodeURIComponent(text)}`, '_blank');
+}
+
+function shareToTwitter(text) {
+    window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`, '_blank');
+}
+
+// تحديث زر المشاركة الرئيسي
+document.addEventListener('DOMContentLoaded', function() {
+    const shareBtn = document.getElementById('shareBtn');
+    if (shareBtn) {
+        shareBtn.onclick = shareProfileLinktree;
+        
+        // تحديث أيقونة الزر
+        shareBtn.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="black" viewBox="0 0 256 256">
+                <path d="M176,160a39.89,39.89,0,0,0-28.62,12.09l-46.1-29.63a40.07,40.07,0,0,0,0-28.92l46.1-29.63a40,40,0,1,0-8.66-13.45l-46.1,29.63a40,40,0,1,0,0,55.82l46.1,29.63A40,40,0,1,0,176,160Zm0-128a24,24,0,1,1-24,24A24,24,0,0,1,176,32ZM64,152a24,24,0,1,1,24-24A24,24,0,0,1,64,152Zm112,72a24,24,0,1,1,24-24A24,24,0,0,1,176,224Z"></path>
+            </svg>
+        `;
+        
+        // إضافة تأثيرات
+        shareBtn.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.15)';
+            this.style.boxShadow = '0 6px 20px rgba(0,0,0,0.25)';
+        });
+        
+        shareBtn.addEventListener('mouseleave', function() {
+            this.style.transform = '';
+            this.style.boxShadow = '';
+        });
+    }
+
+// تحسينات الجوال
+function initMobileOptimizations() {
+    // إضافة شريط الحالة الآمن للآيفون
+    const statusBar = document.createElement('div');
+    statusBar.className = 'status-bar-fix';
+    document.body.prepend(statusBar);
+    
+    // منع الزوم عند النقر المزدوج
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function(event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+    
+    // إصلاح ارتفاع 100vh
+    function setFullHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        // تطبيق على body
+        document.body.style.height = 'calc(var(--vh, 1vh) * 100)';
+    }
+    
+    setFullHeight();
+    window.addEventListener('resize', setFullHeight);
+    window.addEventListener('orientationchange', setFullHeight);
+    
+    // اكتشاف لوحة المفاتيح
+    const viewport = document.querySelector('meta[name="viewport"]');
+    window.addEventListener('resize', function() {
+        if (window.visualViewport.height < window.innerHeight) {
+            document.body.classList.add('keyboard-open');
+        } else {
+            document.body.classList.remove('keyboard-open');
+        }
+    });
+    
+    // تحسين الأداء للجوال
+    const links = document.querySelectorAll('a');
+    links.forEach(link => {
+        link.addEventListener('touchstart', function() {
+            this.style.opacity = '0.8';
+        });
+        
+        link.addEventListener('touchend', function() {
+            this.style.opacity = '1';
+        });
+    });
+    
+    // إضافة تأثير اهتزاز خفيف عند النقر
+    document.addEventListener('touchstart', function(e) {
+        if (e.target.classList.contains('link-item')) {
+            e.target.style.transform = 'scale(0.98)';
+        }
+    });
+    
+    document.addEventListener('touchend', function(e) {
+        if (e.target.classList.contains('link-item')) {
+            setTimeout(() => {
+                e.target.style.transform = '';
+            }, 150);
+        }
+    });
+    
+    // تحسين الأداء للتمرير
+    let ticking = false;
+    window.addEventListener('scroll', function() {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                // تحديث الأنيميشنات
+                ticking = false;
+            });
+            ticking = true;
+        }
+    });
+    
+    // إضافة PWA features
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                console.log('ServiceWorker registration successful');
+            }, function(err) {
+                console.log('ServiceWorker registration failed: ', err);
+            });
+        });
+    }
+    
+    // Add to Home Screen prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        
+        // يمكنك إظهار زر "أضف إلى الشاشة الرئيسية"
+        setTimeout(() => {
+            showAddToHomeScreenPrompt();
+        }, 3000);
+    });
+    
+    function showAddToHomeScreenPrompt() {
+        if (!deferredPrompt) return;
+        
+        const installPrompt = document.createElement('div');
+        installPrompt.innerHTML = `
+            <div style="
+                position: fixed;
+                bottom: 20px;
+                left: 20px;
+                right: 20px;
+                background: white;
+                border-radius: 15px;
+                padding: 15px;
+                box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                animation: slideUp 0.3s ease;
+            ">
+                <div style="
+                    width: 50px;
+                    height: 50px;
+                    background: black;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    color: white;
+                    font-size: 24px;
+                ">
+                    📱
+                </div>
+                <div style="flex: 1;">
+                    <h4 style="margin: 0 0 5px; color: #333;">Add to Home Screen</h4>
+                    <p style="margin: 0; color: #666; font-size: 14px;">Install INTER GULF app for better experience</p>
+                </div>
+                <button id="installBtn" style="
+                    background: black;
+                    color: white;
+                    border: none;
+                    border-radius: 10px;
+                    padding: 10px 20px;
+                    font-weight: 600;
+                    cursor: pointer;
+                ">
+                    Install
+                </button>
+                <button id="closeInstallBtn" style="
+                    background: none;
+                    border: none;
+                    color: #999;
+                    font-size: 20px;
+                    cursor: pointer;
+                    padding: 0 10px;
+                ">
+                    ✕
+                </button>
+            </div>
+        `;
+        
+        document.body.appendChild(installPrompt);
+        
+        document.getElementById('installBtn').addEventListener('click', () => {
+            deferredPrompt.prompt();
+            deferredPrompt.userChoice.then((choiceResult) => {
+                if (choiceResult.outcome === 'accepted') {
+                    console.log('User accepted the install prompt');
+                }
+                installPrompt.remove();
+                deferredPrompt = null;
+            });
+        });
+        
+        document.getElementById('closeInstallBtn').addEventListener('click', () => {
+            installPrompt.remove();
+        });
+    }
+}
+
+// تفعيل عند تحميل الصفحة
+document.addEventListener('DOMContentLoaded', function() {
+    initMobileOptimizations();
+    
+    // إضافة تأثير تحميل للجوال
+    window.addEventListener('load', function() {
+        setTimeout(() => {
+            document.body.classList.add('loaded');
+        }, 100);
+    });
+
+
+
+<!-- ... الكود الحالي ... -->
+
+<!-- تأثير السحر الأسود -->
+<script>
+// إنشاء عنصر تأثير السحر الأسود
+const magicEffect = document.createElement('div');
+magicEffect.className = 'black-magic-effect';
+document.body.appendChild(magicEffect);
+
+// دالة تحديث موضع التأثير
+function updateMagicEffect(x, y) {
+    magicEffect.style.left = x + 'px';
+    magicEffect.style.top = y + 'px';
+}
+
+// لجهاز الكمبيوتر (الماوس)
+document.addEventListener('mousemove', (e) => {
+    magicEffect.classList.add('mouse');
+    magicEffect.classList.add('active');
+    updateMagicEffect(e.clientX, e.clientY);
+});
+
+document.addEventListener('mouseleave', () => {
+    magicEffect.classList.remove('active');
+});
+
+document.addEventListener('mousedown', () => {
+    magicEffect.style.transform = 'translate(-50%, -50%) scale(0.8)';
+});
+
+document.addEventListener('mouseup', () => {
+    magicEffect.style.transform = 'translate(-50%, -50%) scale(1)';
+});
+
+// للجوال (اللمس)
+document.addEventListener('touchstart', (e) => {
+    magicEffect.classList.remove('mouse');
+    magicEffect.classList.add('active');
+    const touch = e.touches[0];
+    updateMagicEffect(touch.clientX, touch.clientY);
+});
+
+document.addEventListener('touchmove', (e) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    updateMagicEffect(touch.clientX, touch.clientY);
+});
+
+document.addEventListener('touchend', () => {
+    magicEffect.classList.remove('active');
+});
+</script>
+</body>
+</html>
