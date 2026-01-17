@@ -3,50 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تطبيق تواصل</title>
+    <title>إنشاء مكالمة - تطبيق التواصل</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- تسجيل الدخول -->
-        <div id="login-section" class="section">
-            <h2>تسجيل الدخول</h2>
-            <input type="text" id="username" placeholder="اسم المستخدم" />
-            <button onclick="registerUser()">دخول</button>
+        <!-- الشعار -->
+        <div class="logo">
+            <i class="fas fa-video"></i>
+            <h1>مكالمات فيديو</h1>
+            <p>أنشئ مكالمة فيديو وأرسل الرابط لأصدقائك</p>
         </div>
 
-        <!-- الدردشة -->
-        <div id="chat-section" class="section" style="display: none;">
-            <h2>الدردشة</h2>
-            
-            <!-- المستخدمون المتصلون -->
-            <div id="online-users">
-                <h3>المستخدمون المتصلون:</h3>
-                <ul id="users-list"></ul>
+        <!-- قسم إنشاء الرابط -->
+        <div class="meeting-section">
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> إنشاء مكالمة جديدة</h2>
+                
+                <div class="form-group">
+                    <label for="hostName"><i class="fas fa-user"></i> اسمك:</label>
+                    <input type="text" id="hostName" placeholder="أدخل اسمك" value="المضيف">
+                </div>
+                
+                <button class="btn-create" onclick="createMeeting()">
+                    <i class="fas fa-video"></i> إنشاء رابط مكالمة
+                </button>
+                
+                <div class="or-divider">
+                    <span>أو</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="joinLink"><i class="fas fa-link"></i> الانضمام إلى مكالمة:</label>
+                    <input type="text" id="joinLink" placeholder="أدخل رابط المكالمة">
+                    <input type="text" id="guestName" placeholder="اسمك">
+                    <button class="btn-join" onclick="joinMeeting()">
+                        <i class="fas fa-sign-in-alt"></i> انضمام
+                    </button>
+                </div>
             </div>
 
-            <!-- محادثة -->
-            <div id="chat-area">
-                <div id="messages"></div>
-                <div class="input-area">
-                    <input type="text" id="message-input" placeholder="اكتب رسالتك..." />
-                    <button onclick="sendMessage()">إرسال</button>
-                    <button onclick="startVideoCall()">🎥 مكالمة فيديو</button>
-                    <button onclick="startVoiceCall()">📞 مكالمة صوتية</button>
-                    <input type="file" id="file-input" />
+            <!-- رابط المكالمة بعد الإنشاء -->
+            <div class="meeting-link-card" id="meetingLinkCard" style="display: none;">
+                <h3><i class="fas fa-check-circle"></i> تم إنشاء الرابط!</h3>
+                
+                <div class="link-info">
+                    <p class="link-label">رابط المضيف:</p>
+                    <div class="link-box">
+                        <input type="text" id="hostLink" readonly>
+                        <button class="btn-copy" onclick="copyLink('hostLink')">
+                            <i class="fas fa-copy"></i> نسخ
+                        </button>
+                    </div>
+                    
+                    <p class="link-label">رابط المشاركين:</p>
+                    <div class="link-box">
+                        <input type="text" id="guestLink" readonly>
+                        <button class="btn-copy" onclick="copyLink('guestLink')">
+                            <i class="fas fa-copy"></i> نسخ
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button class="btn-start" onclick="goToMeeting()">
+                        <i class="fas fa-play"></i> بدء المكالمة الآن
+                    </button>
+                    
+                    <div class="share-buttons">
+                        <button class="btn-share" onclick="shareLink('whatsapp')">
+                            <i class="fab fa-whatsapp"></i> واتساب
+                        </button>
+                        <button class="btn-share" onclick="shareLink('telegram')">
+                            <i class="fab fa-telegram"></i> تيليجرام
+                        </button>
+                        <button class="btn-share" onclick="shareLink('link')">
+                            <i class="fas fa-share-alt"></i> مشاركة
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="meeting-info">
+                    <p><i class="fas fa-users"></i> المشاركون: <span id="participantCount">0</span></p>
+                    <p><i class="fas fa-clock"></i> الإنشاء: <span id="meetingTime">الآن</span></p>
+                </div>
+            </div>
+
+            <!-- مكالمات حديثة -->
+            <div class="recent-meetings">
+                <h3><i class="fas fa-history"></i> مكالمات حديثة</h3>
+                <div id="recentMeetingsList">
+                    <!-- سيتم تعبئتها بالجافاسكريبت -->
                 </div>
             </div>
         </div>
 
-        <!-- مكالمة فيديو -->
-        <div id="call-section" style="display: none;">
-            <video id="local-video" autoplay muted></video>
-            <video id="remote-video" autoplay></video>
-            <button onclick="endCall()">إنهاء المكالمة</button>
+        <!-- ميزات التطبيق -->
+        <div class="features">
+            <div class="feature">
+                <i class="fas fa-shield-alt"></i>
+                <h4>مشفّر</h4>
+                <p>مكالمات آمنة ومشفرة</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-infinity"></i>
+                <h4>لا حدود</h4>
+                <p>مدة مكالمة غير محدودة</p>
+            </div>
+            <div class="feature">
+                <i class="fas fa-user-plus"></i>
+                <h4>مجاني</h4>
+                <p>لا حاجة لتسجيل دخول</p>
+            </div>
         </div>
     </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <!-- الإشعارات -->
+    <div id="notification"></div>
+
     <script src="app.js"></script>
 </body>
 </html>
