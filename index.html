@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تطبيق تواصل</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- تسجيل الدخول -->
+        <div id="login-section" class="section">
+            <h2>تسجيل الدخول</h2>
+            <input type="text" id="username" placeholder="اسم المستخدم" />
+            <button onclick="registerUser()">دخول</button>
+        </div>
+
+        <!-- الدردشة -->
+        <div id="chat-section" class="section" style="display: none;">
+            <h2>الدردشة</h2>
+            
+            <!-- المستخدمون المتصلون -->
+            <div id="online-users">
+                <h3>المستخدمون المتصلون:</h3>
+                <ul id="users-list"></ul>
+            </div>
+
+            <!-- محادثة -->
+            <div id="chat-area">
+                <div id="messages"></div>
+                <div class="input-area">
+                    <input type="text" id="message-input" placeholder="اكتب رسالتك..." />
+                    <button onclick="sendMessage()">إرسال</button>
+                    <button onclick="startVideoCall()">🎥 مكالمة فيديو</button>
+                    <button onclick="startVoiceCall()">📞 مكالمة صوتية</button>
+                    <input type="file" id="file-input" />
+                </div>
+            </div>
+        </div>
+
+        <!-- مكالمة فيديو -->
+        <div id="call-section" style="display: none;">
+            <video id="local-video" autoplay muted></video>
+            <video id="remote-video" autoplay></video>
+            <button onclick="endCall()">إنهاء المكالمة</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,589 @@
+/* تنسيق عام */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #128C7E 0%, #075E54 100%);
+    color: #333;
+    min-height: 100vh;
+    direction: rtl;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* الأقسام */
+.section {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 500px;
+    margin: 20px 0;
+    transition: all 0.3s ease;
+}
+
+.section h2 {
+    color: #075E54;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 28px;
+    font-weight: 600;
+}
+
+/* حقول الإدخال */
+input[type="text"],
+input[type="password"],
+input[type="file"] {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+    text-align: right;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #128C7E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(18, 140, 126, 0.1);
+}
+
+/* الأزرار */
+button {
+    background: #25D366;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    margin: 10px 5px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+button:hover {
+    background: #128C7E;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(18, 140, 126, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+/* قسم المستخدمين المتصلين */
+#online-users {
+    background: #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+#online-users h3 {
+    color: #075E54;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+#users-list {
+    list-style: none;
+}
+
+#users-list li {
+    background: white;
+    padding: 12px 20px;
+    margin: 8px 0;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+#users-list li .status {
+    width: 10px;
+    height: 10px;
+    background: #25D366;
+    border-radius: 50%;
+    display: inline-block;
+    margin-left: 10px;
+}
+
+/* منطقة الدردشة */
+#chat-area {
+    display: flex;
+    flex-direction: column;
+    height: 500px;
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    border: 2px solid #ddd;
+}
+
+#messages {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: #e5ddd5;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path fill="%23d1d7db" opacity="0.3" d="M0,0 L100,0 L100,100 L0,100 Z M20,20 L80,20 L80,80 L20,80 Z"/></svg>');
+    background-size: 50px;
+}
+
+/* الرسائل */
+.message {
+    max-width: 70%;
+    margin: 10px 0;
+    padding: 12px 18px;
+    border-radius: 18px;
+    position: relative;
+    word-wrap: break-word;
+    line-height: 1.5;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #075E54;
+    font-size: 14px;
+}
+
+/* رسائل المرسل (أنت) */
+.message:has(strong:contains('أنت')) {
+    background: #dcf8c6;
+    margin-left: auto;
+    margin-right: 0;
+    border-bottom-right-radius: 4px;
+}
+
+/* رسائل المستقبل */
+.message:not(:has(strong:contains('أنت'))) {
+    background: white;
+    margin-right: auto;
+    margin-left: 0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* منطقة الإدخال */
+.input-area {
+    background: #f0f0f0;
+    padding: 15px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    border-top: 1px solid #ddd;
+}
+
+#message-input {
+    flex: 1;
+    margin: 0;
+}
+
+.input-area button {
+    padding: 12px 20px;
+    margin: 0;
+    white-space: nowrap;
+}
+
+#file-input {
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* قسم المكالمات */
+#call-section {
+    background: rgba(0, 0, 0, 0.9);
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#call-section video {
+    width: 100%;
+    max-width: 800px;
+    height: auto;
+    border-radius: 15px;
+    margin: 10px 0;
+    background: black;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+#local-video {
+    width: 200px;
+    height: 150px;
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    border: 3px solid #25D366;
+    z-index: 1001;
+}
+
+#call-section button {
+    background: #ff3b30;
+    margin-top: 20px;
+    padding: 15px 40px;
+    font-size: 18px;
+}
+
+#call-section button:hover {
+    background: #ff1c00;
+}
+
+/* إشعارات */
+.notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #25D366;
+    color: white;
+    padding: 15px 30px;
+    border-radius: 10px;
+    z-index: 9999;
+    animation: slideDown 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes slideDown {
+    from { top: -100px; opacity: 0; }
+    to { top: 20px; opacity: 1; }
+}
+
+/* شريط التمرير */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #128C7E;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #075E54;
+}
+
+/* تصميم متجاوب */
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+    
+    .section {
+        padding: 20px;
+        margin: 10px 0;
+    }
+    
+    #chat-area {
+        height: 400px;
+    }
+    
+    .input-area {
+        flex-wrap: wrap;
+    }
+    
+    .input-area button {
+        flex: 1;
+        min-width: 120px;
+    }
+    
+    #local-video {
+        width: 120px;
+        height: 90px;
+        bottom: 10px;
+        left: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .section {
+        padding: 15px;
+    }
+    
+    #chat-area {
+        height: 350px;
+    }
+    
+    .message {
+        max-width: 85%;
+    }
+    
+    button {
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+}
+
+/* رسوميات إضافية */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #25D366;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* ألوان خاصة للأزرار */
+.button-primary {
+    background: #128C7E;
+}
+
+.button-secondary {
+    background: #34B7F1;
+}
+
+.button-danger {
+    background: #ff3b30;
+}
+
+.button-warning {
+    background: #ff9500;
+}
+
+/* تأثيرات hover للأزرار الخاصة */
+.button-primary:hover { background: #075E54; }
+.button-secondary:hover { background: #0a7ea6; }
+.button-danger:hover { background: #d70000; }
+.button-warning:hover { background: #e68600; }
+
+/* علامات الوقت */
+.timestamp {
+    font-size: 11px;
+    color: #666;
+    margin-top: 5px;
+    display: block;
+    text-align: left;
+}
+
+/* حالة القراءة */
+.read-status {
+    font-size: 12px;
+    color: #25D366;
+    margin-right: 5px;
+}
+
+/* رأس المحادثة */
+.chat-header {
+    background: #075E54;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 15px 15px 0 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.chat-header img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+/* أزرار الوسائط */
+.media-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.media-btn {
+    padding: 10px 15px;
+    background: #f0f0f0;
+    color: #333;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.media-btn:hover {
+    background: #ddd;
+}
+
+/* رسائل النظام */
+.system-message {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    margin: 15px 0;
+    font-style: italic;
+}
+
+/* مكونات البحث */
+.search-box {
+    position: relative;
+    margin: 15px 0;
+}
+
+.search-box input {
+    padding-right: 40px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #128C7E;
+    font-size: 18px;
+}
+
+/* رسائل البادئات */
+.message-prefix {
+    font-weight: bold;
+    color: #075E54;
+    margin-left: 5px;
+}
+
+/* تواجد المجموعات */
+.group-info {
+    background: #e8f4f9;
+    border: 1px solid #34B7F1;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+}
+
+.group-info h4 {
+    color: #075E54;
+    margin-bottom: 5px;
+}
+
+/* رسائل الصور والملفات */
+.media-message {
+    max-width: 300px;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+.media-message img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.media-info {
+    padding: 10px;
+    background: #f9f9f9;
+}
+
+.media-name {
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.media-size {
+    font-size: 12px;
+    color: #666;
+}
+
+/* مؤشر الكتابة */
+.typing-indicator {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 10px;
+    background: #f0f0f0;
+    border-radius: 10px;
+    margin: 5px 0;
+}
+
+.typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #128C7E;
+    border-radius: 50%;
+    animation: typing 1.4s infinite;
+}
+
+.typing-dot:nth-child(1) { animation-delay: -0.32s; }
+.typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes typing {
+    0%, 60%, 100% { transform: translateY(0); }
+    30% { transform: translateY(-10px); }
+}
+
+/* نمط رسائل الأخطاء */
+.error-message {
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ffcdd2;
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px 0;
+    text-align: center;
+}
+
+/* أزرار التنقل */
+.nav-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.nav-btn {
+    background: transparent;
+    color: #075E54;
+    border: 2px solid #075E54;
+}
+
+.nav-btn:hover {
+    background: #075E54;
+    color: white;
+}
