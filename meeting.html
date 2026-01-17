@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>مكالمة فيديو</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="meeting.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="meeting-container">
+        <!-- رأس المكالمة -->
+        <header class="meeting-header">
+            <div class="meeting-info">
+                <h2 id="meetingId">جاري التحميل...</h2>
+                <div class="participants-count">
+                    <i class="fas fa-users"></i>
+                    <span id="participantCount">1</span> مشارك
+                </div>
+            </div>
+            <div class="meeting-controls">
+                <button class="control-btn" onclick="toggleMic()">
+                    <i class="fas fa-microphone"></i>
+                </button>
+                <button class="control-btn" onclick="toggleCamera()">
+                    <i class="fas fa-video"></i>
+                </button>
+                <button class="control-btn end-call" onclick="leaveMeeting()">
+                    <i class="fas fa-phone-slash"></i> إنهاء
+                </button>
+            </div>
+        </header>
+
+        <!-- منطقة الفيديو -->
+        <div class="video-container">
+            <div class="video-grid" id="videoGrid">
+                <!-- سيتم إضافة مقاطع الفيديو هنا ديناميكياً -->
+            </div>
+            <div class="local-video-container">
+                <video id="localVideo" autoplay muted></video>
+                <div class="video-label">أنت</div>
+            </div>
+        </div>
+
+        <!-- الدردشة -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3><i class="fas fa-comments"></i> الدردشة</h3>
+            </div>
+            <div class="chat-messages" id="chatMessages"></div>
+            <div class="chat-input">
+                <input type="text" id="chatInput" placeholder="اكتب رسالة...">
+                <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+            </div>
+        </div>
+
+        <!-- معلومات إضافية -->
+        <div class="meeting-sidebar">
+            <div class="participants-list">
+                <h4><i class="fas fa-user-friends"></i> المشاركون</h4>
+                <ul id="participantsList"></ul>
+            </div>
+            <div class="meeting-actions">
+                <button onclick="copyMeetingLink()">
+                    <i class="fas fa-link"></i> نسخ الرابط
+                </button>
+                <button onclick="toggleScreenShare()">
+                    <i class="fas fa-desktop"></i> مشاركة الشاشة
+                </button>
+                <button onclick="toggleRecording()">
+                    <i class="fas fa-circle"></i> تسجيل
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة الترحيب -->
+    <div class="welcome-modal" id="welcomeModal">
+        <div class="modal-content">
+            <h2><i class="fas fa-video"></i> مرحباً بك في المكالمة</h2>
+            <div class="meeting-details">
+                <p><strong>معرف المكالمة:</strong> <span id="displayMeetingId"></span></p>
+                <p><strong>اسمك:</strong> <span id="displayUserName"></span></p>
+            </div>
+            <div class="device-check">
+                <p><i class="fas fa-microphone"></i> الميكروفون: <span id="micStatus">جاري الفحص...</span></p>
+                <p><i class="fas fa-video"></i> الكاميرا: <span id="cameraStatus">جاري الفحص...</span></p>
+            </div>
+            <div class="modal-actions">
+                <button class="btn-join" onclick="joinMeeting()">
+                    <i class="fas fa-sign-in-alt"></i> الانضمام للمكالمة
+                </button>
+                <button class="btn-cancel" onclick="leaveMeeting()">
+                    <i class="fas fa-times"></i> إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="peer-handler.js"></script>
+    <script src="meeting.js"></script>
+</body>
+</html>
